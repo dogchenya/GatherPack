@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 cd /work
-deb=${1:-/var/cache/easy-pack/target/release/bundle/deb/GatherPack_0.1.0-alpha.4_amd64.deb}
+version=$(node -p 'require("./package.json").version')
+deb=${1:-/var/cache/easy-pack/target/release/bundle/deb/GatherPack_${version}_amd64.deb}
 export GATHERPACK_TEST_PACKAGE_SHA256=$(sha256sum "$deb" | cut -d ' ' -f 1)
 package=$(dpkg-deb -f "$deb" Package)
 test "$package" = gather-pack

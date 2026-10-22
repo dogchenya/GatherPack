@@ -2,9 +2,10 @@
 set -euo pipefail
 cd /work
 bash scripts/validation-check-scripts-linux.sh
-deb=/var/cache/easy-pack/target/release/bundle/deb/GatherPack_0.1.0-alpha.4_amd64.deb
-image=/var/cache/easy-pack/target/release/bundle/appimage/GatherPack_0.1.0-alpha.4_amd64.AppImage
-source_archive=artifacts/x86_64-unknown-linux-gnu/gatherpack-0.1.0-alpha.4-x86_64-unknown-linux-gnu-corresponding-source.tar
+version=$(node -p 'require("./package.json").version')
+deb=/var/cache/easy-pack/target/release/bundle/deb/GatherPack_${version}_amd64.deb
+image=/var/cache/easy-pack/target/release/bundle/appimage/GatherPack_${version}_amd64.AppImage
+source_archive=artifacts/x86_64-unknown-linux-gnu/gatherpack-${version}-x86_64-unknown-linux-gnu-corresponding-source.tar
 if [ "$#" -gt 0 ]; then
   directory=$(realpath "$1")
   shopt -s nullglob

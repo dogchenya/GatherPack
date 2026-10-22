@@ -8,9 +8,14 @@ import json
 import os
 import gi
 
-gi.require_version("Nautilus", "4.0")
-gi.require_version("Gtk", "4.0")
-gi.require_version("GdkX11", "4.0")
+try:
+    gi.require_version("Nautilus", "4.0")
+    GTK_VERSION = "4.0"
+except ValueError:
+    gi.require_version("Nautilus", "3.0")
+    GTK_VERSION = "3.0"
+gi.require_version("Gtk", GTK_VERSION)
+gi.require_version("GdkX11", GTK_VERSION)
 from gi.repository import Gio, GLib, GObject, Gtk, GdkX11, Nautilus
 
 BUS_NAME = "io.github.dogchenya.gatherpack.NautilusSelection"
@@ -37,9 +42,10 @@ def file_for_item(item):
 def read_window_selection(window, expected_window):
     if window is None or not window.is_active():
         raise RuntimeError("Nautilus 不是前台活动窗口")
-    surface = window.get_surface()
+    surface = window.get_surface() if GTK_VERSION == "4.0" else window.get_window()
     # X11 baseline: compare the actual active surface, including multiple windows/tabs.
-    if surface is None or not isinstance(surface, GdkX11.X11Surface):
+    surface_type = GdkX11.X11Surface if GTK_VERSION == "4.0" else GdkX11.X11Window
+    if surface is None or not isinstance(surface, surface_type):
         raise RuntimeError("当前桥接需要 Nautilus X11 会话")
     if surface.get_xid() != expected_window:
         raise RuntimeError("前台窗口已经变化，未读取后台选择")
@@ -48,6 +54,12 @@ def read_window_selection(window, expected_window):
     while pending:
         widget = pending.pop()
         if not widget.get_mapped():
+            continue
+        if GTK_VERSION == "3.0":
+            if widget.__gtype__.name in ("NautilusCanvasView", "NautilusListView"):
+                selections.append(read_gtk3_selection(widget))
+            if isinstance(widget, Gtk.Container):
+                pending.extend(widget.get_children())
             continue
         if isinstance(widget, (Gtk.GridView, Gtk.ColumnView, Gtk.ListView)):
             model = widget.get_model()
@@ -72,6 +84,63 @@ def read_window_selection(window, expected_window):
     if not selections[0]:
         raise RuntimeError("请先选中文件或文件夹")
     return list(dict.fromkeys(selections[0]))
+
+
+def read_gtk3_selection(view):
+    """Read Nautilus 42's live GObject selection property, not menu callbacks.
+
+    That property returns an owned GList of FileInfo objects. Its gpointer type
+    is not introspectable in Python; use public GObject/GLib/FileInfo C APIs to
+    read and release it. No private structure offsets or cached paths are used.
+    """
+    import ctypes
+
+    prop = view.find_property("selection")
+    if prop is None or prop.value_type.name != "gpointer":
+        raise RuntimeError("当前 Nautilus GTK3 视图不提供实时选择属性")
+    if view.get_property("loading"):
+        raise RuntimeError("文件视图正在加载，请稍后重试")
+    class Node(ctypes.Structure):
+        pass
+    Node._fields_ = [("data", ctypes.c_void_p), ("next", ctypes.POINTER(Node)), ("prev", ctypes.POINTER(Node))]
+    glib = ctypes.CDLL("libglib-2.0.so.0")
+    objects = ctypes.CDLL("libgobject-2.0.so.0")
+    files = ctypes.CDLL("libnautilus-extension.so.1")
+    capsule_pointer = ctypes.pythonapi.PyCapsule_GetPointer
+    capsule_pointer.argtypes = [ctypes.py_object, ctypes.c_char_p]
+    capsule_pointer.restype = ctypes.c_void_p
+    objects.g_object_get.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+    objects.g_object_get.restype = None
+    objects.g_object_unref.argtypes = [ctypes.c_void_p]
+    objects.g_object_unref.restype = None
+    objects.g_type_check_instance_is_a.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+    objects.g_type_check_instance_is_a.restype = ctypes.c_int
+    files.nautilus_file_info_get_type.restype = ctypes.c_size_t
+    files.nautilus_file_info_get_uri.argtypes = [ctypes.c_void_p]
+    files.nautilus_file_info_get_uri.restype = ctypes.c_void_p
+    glib.g_free.argtypes = [ctypes.c_void_p]
+    glib.g_free.restype = None
+    glib.g_list_free_full.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+    glib.g_list_free_full.restype = None
+    head = ctypes.c_void_p()
+    objects.g_object_get(capsule_pointer(view.__gpointer__, None), b"selection", ctypes.byref(head), None)
+    uris = []
+    try:
+        node = ctypes.cast(head, ctypes.POINTER(Node))
+        while node:
+            if len(uris) >= 100000 or not objects.g_type_check_instance_is_a(node.contents.data, files.nautilus_file_info_get_type()):
+                raise RuntimeError("当前文件视图返回了无法识别的选中项")
+            uri = files.nautilus_file_info_get_uri(node.contents.data)
+            try:
+                if not uri:
+                    raise RuntimeError("选中项没有文件 URI")
+                uris.append(ctypes.string_at(uri).decode("utf-8"))
+            finally:
+                glib.g_free(uri)
+            node = node.contents.next
+    finally:
+        glib.g_list_free_full(head, ctypes.cast(objects.g_object_unref, ctypes.c_void_p))
+    return uris
 
 
 class GatherPackSelectionBridge(GObject.GObject, Nautilus.MenuProvider):

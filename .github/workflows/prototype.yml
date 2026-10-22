@@ -48,7 +48,7 @@ jobs:
           - runner: macos-15-intel
             target: x86_64-apple-darwin
             bundles: dmg
-          - runner: ubuntu-24.04
+          - runner: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             bundles: deb,appimage
     runs-on: ${{ matrix.runner }}
@@ -65,9 +65,13 @@ jobs:
       - name: Linux build dependencies
         if: runner.os == 'Linux'
         run: |
-          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+            sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          else
+            sed -n 's/^deb /deb-src /p' /etc/apt/sources.list | sudo tee /etc/apt/sources.list.d/gatherpack-sources.list > /dev/null
+          fi
           sudo apt-get update
-          sudo apt-get install -y curl libcurl4t64 libcurl3t64-gnutls libwebkit2gtk-4.1-dev build-essential libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libfuse2t64 python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4.0 x11-utils xvfb dbus-x11
+          sudo apt-get install -y curl libcurl4 libcurl3-gnutls libwebkit2gtk-4.1-dev build-essential libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libfuse2 python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-3.0 gir1.2-gtk-4.0 x11-utils xvfb dbus-x11
           sudo python3 scripts/refresh-runtime-libraries-linux.py --apply
       - run: pnpm install --frozen-lockfile
       - run: cargo fetch --locked
@@ -84,6 +88,11 @@ jobs:
           bash scripts/download-appimage-runtime-linux.sh
           echo "LDAI_RUNTIME_FILE=$HOME/.cache/tauri/gatherpack-runtime-x86_64" >> "$GITHUB_ENV"
       - run: pnpm tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+      - name: Enforce Ubuntu 22.04 glibc baseline
+        if: runner.os == 'Linux'
+        run: |
+          python3 scripts/check-glibc-linux.py "target/${{ matrix.target }}/release/gatherpack" artifacts/validation/glibc-executable.json
+          python3 scripts/check-glibc-linux.py "target/${{ matrix.target }}/release/bundle/appimage/GatherPack.AppDir" artifacts/validation/glibc-appimage.json
       - name: AppImage system notices and corresponding source
         if: runner.os == 'Linux'
         shell: bash
@@ -115,16 +124,57 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: native-validation-${{ matrix.target }}
-          path: artifacts/validation/**/native-*.json
+          path: |
+            artifacts/validation/**/native-*.json
+            artifacts/validation/glibc-*.json
           if-no-files-found: warn
       - uses: ./.github/actions/upload-installers
         with:
           target: ${{ matrix.target }}
           directory: artifacts/${{ matrix.target }}
 
+  linux-package-compatibility:
+    needs: installers
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: gatherpack-linux-x64-deb
+          path: artifacts/deb
+      - name: Install and run the delivered Debian package
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb dbus-x11 xauth ./artifacts/deb/*.deb
+          python3 scripts/check-glibc-linux.py /usr/bin/gatherpack artifacts/validation/glibc-installed.json
+          ldd /usr/bin/gatherpack > artifacts/validation/ldd-installed.txt
+          ! grep -q 'not found' artifacts/validation/ldd-installed.txt
+          xvfb-run -a dbus-run-session -- node scripts/test-native.mjs /usr/bin/gatherpack
+          xvfb-run -a dbus-run-session -- node scripts/test-profile-migration.mjs /usr/bin/gatherpack
+          sudo apt-get remove -y gather-pack
+          test ! -e /usr/bin/gatherpack
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ubuntu-package-validation-${{ matrix.os }}
+          path: |
+            artifacts/validation/glibc-installed.json
+            artifacts/validation/ldd-installed.txt
+            artifacts/validation/**/native-*.json
+            artifacts/validation/profile-migration-report.json
+          if-no-files-found: error
+
   draft-release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: installers
+    needs: [installers, linux-package-compatibility]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

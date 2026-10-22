@@ -18,9 +18,9 @@ Windows NSIS 下载工具随附的完整 COPYING 已原样保存在 installer-no
 
 NSIS 原始分发与源码可从[官方项目下载页](https://nsis.sourceforge.io/Download)获取；本机使用版本为 3.13。
 
-Linux .deb 使用系统 WebKitGTK/GTK 等依赖。AppImage 会实际捆绑这些库，因此另行核对：当前候选记录 126 个二进制/开发包的原始 copyright 与完整通用条款，未解析项为零。对应 98 个确切源码包版本的 .dsc、原始压缩包和 Ubuntu 补丁一并保存于对应源码归档；包内 manifest.json 记录版本、来源与声明摘要。部署仅移动库并可能改写 ELF 搜索路径，不修改系统库源码。
+Linux .deb 使用系统 WebKitGTK/GTK 等依赖。AppImage 会实际捆绑这些库，因此另行核对：逐次构建记录实际二进制/开发包的原始 copyright 与完整通用条款，未解析项必须为零。对应确切源码包版本的 .dsc、原始压缩包和 Ubuntu 补丁一并保存于对应源码归档；包内 manifest.json 记录版本、来源与声明摘要。部署仅移动库并可能改写 ELF 搜索路径，不修改系统库源码。
 
-AppImage 运行时 fedfad5 的原始 MIT LICENSE、libfuse LGPL、squashfuse、musl、zstd 与 zlib 声明另存于包内 usr/share/doc/easy-pack/appimage-runtime/。对应源码归档包括运行时原始源码/构建脚本、上游固定的 libfuse 3.15.0 源码及补丁、squashfuse 0.5.2 源码；下载校验与上游构建脚本一致。分发 AppImage 时需同时提供 corresponding-source.tar，不将这些第三方库改为 MIT。此部分独立于 Cargo/npm 的 531 项审计。
+AppImage 运行时 fedfad5 的原始 MIT LICENSE、libfuse LGPL、squashfuse、musl、zstd 与 zlib 声明另存于包内 usr/share/doc/gatherpack/appimage-runtime/。对应源码归档包括运行时原始源码/构建脚本、上游固定的 libfuse 3.15.0 源码及补丁、squashfuse 0.5.2 源码；下载校验与上游构建脚本一致。分发 AppImage 时需同时提供 corresponding-source.tar，不将这些第三方库改为 MIT。此部分独立于 Cargo/npm 的 531 项审计。
 
 该目录还保留 AppRun 上游源文件中的原始 MIT 版权与完整许可、linuxdeploy 及 GTK 部署钩子的原始 MIT 声明。AppRun 可执行文件来自 Tauri 的 apprun-old 镜像；提供上游源文件作为许可/来源参考，未声称当前 HEAD 是该镜像的确切构建提交。包装脚本与 GTK 钩子的实际源码随 AppImage 保留；AppRun.wrapped 动态依赖系统 libc，不把系统 libc 静态嵌入该包装器。
 
@@ -31,3 +31,5 @@ node scripts/license-notices.mjs
 ```
 
 可通过 CARGO 环境变量指定 cargo 可执行文件。生成器对无法确定适用完整条款的条目返回非零退出码；CI 将执行此检查。修改依赖后重新生成，不通过删除条目或替换为推测版权主体来消除问题。
+
+构建所用 musl 原始版权文本已原样保存在 installer-notices/musl-COPYRIGHT，来源为官方 https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT；SHA256 为 `b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b`。构建验证哈希后复制至运行时声明，避免因上游站点连接超时丢失授权文本。升级运行时时需重新核对适用声明。

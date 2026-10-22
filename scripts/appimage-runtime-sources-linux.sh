@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+repository_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 directory=${1:-/var/cache/easy-pack/corresponding-source/appimage-runtime}
 mkdir -p "$directory"
 cd "$directory"
@@ -17,7 +18,8 @@ mkdir -p notices
 cp type2-runtime-fedfad5/LICENSE notices/type2-runtime-LICENSE
 cp fuse-3.15.0/LGPL2.txt notices/libfuse-LGPL2.txt
 cp squashfuse-0.5.2/LICENSE notices/squashfuse-LICENSE
-fetch https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT notices/musl-COPYRIGHT
+cp "$repository_root/docs/installer-notices/musl-COPYRIGHT" notices/musl-COPYRIGHT
+echo 'b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b  notices/musl-COPYRIGHT' | sha256sum -c -
 fetch https://raw.githubusercontent.com/facebook/zstd/dev/LICENSE notices/zstd-LICENSE
 fetch https://raw.githubusercontent.com/madler/zlib/master/LICENSE notices/zlib-LICENSE
 fetch https://raw.githubusercontent.com/AppImage/AppImageKit/master/src/AppRun.c notices/AppRun-upstream-source.c

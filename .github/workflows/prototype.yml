@@ -1,0 +1,136 @@
+name: Checks and desktop installers
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@1.98.1
+        with:
+          components: rustfmt
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: node scripts/test-ui.mjs
+      - run: cargo fmt --all --check
+      - run: cargo test --locked -p easy-pack-collection
+      - name: ZIP64 large file roundtrip
+        run: cargo test --locked --release -p easy-pack-collection zip64_large_file_roundtrip -- --ignored
+
+  installers:
+    if: github.event_name != 'pull_request'
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: x86_64-pc-windows-msvc
+            bundles: nsis
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            bundles: dmg
+          - runner: macos-15
+            target: x86_64-apple-darwin
+            bundles: dmg
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            bundles: deb,appimage
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@1.98.1
+        with:
+          targets: ${{ matrix.target }}
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libfuse2t64 python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4.0 x11-utils xvfb dbus-x11
+      - run: pnpm install --frozen-lockfile
+      - run: cargo fetch --locked
+      - run: node scripts/license-notices.mjs
+      - name: Record actual host and requested target
+        shell: bash
+        run: |
+          rustc -vV
+          echo "requested-target=${{ matrix.target }}"
+      - name: Pin verified AppImage runtime
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          bash scripts/download-appimage-runtime-linux.sh
+          echo "LDAI_RUNTIME_FILE=$HOME/.cache/tauri/easy-pack-runtime-x86_64" >> "$GITHUB_ENV"
+      - run: pnpm tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+      - name: AppImage system notices and corresponding source
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          sudo apt-get update
+          version=$(node -p 'require("./package.json").version')
+          bash scripts/finalize-appimage-linux.sh "target/${{ matrix.target }}/release/bundle" "artifacts/${{ matrix.target }}/easy_pack-$version-${{ matrix.target }}-corresponding-source.tar"
+      - name: Real native IPC and restart validation on native host
+        shell: bash
+        env:
+          REQUESTED_TARGET: ${{ matrix.target }}
+        run: |
+          host=$(rustc -vV | sed -n 's/^host: //p')
+          if [ "$host" != "$REQUESTED_TARGET" ]; then
+            echo "Cross-built target: execution requires its matching target machine."
+          elif [ "$RUNNER_OS" = Linux ]; then
+            xvfb-run -a dbus-run-session -- node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/easy-pack"
+          elif [ "$RUNNER_OS" = Windows ]; then
+            node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/easy-pack.exe"
+          else
+            node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/easy-pack"
+          fi
+      - run: node scripts/collect-artifacts.mjs ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: easy-pack-${{ matrix.target }}
+          path: artifacts/${{ matrix.target }}/
+          if-no-files-found: error
+
+  draft-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: installers
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+      - name: Create draft release only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" --draft --verify-tag --title "easy_pack $RELEASE_TAG" --notes "File collection and archive alpha. Review docs/prototype-validation.md for desktop compatibility and remaining verification."
+          find release-assets -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.deb' -o -name '*.AppImage' -o -name '*-corresponding-source.tar' -o -name '*-provenance.json' \) -print0 | xargs -0 -r gh release upload "$RELEASE_TAG"
+          gh release upload "$RELEASE_TAG" "$(find release-assets -name THIRD_PARTY_NOTICES.md -print -quit)" "$(find release-assets -name LICENSE -print -quit)" "$(find release-assets -name third-party.md -print -quit)" "$(find release-assets -name license-audit.json -print -quit)"
+          find release-assets -name SHA256SUMS.txt -exec cat {} + > SHA256SUMS.txt
+          gh release upload "$RELEASE_TAG" SHA256SUMS.txt
+

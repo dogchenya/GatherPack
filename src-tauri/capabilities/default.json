@@ -1,0 +1,6 @@
+{
+  "identifier": "main",
+  "description": "Local prototype window, events and native drops",
+  "windows": ["main"],
+  "permissions": ["core:default", "core:window:allow-start-dragging"]
+}

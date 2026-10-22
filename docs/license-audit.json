@@ -1,0 +1,286 @@
+{
+  "packages": 531,
+  "missingLicenseText": [],
+  "rustStandardLibrary": {
+    "version": "1.98.1",
+    "file": "Rust-COPYRIGHT-library.html",
+    "sha256": "68129500b616d5838629e68f55ff3aed5e096dacf60ce9eb41bbe599a563afa6",
+    "source": "Original share/doc/rust/COPYRIGHT-library.html from the official Rust 1.98.1 toolchain; includes standard-library and third-party license texts."
+  },
+  "canonicalTermsFallback": [
+    {
+      "package": "alloc-stdlib@0.3.0",
+      "selectedLicense": "BSD-3-Clause",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/BSD-3-Clause.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "block2@0.6.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "dispatch2@0.3.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "dlopen2@0.8.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "dlopen2_derive@0.4.3",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "jni-sys-macros@0.4.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "libappindicator-sys@0.9.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "lzma-rust@0.1.7",
+      "selectedLicense": "Apache-2.0",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "ndk@0.9.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "ndk-context@0.1.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "ndk-sys@0.6.0+11769913",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2@0.6.5",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-app-kit@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 2
+    },
+    {
+      "package": "objc2-cloud-kit@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-core-data@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-core-foundation@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-core-graphics@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-core-image@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-core-location@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-core-text@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 5
+    },
+    {
+      "package": "objc2-encode@4.1.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-exception-helper@0.1.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-foundation@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 2
+    },
+    {
+      "package": "objc2-io-surface@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-quartz-core@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-security@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-service-management@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-ui-kit@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-user-notifications@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "objc2-web-kit@0.3.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "r-efi@5.3.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "r-efi@6.0.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "selectors@0.38.0",
+      "selectedLicense": "MPL-2.0",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MPL-2.0.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "tauri-plugin@2.7.2",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 1
+    },
+    {
+      "package": "webview2-com@0.39.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "webview2-com-macros@0.8.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "webview2-com-sys@0.39.1",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 0
+    },
+    {
+      "package": "winapi-i686-pc-windows-gnu@0.4.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 2
+    },
+    {
+      "package": "winapi-x86_64-pc-windows-gnu@0.4.0",
+      "selectedLicense": "MIT",
+      "termsSource": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "attributionLines": 2
+    }
+  ],
+  "inheritedLicenseFiles": [
+    {
+      "package": "npm: @esbuild/win32-x64@0.28.2",
+      "inheritedFrom": "esbuild@0.28.2"
+    },
+    {
+      "package": "npm: @rollup/rollup-win32-x64-gnu@4.64.12",
+      "inheritedFrom": "rollup@4.64.12"
+    },
+    {
+      "package": "npm: @rollup/rollup-win32-x64-msvc@4.64.12",
+      "inheritedFrom": "rollup@4.64.12"
+    },
+    {
+      "package": "npm: @tauri-apps/cli-win32-x64-msvc@2.12.3",
+      "inheritedFrom": "@tauri-apps/cli@2.12.3"
+    }
+  ],
+  "canonicalTerms": [
+    {
+      "id": "BSD-3-Clause",
+      "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/BSD-3-Clause.txt",
+      "sha256": "8e09f09aab0583c2de83142420181d08a2838cbc9cdf814e3e41b94e720acebc"
+    },
+    {
+      "id": "MIT",
+      "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt",
+      "sha256": "4e8a4240c2d0e8561303d6767778db3636f58d5fa231ccca6004405ba0813f6b"
+    },
+    {
+      "id": "Apache-2.0",
+      "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/Apache-2.0.txt",
+      "sha256": "25b352ea9703362fa47620ebc829bed4d7ec18b9c9d569b959e508c89f737a11"
+    },
+    {
+      "id": "MPL-2.0",
+      "source": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MPL-2.0.txt",
+      "sha256": "f35b870c59c69f29f127265bb7adb7417c6fe0d19a75c2dd8a50fd8447e66536"
+    }
+  ]
+}

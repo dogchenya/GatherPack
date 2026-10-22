@@ -1,0 +1,48 @@
+name: Validate delivered macOS packages
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful installer run containing both macOS artifacts
+        required: true
+      build_commit:
+        description: Full source commit recorded in installer provenance
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  installed-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: easy-pack-${{ matrix.target }}
+          path: artifacts/package
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+      - name: Mount and validate the delivered application
+        env:
+          TARGET: ${{ matrix.target }}
+          BUILD_COMMIT: ${{ inputs.build_commit }}
+        run: bash scripts/validation-install-macos.sh artifacts/package "$TARGET" "$BUILD_COMMIT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macos-package-validation-${{ matrix.target }}
+          path: |
+            artifacts/validation/**/native-*.json
+            artifacts/validation/macos-install-*.json
+          if-no-files-found: warn

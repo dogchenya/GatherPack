@@ -31,6 +31,11 @@ class BridgeDiagnostics(unittest.TestCase):
     def test_absent_package(self):
         self.assertIn("sudo apt install python3-nautilus python3-gi", self.diagnose(1, ""))
 
+    def test_held_package_is_still_installed(self):
+        message = self.diagnose(0, "hold ok installed")
+        self.assertIn("已安装，无需重复安装", message)
+        self.assertNotIn("sudo apt install", message)
+
     def test_removed_package(self):
         self.assertIn("缺少或未完整安装", self.diagnose(0, "deinstall ok config-files"))
 

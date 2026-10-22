@@ -15,7 +15,8 @@ def bridge_unavailable_reason():
             ["/usr/bin/dpkg-query", "-W", "-f=${Status}", "python3-nautilus"],
             capture_output=True, text=True, timeout=2,
         )
-        if package.returncode == 0 and package.stdout.strip() == "install ok installed":
+        status = package.stdout.split()
+        if package.returncode == 0 and len(status) == 3 and status[1:] == ["ok", "installed"]:
             return (
                 "Nautilus 桥接尚未加载，python3-nautilus 已安装，无需重复安装。"
                 "请先等待文件复制、移动等操作结束，再执行 nautilus -q，重新打开“文件”后重试。"

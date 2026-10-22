@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Use official Ubuntu archive mirror
+        run: bash scripts/ci-ubuntu-mirror.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -56,6 +58,9 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+      - name: Use official Ubuntu archive mirror
+        if: runner.os == 'Linux'
+        run: bash scripts/ci-ubuntu-mirror.sh
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -144,6 +149,8 @@ jobs:
         os: [ubuntu-22.04, ubuntu-24.04]
     steps:
       - uses: actions/checkout@v4
+      - name: Use official Ubuntu archive mirror
+        run: bash scripts/ci-ubuntu-mirror.sh
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

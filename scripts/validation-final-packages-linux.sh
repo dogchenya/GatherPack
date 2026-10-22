@@ -22,6 +22,7 @@ fi
 bash scripts/validation-install-linux.sh "$deb"
 cp artifacts/validation/linux-selection.png artifacts/validation/linux-deb-gui.png
 bash scripts/validation-desktop-linux.sh native "$image"
+bash scripts/validation-desktop-linux.sh migration "$image"
 bash scripts/validation-desktop-linux.sh gnome "$image"
 cp artifacts/validation/linux-selection-report.json artifacts/validation/linux-appimage-gui-report.json
 cp artifacts/validation/linux-selection.png artifacts/validation/linux-appimage-gui.png

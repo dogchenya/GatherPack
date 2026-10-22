@@ -101,6 +101,7 @@ jobs:
           elif [ "$RUNNER_OS" = Linux ]; then
             cargo test --locked --release --target "$REQUESTED_TARGET" -p gatherpack
             xvfb-run -a dbus-run-session -- node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/gatherpack"
+            xvfb-run -a dbus-run-session -- node scripts/test-profile-migration.mjs "target/$REQUESTED_TARGET/release/gatherpack"
           elif [ "$RUNNER_OS" = Windows ]; then
             cargo test --locked --release --target "$REQUESTED_TARGET" -p gatherpack
             node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/gatherpack.exe"

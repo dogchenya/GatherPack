@@ -26,7 +26,10 @@ if [ "${1:-selection}" = gnome ]; then
 else
   openbox >/work/artifacts/validation/openbox.log 2>&1 &
 fi
-if [ "${1:-selection}" = native ]; then
+if [ "${1:-selection}" = migration ]; then
+  cd /work
+  node scripts/test-profile-migration.mjs "${2:-/var/cache/easy-pack/target/release/gatherpack}"
+elif [ "${1:-selection}" = native ]; then
   cd /work
   export APPIMAGE_EXTRACT_AND_RUN=1
   node scripts/test-native.mjs "${2:-/var/cache/easy-pack/target/release/gatherpack}"

@@ -85,11 +85,11 @@ Linux 的 .deb 安装上述运行依赖和 Nautilus 桥接；源码运行或 App
 | runner | Rust 目标 | 安装格式 | 构建关系 |
 | --- | --- | --- | --- |
 | windows-2025 | x86_64-pc-windows-msvc | NSIS .exe | 原生 |
-| macos-15 | aarch64-apple-darwin | .dmg | 与实际 runner host 一致时原生，否则跨架构 |
-| macos-15 | x86_64-apple-darwin | .dmg | 与实际 runner host 一致时原生，否则跨架构 |
+| macos-15 | aarch64-apple-darwin | .dmg | ARM64 原生，执行前核对实际 host |
+| macos-15-intel | x86_64-apple-darwin | .dmg | Intel 原生，执行前核对实际 host |
 | ubuntu-24.04 | x86_64-unknown-linux-gnu | .deb / AppImage | 原生 |
 
-macOS 两个 target 使用相同 runner 类型，其中与实际 host 不同的目标为跨架构编译。工作流记录 rustc -vV 和 requested target；不把不同系统分别原生构建称为跨操作系统交叉编译。本期未承诺 Linux ARM64 安装包。
+macOS 两个 target 分别使用 ARM64 和 Intel runner；执行前仍核对 rustc -vV 的实际 host，若不匹配则明确跳过目标程序执行。保留 --target 构建与对应工具链配置，不把不同系统分别原生构建称为跨操作系统交叉编译。本期未承诺 Linux ARM64 安装包。runner 标签依据 [GitHub 官方参考](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)。
 
 Actions 运行页的 Artifacts 可以下载对应目标安装包、SHA256SUMS、源码提交/工具链 provenance 及许可证声明；安装包文件名包含版本、目标系统及 CPU 架构。Release 保持草稿，待目标环境安装与核心流程验收后再发布。
 

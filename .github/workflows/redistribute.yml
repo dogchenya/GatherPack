@@ -1,13 +1,13 @@
-name: Prepare separate installer downloads
-run-name: Prepare downloads from build ${{ inputs.build_run_id }}
+name: Validate Ubuntu packages and prepare downloads
+run-name: Validate Ubuntu packages from build ${{ inputs.build_run_id }}
 on:
   workflow_dispatch:
     inputs:
       build_run_id:
-        description: Successful build run containing the original collected target artifacts
+        description: Installer build containing split Linux downloads
         required: true
       build_commit:
-        description: Full original build commit from provenance
+        description: Full source commit recorded in package provenance
         required: true
 permissions:
   contents: read
@@ -16,7 +16,7 @@ jobs:
   validate-build:
     runs-on: ubuntu-24.04
     steps:
-      - name: Require a successful original build
+      - name: Require successful installer jobs from the requested source
         env:
           GH_TOKEN: ${{ github.token }}
           BUILD_RUN_ID: ${{ inputs.build_run_id }}
@@ -24,18 +24,61 @@ jobs:
         run: |
           [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
           [[ "$BUILD_COMMIT" =~ ^[a-f0-9]{40}$ ]]
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > build-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > build.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID/jobs" > jobs.json
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
-          import { readFile } from 'node:fs/promises';
-          const run = JSON.parse(await readFile('build-run.json', 'utf8'));
-          assert.equal(run.status, 'completed');
-          assert.equal(run.conclusion, 'success');
-          assert.equal(run.head_sha, process.env.BUILD_COMMIT);
-          assert.equal(run.path, '.github/workflows/prototype.yml');
+          import {readFileSync} from 'node:fs';
+          const build = JSON.parse(readFileSync('build.json'));
+          assert.equal(build.head_sha, process.env.BUILD_COMMIT);
+          assert.equal(build.path, '.github/workflows/prototype.yml');
+          const jobs = JSON.parse(readFileSync('jobs.json')).jobs;
+          assert.equal(jobs.find(job => job.name === 'check')?.conclusion, 'success');
+          const installers = jobs.filter(job => job.name.startsWith('installers ('));
+          assert.equal(installers.length, 4);
+          assert.ok(installers.every(job => job.conclusion === 'success'));
           JS
-  downloads:
+  installed-ubuntu:
     needs: validate-build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: gatherpack-linux-x64-deb
+          path: artifacts/deb
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+      - name: Install, run and remove the delivered Debian package
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb dbus-x11 xauth xdotool ./artifacts/deb/*.deb
+          python3 scripts/check-glibc-linux.py /usr/bin/gatherpack artifacts/validation/glibc-installed.json
+          ldd /usr/bin/gatherpack > artifacts/validation/ldd-installed.txt
+          ! grep -q 'not found' artifacts/validation/ldd-installed.txt
+          xvfb-run -a dbus-run-session -- node scripts/test-native.mjs /usr/bin/gatherpack
+          xvfb-run -a dbus-run-session -- node scripts/test-profile-migration.mjs /usr/bin/gatherpack
+          sudo apt-get remove -y gather-pack
+          test ! -e /usr/bin/gatherpack
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ubuntu-package-validation-${{ matrix.os }}
+          path: |
+            artifacts/validation/glibc-installed.json
+            artifacts/validation/ldd-installed.txt
+            artifacts/validation/**/native-*.json
+            artifacts/validation/profile-migration-report.json
+          if-no-files-found: error
+  downloads:
+    needs: installed-ubuntu
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -47,8 +90,17 @@ jobs:
         with:
           node-version: '24'
       - uses: actions/download-artifact@v4
+        if: matrix.target != 'x86_64-unknown-linux-gnu'
         with:
           name: gatherpack-${{ matrix.target }}
+          path: collected/${{ matrix.target }}
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        with:
+          pattern: gatherpack-linux-x64-*
+          merge-multiple: true
           path: collected/${{ matrix.target }}
           run-id: ${{ inputs.build_run_id }}
           github-token: ${{ github.token }}

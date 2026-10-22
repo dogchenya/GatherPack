@@ -1,5 +1,7 @@
 # Ubuntu 22.04 / 24.04 安装包兼容性
 
+当前 alpha.6 保留双系统兼容性；悬浮窗、快捷键与关系图的最终安装包证据见 [桌面交互记录](desktop-interaction.md)。以下保留 alpha.5 的兼容性修复记录。
+
 已验证修复版本：**0.1.0-alpha.5**。[下载最终安装包](https://github.com/dogchenya/GatherPack/actions/runs/39768713022)。
 
 alpha.4 的 Linux 程序由 Ubuntu 24.04 构建，ELF 实际要求 GLIBC 2.39；Ubuntu 22.04 提供 GLIBC 2.35，因此不能在 22.04 运行。这是二进制构建基线问题，不能通过仅修改 Debian 依赖声明修复，也不要求用户升级系统 glibc。

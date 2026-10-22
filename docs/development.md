@@ -57,6 +57,7 @@ cargo check --locked -p gatherpack
 # Windows 默认使用已安装的 Edge；其他平台先安装 Chromium
 pnpm exec playwright install chromium
 pnpm test:ui
+node scripts/test-graph.mjs
 ```
 
 界面测试使用模拟 IPC。生产程序构建后，可通过真实 Rust IPC 验证打包、取消、报告和重启恢复：
@@ -68,6 +69,8 @@ node scripts/test-native.mjs path/to/gatherpack
 ```
 
 真实 IPC 测试生成隔离配置和测试源，不修改普通用户配置。原生对话框、文件管理器和实际快捷键交互另行验证。
+
+文件关系图的模型测试覆盖目录层级、重命名来源、空目录、问题项、大小汇总与只读隔离；界面测试另检查展开、分批显示、缩放、平移与拖动/点击区分。最终 Linux 包在专用隔离 GNOME/X11 会话运行 `scripts/test-linux-selection.py` 和 `scripts/test-shortcut-recovery-linux.py`，不在个人桌面执行这些会操作 Nautilus 的测试；实际范围见 [桌面交互记录](desktop-interaction.md)。普通启动迁移测试依赖 `xdotool`，无头环境使用已安装的 UTF-8 locale（例如 `LC_ALL=C.UTF-8`）。
 
 按需执行大文件测试；该测试会创建并读取超过 4 GiB 的临时文件：
 

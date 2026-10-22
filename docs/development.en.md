@@ -57,6 +57,7 @@ UI integration tests:
 # Windows uses the installed Edge by default; install Chromium on other platforms.
 pnpm exec playwright install chromium
 pnpm test:ui
+node scripts/test-graph.mjs
 ```
 
 UI tests use mocked IPC. Once a production executable has been built, run real Rust IPC checks for packing, cancellation, reports, and restart recovery:
@@ -68,6 +69,8 @@ node scripts/test-native.mjs path/to/gatherpack
 ```
 
 Native IPC tests create isolated profiles and fixtures without modifying the normal user profile. Native dialogs, file manager interaction, and physical shortcut input are validated separately.
+
+Graph model tests cover folder hierarchy, renamed source paths, empty directories, problems, size aggregation, and read-only isolation. UI tests also check expansion, incremental display, zoom, pan, and window drag/click separation. Final Linux packages run `scripts/test-linux-selection.py` and `scripts/test-shortcut-recovery-linux.py` in dedicated isolated GNOME/X11 sessions; these tests operate Nautilus and should not run on a personal desktop. See the [desktop interaction record](desktop-interaction.md) (Chinese) for actual coverage. Ordinary-startup migration tests require `xdotool` and an installed UTF-8 locale, such as `LC_ALL=C.UTF-8` in headless environments.
 
 Run large-file tests as needed. These create and read temporary files larger than 4 GiB:
 

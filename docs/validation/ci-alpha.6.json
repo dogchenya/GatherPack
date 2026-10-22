@@ -1,0 +1,1856 @@
+{
+  "passed": true,
+  "version": "0.1.0-alpha.6",
+  "commit": "1734a2a5082ee046a09fd7ee21dd3b8365d28d87",
+  "results": [
+    {
+      "target": "aarch64-apple-darwin",
+      "run": "39785533012",
+      "nativeAssertions": 27,
+      "artifacts": [
+        {
+          "name": "gatherpack-0.1.0-alpha.6-aarch64-apple-darwin-GatherPack_0.1.0-alpha.6_aarch64.dmg",
+          "sha256": "48acac8f4b0c2037ae853855c9f7400519be00c586dcedd700b7f916dd719edc"
+        }
+      ]
+    },
+    {
+      "target": "x86_64-apple-darwin",
+      "run": "39785533012",
+      "nativeAssertions": 27,
+      "artifacts": [
+        {
+          "name": "gatherpack-0.1.0-alpha.6-x86_64-apple-darwin-GatherPack_0.1.0-alpha.6_x64.dmg",
+          "sha256": "f3ba742bd1a6cd9abaf4559c1fbf1005f126b5c84505a51a4bf9558ec8d5a7c8"
+        }
+      ]
+    },
+    {
+      "target": "x86_64-pc-windows-msvc",
+      "run": "39785533012",
+      "nativeAssertions": 27,
+      "artifacts": [
+        {
+          "name": "gatherpack-0.1.0-alpha.6-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.6_x64-setup.exe",
+          "sha256": "5c6a696f3a4b6055b3a9b2a148e1f662c397e9ca71241b635661134449d544aa"
+        }
+      ]
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "run": "39785533012",
+      "nativeAssertions": 27,
+      "artifacts": [
+        {
+          "name": "gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.6_amd64.AppImage",
+          "sha256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d"
+        },
+        {
+          "name": "gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-corresponding-source.tar",
+          "sha256": "693e7591bc4e941aeee3c1cce0f00b7697eb0a6382ccc9804257fd177f589903"
+        },
+        {
+          "name": "gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.6_amd64.deb",
+          "sha256": "cc4b1c631b1534ccb9b4f89ab70794758e9f5de38d1513a1f23edd746771d986"
+        }
+      ]
+    }
+  ],
+  "supportedUbuntuVersions": [
+    "22.04",
+    "24.04"
+  ],
+  "glibcLimit": "2.35",
+  "appImageELFFilesChecked": 179,
+  "ubuntuRuntimeChecks": [
+    {
+      "ubuntu": "22.04",
+      "installedExecutableSHA256": "77bb9e2f920074f0012e3979fb7e339a7b04289a462b338212c672b1805ac053",
+      "glibc": {
+        "passed": true,
+        "maximumAllowedGLIBC": "2.35",
+        "checkedELFFiles": 1,
+        "files": [
+          {
+            "file": "gatherpack",
+            "requiredGLIBC": "2.34"
+          }
+        ],
+        "failures": []
+      },
+      "nativeAssertions": 27,
+      "installedStartupMigration": {
+        "passed": true,
+        "executableSHA256": "77bb9e2f920074f0012e3979fb7e339a7b04289a462b338212c672b1805ac053",
+        "checks": [
+          "Ordinary startup imports legacy collection, settings and reports through the real Tauri data path",
+          "Ordinary restart preserves existing new state and report records",
+          "Legacy records and source bytes remain unchanged"
+        ]
+      },
+      "desktop": {
+        "deb": {
+          "passed": true,
+          "executable": "/usr/bin/gatherpack",
+          "executableSHA256": "77bb9e2f920074f0012e3979fb7e339a7b04289a462b338212c672b1805ac053",
+          "packageSHA256": "cc4b1c631b1534ccb9b4f89ab70794758e9f5de38d1513a1f23edd746771d986",
+          "checks": [
+            {
+              "name": "Nautilus live selection bridge returns successfully",
+              "passed": true
+            },
+            {
+              "name": "mixed file/folder selection is read directly",
+              "passed": true
+            },
+            {
+              "name": "foreground second window excludes background selection",
+              "passed": true
+            },
+            {
+              "name": "new current tab reads its own selection",
+              "passed": true
+            },
+            {
+              "name": "switching tabs does not reuse the prior tab selection",
+              "passed": true
+            },
+            {
+              "name": "empty current selection does not reuse previous paths",
+              "passed": true
+            },
+            {
+              "name": "selection query preserves foreground focus",
+              "passed": true
+            },
+            {
+              "name": "global shortcut test starts with a fresh isolated profile",
+              "passed": true
+            },
+            {
+              "name": "real global hotkey appends Nautilus mixed selection through Rust",
+              "passed": true
+            },
+            {
+              "name": "real collection hotkey does not steal focus",
+              "passed": true
+            },
+            {
+              "name": "collection preserves unrelated clipboard contents",
+              "passed": true
+            },
+            {
+              "name": "real hotkey appends a second source directory",
+              "passed": true
+            },
+            {
+              "name": "empty hotkey capture leaves the collection unchanged",
+              "passed": true
+            },
+            {
+              "name": "native Nautilus file drag is received by the Tauri window",
+              "passed": true
+            },
+            {
+              "name": "native drag preserves source bytes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add files opens a native file picker",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native picker selection reaches the persistent collection",
+              "passed": true
+            },
+            {
+              "name": "native picker does not modify its source",
+              "passed": true
+            },
+            {
+              "name": "floating window returns to always-on-top after picker closes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件夹 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add folder opens its native folder chooser",
+              "passed": true
+            },
+            {
+              "name": "folder chooser exposes its visible filesystem Home location",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native folder chooser adds the whole folder",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件：.hidden button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 放大关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 适应画布 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "file graph exploration preserves the collection and pack settings",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收集清单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 检查并打包 → button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 选择保存位置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "pack confirmation opens a native save dialog",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 开始打包 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "complete native UI flow delivers the selected ZIP output",
+              "passed": true
+            },
+            {
+              "name": "UI-created ZIP restores all selected content, hidden files and empty folder",
+              "passed": true
+            },
+            {
+              "name": "native UI result report matches the seven archived files",
+              "passed": true
+            },
+            {
+              "name": "native UI packing retains the six public collection entries",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=True",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=True",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=False",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=False",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 重新注册 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "re-register button restores actual foreground collection hotkey",
+              "passed": true
+            },
+            {
+              "name": "expanded panel moves from its broad sticky header",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收起面板 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "collapse returns to the compact floating window",
+              "passed": true
+            },
+            {
+              "name": "the app drag handle moves its real native window",
+              "passed": true
+            },
+            {
+              "name": "dragging the whole compact icon moves the native window",
+              "passed": true
+            },
+            {
+              "name": "dragging compact icon does not expand panel",
+              "passed": true
+            },
+            {
+              "name": "clicking the compact icon reopens the collection panel",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 应用菜单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 退出 GatherPack button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "application menu exits normally after packing",
+              "passed": true
+            }
+          ]
+        },
+        "appimage": {
+          "passed": true,
+          "executable": "/work/artifacts/ci-gatherpack-39785533012/gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.6_amd64.AppImage",
+          "executableSHA256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d",
+          "packageSHA256": null,
+          "checks": [
+            {
+              "name": "Nautilus live selection bridge returns successfully",
+              "passed": true
+            },
+            {
+              "name": "mixed file/folder selection is read directly",
+              "passed": true
+            },
+            {
+              "name": "foreground second window excludes background selection",
+              "passed": true
+            },
+            {
+              "name": "new current tab reads its own selection",
+              "passed": true
+            },
+            {
+              "name": "switching tabs does not reuse the prior tab selection",
+              "passed": true
+            },
+            {
+              "name": "empty current selection does not reuse previous paths",
+              "passed": true
+            },
+            {
+              "name": "selection query preserves foreground focus",
+              "passed": true
+            },
+            {
+              "name": "global shortcut test starts with a fresh isolated profile",
+              "passed": true
+            },
+            {
+              "name": "real global hotkey appends Nautilus mixed selection through Rust",
+              "passed": true
+            },
+            {
+              "name": "real collection hotkey does not steal focus",
+              "passed": true
+            },
+            {
+              "name": "collection preserves unrelated clipboard contents",
+              "passed": true
+            },
+            {
+              "name": "real hotkey appends a second source directory",
+              "passed": true
+            },
+            {
+              "name": "empty hotkey capture leaves the collection unchanged",
+              "passed": true
+            },
+            {
+              "name": "native Nautilus file drag is received by the Tauri window",
+              "passed": true
+            },
+            {
+              "name": "native drag preserves source bytes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add files opens a native file picker",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native picker selection reaches the persistent collection",
+              "passed": true
+            },
+            {
+              "name": "native picker does not modify its source",
+              "passed": true
+            },
+            {
+              "name": "floating window returns to always-on-top after picker closes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件夹 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add folder opens its native folder chooser",
+              "passed": true
+            },
+            {
+              "name": "folder chooser exposes its visible filesystem Home location",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native folder chooser adds the whole folder",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件：.hidden button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 放大关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 适应画布 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "file graph exploration preserves the collection and pack settings",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收集清单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 检查并打包 → button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 选择保存位置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "pack confirmation opens a native save dialog",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 开始打包 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "complete native UI flow delivers the selected ZIP output",
+              "passed": true
+            },
+            {
+              "name": "UI-created ZIP restores all selected content, hidden files and empty folder",
+              "passed": true
+            },
+            {
+              "name": "native UI result report matches the seven archived files",
+              "passed": true
+            },
+            {
+              "name": "native UI packing retains the six public collection entries",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=True",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=True",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=False",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=False",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 重新注册 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "re-register button restores actual foreground collection hotkey",
+              "passed": true
+            },
+            {
+              "name": "expanded panel moves from its broad sticky header",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收起面板 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "collapse returns to the compact floating window",
+              "passed": true
+            },
+            {
+              "name": "the app drag handle moves its real native window",
+              "passed": true
+            },
+            {
+              "name": "dragging the whole compact icon moves the native window",
+              "passed": true
+            },
+            {
+              "name": "dragging compact icon does not expand panel",
+              "passed": true
+            },
+            {
+              "name": "clicking the compact icon reopens the collection panel",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 应用菜单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 退出 GatherPack button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "application menu exits normally after packing",
+              "passed": true
+            }
+          ]
+        }
+      },
+      "appImageStartupMigration": {
+        "passed": true,
+        "executableSHA256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d",
+        "checks": [
+          "Ordinary startup imports legacy collection, settings and reports through the real Tauri data path",
+          "Ordinary restart preserves existing new state and report records",
+          "Legacy records and source bytes remain unchanged"
+        ]
+      },
+      "shortcutRecovery": {
+        "passed": true,
+        "executableSHA256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d",
+        "checks": [
+          {
+            "name": "fresh Nautilus starts before the user bridge exists",
+            "passed": true
+          },
+          {
+            "name": "first installation explains that the running Nautilus must load its new bridge",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "unloaded bridge cannot collect stale or unrelated paths",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "actual hotkey recovers after the new bridge loads without restarting the app",
+            "passed": true
+          },
+          {
+            "name": "Recovery UI exposes one 设置 button",
+            "passed": true
+          },
+          {
+            "name": "shortcut conflict with another running instance is visible",
+            "passed": true
+          },
+          {
+            "name": "Recovery UI exposes one 保存设置 button",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "saving the unchanged shortcut restores real collection after conflict removal",
+            "passed": true
+          },
+          {
+            "name": "Recovery UI exposes one 重新注册 button",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "explicit re-registration preserves actual foreground collection",
+            "passed": true
+          },
+          {
+            "name": "Caps Lock is actually enabled during the shortcut test",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "real collection shortcut works with Caps Lock enabled",
+            "passed": true
+          },
+          {
+            "name": "recovery preserves original source bytes",
+            "passed": true
+          }
+        ]
+      },
+      "correspondingSource": {
+        "passed": true,
+        "archive": "/work/artifacts/ci-gatherpack-39785533012/gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-corresponding-source.tar",
+        "verifiedSourceFiles": 2265
+      }
+    },
+    {
+      "ubuntu": "24.04",
+      "installedExecutableSHA256": "77bb9e2f920074f0012e3979fb7e339a7b04289a462b338212c672b1805ac053",
+      "glibc": {
+        "passed": true,
+        "maximumAllowedGLIBC": "2.35",
+        "checkedELFFiles": 1,
+        "files": [
+          {
+            "file": "gatherpack",
+            "requiredGLIBC": "2.34"
+          }
+        ],
+        "failures": []
+      },
+      "nativeAssertions": 27,
+      "installedStartupMigration": {
+        "passed": true,
+        "executableSHA256": "77bb9e2f920074f0012e3979fb7e339a7b04289a462b338212c672b1805ac053",
+        "checks": [
+          "Ordinary startup imports legacy collection, settings and reports through the real Tauri data path",
+          "Ordinary restart preserves existing new state and report records",
+          "Legacy records and source bytes remain unchanged"
+        ]
+      },
+      "desktop": {
+        "deb": {
+          "passed": true,
+          "executable": "/usr/bin/gatherpack",
+          "executableSHA256": "77bb9e2f920074f0012e3979fb7e339a7b04289a462b338212c672b1805ac053",
+          "packageSHA256": "cc4b1c631b1534ccb9b4f89ab70794758e9f5de38d1513a1f23edd746771d986",
+          "checks": [
+            {
+              "name": "Nautilus live selection bridge returns successfully",
+              "passed": true
+            },
+            {
+              "name": "mixed file/folder selection is read directly",
+              "passed": true
+            },
+            {
+              "name": "foreground second window excludes background selection",
+              "passed": true
+            },
+            {
+              "name": "new current tab reads its own selection",
+              "passed": true
+            },
+            {
+              "name": "switching tabs does not reuse the prior tab selection",
+              "passed": true
+            },
+            {
+              "name": "empty current selection does not reuse previous paths",
+              "passed": true
+            },
+            {
+              "name": "selection query preserves foreground focus",
+              "passed": true
+            },
+            {
+              "name": "global shortcut test starts with a fresh isolated profile",
+              "passed": true
+            },
+            {
+              "name": "real global hotkey appends Nautilus mixed selection through Rust",
+              "passed": true
+            },
+            {
+              "name": "real collection hotkey does not steal focus",
+              "passed": true
+            },
+            {
+              "name": "collection preserves unrelated clipboard contents",
+              "passed": true
+            },
+            {
+              "name": "real hotkey appends a second source directory",
+              "passed": true
+            },
+            {
+              "name": "empty hotkey capture leaves the collection unchanged",
+              "passed": true
+            },
+            {
+              "name": "native Nautilus file drag is received by the Tauri window",
+              "passed": true
+            },
+            {
+              "name": "native drag preserves source bytes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add files opens a native file picker",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native picker selection reaches the persistent collection",
+              "passed": true
+            },
+            {
+              "name": "native picker does not modify its source",
+              "passed": true
+            },
+            {
+              "name": "floating window returns to always-on-top after picker closes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件夹 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add folder opens its native folder chooser",
+              "passed": true
+            },
+            {
+              "name": "folder chooser exposes its visible filesystem Home location",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native folder chooser adds the whole folder",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件：.hidden button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 放大关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 适应画布 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "file graph exploration preserves the collection and pack settings",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收集清单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 检查并打包 → button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 选择保存位置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "pack confirmation opens a native save dialog",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 开始打包 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "complete native UI flow delivers the selected ZIP output",
+              "passed": true
+            },
+            {
+              "name": "UI-created ZIP restores all selected content, hidden files and empty folder",
+              "passed": true
+            },
+            {
+              "name": "native UI result report matches the seven archived files",
+              "passed": true
+            },
+            {
+              "name": "native UI packing retains the six public collection entries",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=True",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=True",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=False",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=False",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 重新注册 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "re-register button restores actual foreground collection hotkey",
+              "passed": true
+            },
+            {
+              "name": "expanded panel moves from its broad sticky header",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收起面板 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "collapse returns to the compact floating window",
+              "passed": true
+            },
+            {
+              "name": "the app drag handle moves its real native window",
+              "passed": true
+            },
+            {
+              "name": "dragging the whole compact icon moves the native window",
+              "passed": true
+            },
+            {
+              "name": "dragging compact icon does not expand panel",
+              "passed": true
+            },
+            {
+              "name": "clicking the compact icon reopens the collection panel",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 应用菜单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 退出 GatherPack button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "application menu exits normally after packing",
+              "passed": true
+            }
+          ]
+        },
+        "appimage": {
+          "passed": true,
+          "executable": "/work/artifacts/ci-gatherpack-39785533012/gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.6_amd64.AppImage",
+          "executableSHA256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d",
+          "packageSHA256": null,
+          "checks": [
+            {
+              "name": "Nautilus live selection bridge returns successfully",
+              "passed": true
+            },
+            {
+              "name": "mixed file/folder selection is read directly",
+              "passed": true
+            },
+            {
+              "name": "foreground second window excludes background selection",
+              "passed": true
+            },
+            {
+              "name": "new current tab reads its own selection",
+              "passed": true
+            },
+            {
+              "name": "switching tabs does not reuse the prior tab selection",
+              "passed": true
+            },
+            {
+              "name": "empty current selection does not reuse previous paths",
+              "passed": true
+            },
+            {
+              "name": "selection query preserves foreground focus",
+              "passed": true
+            },
+            {
+              "name": "global shortcut test starts with a fresh isolated profile",
+              "passed": true
+            },
+            {
+              "name": "real global hotkey appends Nautilus mixed selection through Rust",
+              "passed": true
+            },
+            {
+              "name": "real collection hotkey does not steal focus",
+              "passed": true
+            },
+            {
+              "name": "collection preserves unrelated clipboard contents",
+              "passed": true
+            },
+            {
+              "name": "real hotkey appends a second source directory",
+              "passed": true
+            },
+            {
+              "name": "empty hotkey capture leaves the collection unchanged",
+              "passed": true
+            },
+            {
+              "name": "native Nautilus file drag is received by the Tauri window",
+              "passed": true
+            },
+            {
+              "name": "native drag preserves source bytes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add files opens a native file picker",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native picker selection reaches the persistent collection",
+              "passed": true
+            },
+            {
+              "name": "native picker does not modify its source",
+              "passed": true
+            },
+            {
+              "name": "floating window returns to always-on-top after picker closes",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 添加文件夹 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "add folder opens its native folder chooser",
+              "passed": true
+            },
+            {
+              "name": "folder chooser exposes its visible filesystem Home location",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native folder chooser adds the whole folder",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件：.hidden button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 放大关系图 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 适应画布 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "file graph exploration preserves the collection and pack settings",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收集清单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 检查并打包 → button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 选择保存位置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "pack confirmation opens a native save dialog",
+              "passed": true
+            },
+            {
+              "name": "native chooser focuses one editable location field",
+              "passed": true
+            },
+            {
+              "name": "native chooser accepts the full location through accessibility input",
+              "passed": true
+            },
+            {
+              "name": "native location entry exposes its activate action",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 开始打包 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "complete native UI flow delivers the selected ZIP output",
+              "passed": true
+            },
+            {
+              "name": "UI-created ZIP restores all selected content, hidden files and empty folder",
+              "passed": true
+            },
+            {
+              "name": "native UI result report matches the seven archived files",
+              "passed": true
+            },
+            {
+              "name": "native UI packing retains the six public collection entries",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=True",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=True",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings exposes one native-accessible autostart checkbox",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 保存设置 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "settings UI persists autostart=False",
+              "passed": true
+            },
+            {
+              "name": "actual desktop startup registration matches setting=False",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 重新注册 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "re-register button restores actual foreground collection hotkey",
+              "passed": true
+            },
+            {
+              "name": "expanded panel moves from its broad sticky header",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 收起面板 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "collapse returns to the compact floating window",
+              "passed": true
+            },
+            {
+              "name": "the app drag handle moves its real native window",
+              "passed": true
+            },
+            {
+              "name": "dragging the whole compact icon moves the native window",
+              "passed": true
+            },
+            {
+              "name": "dragging compact icon does not expand panel",
+              "passed": true
+            },
+            {
+              "name": "clicking the compact icon reopens the collection panel",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 应用菜单 button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "native WebView exposes one accessible 退出 GatherPack button",
+              "passed": true
+            },
+            {
+              "name": "UI button has a visible interaction target",
+              "passed": true
+            },
+            {
+              "name": "application menu exits normally after packing",
+              "passed": true
+            }
+          ]
+        }
+      },
+      "appImageStartupMigration": {
+        "passed": true,
+        "executableSHA256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d",
+        "checks": [
+          "Ordinary startup imports legacy collection, settings and reports through the real Tauri data path",
+          "Ordinary restart preserves existing new state and report records",
+          "Legacy records and source bytes remain unchanged"
+        ]
+      },
+      "shortcutRecovery": {
+        "passed": true,
+        "executableSHA256": "370af86b36f404d7b7ebe98de678c0fcf7e09fb934139656fc95a3a825072b9d",
+        "checks": [
+          {
+            "name": "fresh Nautilus starts before the user bridge exists",
+            "passed": true
+          },
+          {
+            "name": "first installation explains that the running Nautilus must load its new bridge",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "unloaded bridge cannot collect stale or unrelated paths",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "actual hotkey recovers after the new bridge loads without restarting the app",
+            "passed": true
+          },
+          {
+            "name": "Recovery UI exposes one 设置 button",
+            "passed": true
+          },
+          {
+            "name": "shortcut conflict with another running instance is visible",
+            "passed": true
+          },
+          {
+            "name": "Recovery UI exposes one 保存设置 button",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "saving the unchanged shortcut restores real collection after conflict removal",
+            "passed": true
+          },
+          {
+            "name": "Recovery UI exposes one 重新注册 button",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "explicit re-registration preserves actual foreground collection",
+            "passed": true
+          },
+          {
+            "name": "Caps Lock is actually enabled during the shortcut test",
+            "passed": true
+          },
+          {
+            "name": "recovery shortcut starts in the real foreground file manager",
+            "passed": true
+          },
+          {
+            "name": "real collection shortcut works with Caps Lock enabled",
+            "passed": true
+          },
+          {
+            "name": "recovery preserves original source bytes",
+            "passed": true
+          }
+        ]
+      },
+      "correspondingSource": {
+        "passed": true,
+        "archive": "/work/artifacts/ci-gatherpack-39785533012/gatherpack-0.1.0-alpha.6-x86_64-unknown-linux-gnu-corresponding-source.tar",
+        "verifiedSourceFiles": 2265
+      }
+    }
+  ],
+  "windowsInstalled": {
+    "installation": "C:\\Users\\28993\\Documents\\ChatGPT\\easy_pack\\artifacts\\validation\\windows-install-d852e6dd68174af1874c6a6f7da0b47a",
+    "checks": [
+      "Silent install succeeds and installs the expected executable",
+      "Installed executable product name and version match the current brand",
+      "Installed resources include dependency and NSIS license notices",
+      "Installed Rust standard-library copyright text matches the original SHA256",
+      "Installed executable passes core and restart native IPC scenarios",
+      "Silent uninstall removes the executable and installation registration"
+    ],
+    "installerSHA256": "5c6a696f3a4b6055b3a9b2a148e1f662c397e9ca71241b635661134449d544aa",
+    "installer": "C:\\Users\\28993\\Documents\\ChatGPT\\easy_pack\\artifacts\\ci\\39785533012\\x86_64-pc-windows-msvc\\gatherpack-0.1.0-alpha.6-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.6_x64-setup.exe",
+    "passed": true
+  },
+  "macOSPackages": [
+    {
+      "passed": true,
+      "target": "aarch64-apple-darwin",
+      "commit": "1734a2a5082ee046a09fd7ee21dd3b8365d28d87",
+      "checks": [
+        "DMG SHA256 and build provenance match",
+        "DMG mounts read-only on matching native architecture",
+        "Bundled executable and license resources exist",
+        "Original Rust standard-library notice bytes match",
+        "Bundle display name and identifier match the current brand",
+        "Bundled executable passes 22 core and 5 restart native IPC assertions",
+        "DMG detaches after the application exits"
+      ]
+    },
+    {
+      "passed": true,
+      "target": "x86_64-apple-darwin",
+      "commit": "1734a2a5082ee046a09fd7ee21dd3b8365d28d87",
+      "checks": [
+        "DMG SHA256 and build provenance match",
+        "DMG mounts read-only on matching native architecture",
+        "Bundled executable and license resources exist",
+        "Original Rust standard-library notice bytes match",
+        "Bundle display name and identifier match the current brand",
+        "Bundled executable passes 22 core and 5 restart native IPC assertions",
+        "DMG detaches after the application exits"
+      ]
+    }
+  ],
+  "limitations": [
+    "Linux desktop results apply to isolated GNOME/X11 sessions; Wayland remains unverified",
+    "Full Windows Explorer/macOS Finder desktop acceptance remains unverified"
+  ],
+  "buildRun": "39785533012",
+  "downloadRun": "39785533012",
+  "macOSValidationRun": "39787772157",
+  "buildRunAttempt": 2,
+  "validationCommit": "1734a2a5082ee046a09fd7ee21dd3b8365d28d87",
+  "validationScripts": {
+    "scripts/test-linux-selection.py": "7085c08c29a937c8df094851e42c75111caadcfb8f73dc025bd0b092595ab77d",
+    "scripts/test-shortcut-recovery-linux.py": "53466ffd248b0a02e9b09b66fa49c285a68217237baf37e29b2de7d3b7919d53",
+    "scripts/test-profile-migration.mjs": "7cce59c61e8c8a2a75e068ab9270cca29532b0bc87c74cfa1f92a99aa7916d71",
+    "scripts/test-graph.mjs": "24fb704b476103f68ae7bb0e567edcdbd40802defc973da0cd39f8ab4cb59d2a",
+    "scripts/verify-ci-artifacts.mjs": "fd090834e1b0511bbb6f3da9b421d814be196cb0a74a504b616bd408d345f1d6",
+    "scripts/verify-ubuntu-artifacts.mjs": "5c209bb3d6b8d7baae18d5637bcbc8191ed8a383f2db29c39ea1ec1ac8f7fe20"
+  }
+}

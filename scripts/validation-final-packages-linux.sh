@@ -27,6 +27,7 @@ bash scripts/validation-desktop-linux.sh migration "$image"
 bash scripts/validation-desktop-linux.sh gnome "$image"
 cp artifacts/validation/linux-selection-report.json artifacts/validation/linux-appimage-gui-report.json
 cp artifacts/validation/linux-selection.png artifacts/validation/linux-appimage-gui.png
+bash scripts/validation-desktop-linux.sh shortcuts "$image"
 temporary=$(mktemp -d /tmp/gatherpack-license-check-XXXXXX)
 trap 'test -n "$temporary" && rm -rf -- "$temporary"' EXIT
 (cd "$temporary"; "$image" --appimage-extract 'usr/lib/GatherPack/licenses/Rust-COPYRIGHT-library.html' >/dev/null)

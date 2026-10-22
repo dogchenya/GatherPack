@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
 assert.equal(process.platform, 'linux', 'This startup test uses isolated Linux XDG directories');
+execFileSync('xdotool', ['--version'], {stdio: 'ignore'});
 const executable = resolve(process.argv[2]);
 await mkdir('artifacts/validation', { recursive: true });
 const root = await mkdtemp(resolve('artifacts/validation/migration-'));
@@ -32,7 +33,7 @@ async function startAndInspect(inspect) {
   child.stderr.on('data', bytes => { stderr = (stderr + bytes).slice(-4000); });
   const exited = new Promise((resolve, reject) => { child.once('exit', resolve); child.once('error', reject); });
   try {
-    let ready = false;
+    let ready = false, readinessError = '';
     for (let i = 0; i < 150; i++) {
       if (child.exitCode !== null) throw new Error('Ordinary startup exited early: ' + stderr);
       try {
@@ -42,9 +43,9 @@ async function startAndInspect(inspect) {
         // Debian installs the bridge system-wide, so a user bridge is optional.
         assert.ok(execFileSync('xdotool', ['search', '--onlyvisible', '--name', '^GatherPack · 文件收集与打包$'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
         ready = true; break;
-      } catch { await delay(100); }
+      } catch (error) { readinessError = String(error); await delay(100); }
     }
-    assert.ok(ready, 'Ordinary startup must load its profile, prepare a bridge and show its window: ' + stderr);
+    assert.ok(ready, 'Ordinary startup must load its profile, prepare a bridge and show its window: ' + readinessError + '\n' + stderr);
     await inspect();
   } finally {
     // AppImage may launch the real executable as a descendant of its wrapper.

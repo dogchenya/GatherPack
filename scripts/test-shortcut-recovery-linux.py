@@ -12,6 +12,7 @@ import tempfile
 import time
 from collections import deque
 from file_hash import sha256_stream
+from gi.repository import GLib
 
 assert os.getuid() == 2000 and os.environ.get("XDG_SESSION_TYPE") == "x11"
 assert not Path("/usr/share/nautilus-python/extensions/gatherpack_selection.py").exists(), "Run after Debian removal to reproduce a fresh user bridge"
@@ -41,7 +42,7 @@ def wait(predicate, description):
             value = predicate()
             if value:
                 return value
-        except (subprocess.CalledProcessError, FileNotFoundError, ProcessLookupError):
+        except (subprocess.CalledProcessError, FileNotFoundError, ProcessLookupError, GLib.Error):
             pass
         time.sleep(.1)
     raise RuntimeError(description)
@@ -91,6 +92,7 @@ def geometry(window):
 
 
 def expand(window):
+    wait(lambda: "展开收集面板" in app_text(), "The real WebView must finish mounting before the compact click")
     command("xdotool", "windowmove", window, "20", "40")
     focus(window)
     bounds = geometry(window)
@@ -112,10 +114,10 @@ def app_widgets():
 def app_text():
     text = []
     for item in app_widgets():
-        text.append(item.name or "")
         try:
+            text.append(item.name or "")
             text.append(item.queryText().getText(0, -1))
-        except (NotImplementedError, AttributeError, RuntimeError):
+        except (NotImplementedError, AttributeError, RuntimeError, GLib.Error):
             pass
     return "\n".join(text)
 
@@ -135,18 +137,27 @@ def files_window():
     return window
 
 
-def collect(window):
+def collect(window, clear_modifiers=True):
+    # Keep the always-on-top panel from covering a coordinate in Nautilus.
+    panels = [item for item in app_widgets() if item.name == "收起面板" and item.getRoleName() == "push button"]
+    for item in panels:
+        item.queryAction().doAction(0)
+    time.sleep(.3)
     focus(window)
     bounds = geometry(window)
     command("xdotool", "mousemove", str(bounds["X"] + 280), str(bounds["Y"] + 120), "click", "1")
+    check(command("xdotool", "getactivewindow") == window, "recovery shortcut starts in the real foreground file manager")
     command("xdotool", "key", "--clearmodifiers", "ctrl+a")
     time.sleep(.3)
-    command("xdotool", "key", "--clearmodifiers", "ctrl+alt+shift+e")
+    if clear_modifiers:
+        command("xdotool", "key", "--clearmodifiers", "ctrl+alt+shift+e")
+    else:
+        command("xdotool", "key", "ctrl+alt+shift+e")
 
 
 try:
     primary_env, primary_data = environment("primary")
-    launch(["nautilus", "--new-window", str(source)], primary_env, "shortcut-nautilus-first")
+    first_nautilus = launch(["nautilus", "--new-window", str(source)], primary_env, "shortcut-nautilus-first")
     files = files_window()
     check(command("gdbus", "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path", "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.NameHasOwner", "io.github.dogchenya.gatherpack.NautilusSelection") == "(false,)", "fresh Nautilus starts before the user bridge exists")
     primary = launch([executable], primary_env, "shortcut-primary")
@@ -157,7 +168,8 @@ try:
     collect(files)
     wait(lambda: "桥接尚未加载" in app_text(), "Missing bridge must be visible instead of a silent hotkey")
     check(not (primary_data / "io.github.dogchenya.gatherpack/state.json").exists(), "unloaded bridge cannot collect stale or unrelated paths")
-    command("nautilus", "--quit")
+    # Restart only the file-manager process created by this isolated test.
+    stop(first_nautilus)
     time.sleep(1)
     launch(["nautilus", "--new-window", str(source)], primary_env, "shortcut-nautilus-reloaded")
     files = files_window()
@@ -169,22 +181,35 @@ try:
     secondary = launch([executable], second_env, "shortcut-secondary")
     secondary_window = wait(lambda: app_window(secondary), "Conflicting second instance must start")
     expand(secondary_window)
+    button(secondary_window, "设置")
     wait(lambda: "快捷键注册失败" in app_text(), "A second app shortcut conflict must be reported")
     check(True, "shortcut conflict with another running instance is visible")
     stop(primary)
-    button(secondary_window, "重新注册")
+    button(secondary_window, "保存设置")
     (source / "retry.txt").write_bytes(b"retry original")
     time.sleep(.5)
     collect(files)
     secondary_state = second_data / "io.github.dogchenya.gatherpack/state.json"
     wait(lambda: len(json.loads(secondary_state.read_text())["paths"]) == 3, "Same-key retry must recover after the conflicting instance exits")
-    check(True, "same-key retry restores real foreground collection after conflict removal")
+    check(True, "saving the unchanged shortcut restores real collection after conflict removal")
+    expand(secondary_window)
+    button(secondary_window, "重新注册")
+    (source / "retry-again.txt").write_bytes(b"retry again original")
+    time.sleep(.5)
+    collect(files)
+    wait(lambda: len(json.loads(secondary_state.read_text())["paths"]) == 4, "Explicit re-registration must preserve a working shortcut")
+    check(True, "explicit re-registration preserves actual foreground collection")
     (source / "caps.txt").write_bytes(b"caps original")
     time.sleep(.5)
     command("xdotool", "key", "Caps_Lock")
     try:
-        collect(files)
-        wait(lambda: len(json.loads(secondary_state.read_text())["paths"]) == 4, "Caps Lock must not disable the shortcut")
+        import gi
+        gi.require_version("Gdk", "3.0")
+        from gi.repository import Gdk
+        Gdk.init([])
+        check(Gdk.Keymap.get_default().get_caps_lock_state(), "Caps Lock is actually enabled during the shortcut test")
+        collect(files, clear_modifiers=False)
+        wait(lambda: len(json.loads(secondary_state.read_text())["paths"]) == 5, "Caps Lock must not disable the shortcut")
     finally:
         command("xdotool", "key", "Caps_Lock")
     check(True, "real collection shortcut works with Caps Lock enabled")
@@ -200,7 +225,6 @@ finally:
     (evidence / "shortcut-recovery-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
     for child in reversed(processes):
         stop(child)
-    subprocess.run(["nautilus", "--quit"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
     for log in logs:
         log.close()
 print(json.dumps(report, ensure_ascii=False))

@@ -58,8 +58,9 @@ for (const target of ['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-
     for (const [kind, extension] of [['deb', '.deb'], ['appimage', '.AppImage']]) {
       const gui = JSON.parse(await readFile(join(root, 'linux-installed', 'linux-' + kind + '-gui-report.json'), 'utf8'));
       assert.equal(gui.passed, true);
-      assert.equal(gui.checks.length, 70);
+      assert.ok(gui.checks.length >= 70);
       assert.ok(gui.checks.every(check => check.passed));
+      for (const name of ['file graph exploration preserves the collection and pack settings', 'expanded panel moves from its broad sticky header', 'dragging compact icon does not expand panel', 're-register button restores actual foreground collection hotkey']) assert.ok(gui.checks.some(check => check.name === name && check.passed), name);
       const testedSHA = kind === 'deb' ? gui.packageSHA256 : gui.executableSHA256;
       assert.ok(artifacts.some(file => file.name.endsWith(extension) && file.sha256 === testedSHA));
     }
@@ -69,6 +70,9 @@ for (const target of ['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-
     assert.equal(migration.passed, true);
     assert.equal(migration.checks.length, 3);
     assert.ok(artifacts.some(file => file.name.endsWith('.AppImage') && file.sha256 === migration.executableSHA256));
+    const shortcuts = JSON.parse(await readFile(join(root, 'linux-installed', 'shortcut-recovery-report.json'), 'utf8'));
+    assert.equal(shortcuts.passed, true); assert.ok(shortcuts.checks.every(check => check.passed));
+    assert.ok(artifacts.some(file => file.name.endsWith('.AppImage') && file.sha256 === shortcuts.executableSHA256));
   }
   const validation = await reports(join(root, 'native-' + target));
   assert.equal(validation.length, 2);

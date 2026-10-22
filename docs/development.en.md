@@ -22,7 +22,7 @@ Platform dependencies:
 
 ```sh
 sudo apt-get update
-sudo apt-get install -y build-essential file libssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libfuse2t64 python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4.0 x11-utils
+sudo apt-get install -y build-essential file curl libcurl4t64 libssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libfuse2t64 python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4.0 x11-utils
 ```
 
 ## Local development

@@ -34,16 +34,21 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 当前版本：**0.1.0-alpha.4**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。
 
-打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/runs/39748220404)，在 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
+打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/runs/39760156652)，在 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
 | Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | 运行 `.exe` 安装程序 |
 | macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
 | macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
-| Linux x64 · Ubuntu 24.04 | `gatherpack-x86_64-unknown-linux-gnu` | 安装 `.deb`，或赋予 `.AppImage` 执行权限后运行 |
+| Linux x86_64 · Ubuntu 24.04 | `gatherpack-linux-x64-deb` | 约 5.3 MiB，安装 `.deb` |
+| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | 约 80.6 MiB，赋予 `.AppImage` 执行权限后运行 |
 
-安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。AppImage 的再分发需同时提供下载项中的 `corresponding-source.tar`。
+Linux 安装包、对应源码和校验材料分别下载，普通安装只需选择 `.deb` 或 AppImage 其中一种。`x64`、`x86_64`、`amd64` 均指 Intel/AMD 64 位架构，目前没有 32 位 x86 包。
+
+对应源码单独放在 `gatherpack-linux-x64-corresponding-source`（其中的 `.tar` 约 611 MiB）；SHA256 校验和、构建来源及授权说明放在 `gatherpack-linux-x64-checksums-and-licenses`。再分发 AppImage 时，须同时提供**同一轮下载**中的 `corresponding-source.tar`。
+
+安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。
 
 四目标构建、真实 IPC、Windows 安装卸载、双架构 Mac 包内运行及 Linux 桌面流程已通过，证据见 [品牌迁移记录](docs/brand-migration.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
 

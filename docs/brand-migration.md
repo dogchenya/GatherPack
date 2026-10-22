@@ -61,3 +61,7 @@ CI 镜像中预装的 curl/systemd 旧二进制版本曾与已更新的源码索
 以上检查全部通过后才更新默认分支并重命名原仓库，保留提交历史、问题与历史构建。最终证据文档提交不改变已验证的应用源码。
 
 Windows Explorer / macOS Finder 完整桌面交互、Wayland 与其他 Linux 文件管理器仍待专项验证；不将本次构建及 IPC 结果等同于这些环境的验收。
+
+## 独立下载项
+
+安装包验证后，按用户要求将 Linux `.deb`、AppImage、对应源码和校验/授权材料拆为独立下载项：[下载页面](https://github.com/dogchenya/GatherPack/actions/runs/39760156652)。Windows/macOS 安装包也保留在此页面。原始构建仍为 `39748220404`，文件内容与构建来源不变，未重新编译；拆分后的 `.deb` 约 5.31 MiB、AppImage 约 80.63 MiB，普通安装无需下载大型源码归档。上传及回下载校验证据见 [downloads-alpha.4.json](validation/downloads-alpha.4.json)。正常构建后续也自动使用相同拆分规则。

@@ -34,16 +34,21 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 Current version: **0.1.0-alpha.4**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions.
 
-Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs/39748220404), choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
+Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs/39760156652), choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
 | Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | Run the `.exe` installer |
 | macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
 | macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
-| Linux x64 · Ubuntu 24.04 | `gatherpack-x86_64-unknown-linux-gnu` | Install the `.deb`, or make the `.AppImage` executable and run it |
+| Linux x86_64 · Ubuntu 24.04 | `gatherpack-linux-x64-deb` | About 5.3 MiB; install the `.deb` |
+| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | About 80.6 MiB; make the `.AppImage` executable and run it |
 
-Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup. When redistributing the AppImage, include the accompanying `corresponding-source.tar`.
+Linux installers, corresponding source, and verification materials are separate downloads. For normal installation, choose either the `.deb` or AppImage. `x64`, `x86_64`, and `amd64` all mean 64-bit Intel/AMD; 32-bit x86 builds are currently unavailable.
+
+Corresponding source is under `gatherpack-linux-x64-corresponding-source` (the `.tar` is about 611 MiB). SHA256 checksums, build provenance, and license notices are under `gatherpack-linux-x64-checksums-and-licenses`. When redistributing the AppImage, include `corresponding-source.tar` from the **same download run**.
+
+Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup.
 
 Four-target builds, real IPC, Windows installation/uninstallation, both Mac package architectures, and Linux desktop flows have passed; see the [migration record](docs/brand-migration.md) (Chinese) for evidence. Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
 

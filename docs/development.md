@@ -136,4 +136,6 @@ sudo apt-get install -y python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4
 
 工作流记录实际 Rust host 和请求 target；只有架构匹配时才执行原生 IPC。四目标原生构建不等于跨操作系统或 Linux ARM64 交叉编译验证。独立的 [Mac 包验证工作流](../.github/workflows/macos-package-validation.yml) 可下载指定构建产物，挂载 DMG 并验证包内程序。
 
-Artifacts 包含安装包、`SHA256SUMS.txt`、源码提交/工具链来源记录和第三方声明。完整的本地与远端验证证据见 [验证记录](prototype-validation.md) 和 [CI 摘要](brand-migration.md)。
+Windows/macOS Artifacts 包含安装包、`SHA256SUMS.txt`、源码提交/工具链来源记录和第三方声明。Linux 分为 `gatherpack-linux-x64-deb`、`gatherpack-linux-x64-appimage`、`gatherpack-linux-x64-corresponding-source` 和 `gatherpack-linux-x64-checksums-and-licenses` 四个下载项，分别只含对应格式或元数据。安装包内部的授权声明保留。将四项解压至同一目录，可恢复原始收集目录并用 `sha256sum -c SHA256SUMS.txt` 校验全部文件。
+
+[下载整理工作流](../.github/workflows/redistribute.yml) 可针对仍提供旧合并 Artifacts 的成功构建，输入其运行编号和完整源码提交，验证原始文件哈希后重新上传独立下载项；不重新编译，不修改包内容，也不将整理提交冒充原始构建提交。未来正常构建共用同一个 [上传动作](../.github/actions/upload-installers/action.yml)。完整的本地与远端验证证据见 [验证记录](prototype-validation.md) 和 [CI 摘要](brand-migration.md)。

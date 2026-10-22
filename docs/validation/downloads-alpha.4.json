@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "version": "0.1.0-alpha.4",
+  "buildRun": "39748220404",
+  "buildCommit": "0c4564c8578a515506d6951a38b75c7b4805c3fb",
+  "distributionRun": "39760156652",
+  "distributionCommit": "6697a0af23b1dd74fb93abbf1b4c6a7eec3ae756",
+  "checks": [
+    "All original payload checksums and provenance verified in the distribution workflow",
+    "Linux deb, AppImage and source each contain exactly one payload file",
+    "Checksum and license artifact contains seven original metadata files",
+    "Downloaded deb and AppImage hashes match the previously installed and GUI-tested packages",
+    "Downloaded checksums, provenance and license bytes match the original build"
+  ],
+  "payloads": [
+    {
+      "name": "gatherpack-0.1.0-alpha.4-aarch64-apple-darwin-GatherPack_0.1.0-alpha.4_aarch64.dmg",
+      "sha256": "aeeb785b2e055c9d906ad4a8c76ac495337b609e20466f99b555195568d8e11d"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.4-x86_64-apple-darwin-GatherPack_0.1.0-alpha.4_x64.dmg",
+      "sha256": "fb230d691e35e9b0cc6b5f49171f149810de52171d48a746c3405da44a8fb7df"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.4-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.4_x64-setup.exe",
+      "sha256": "4b3d3b648869450bf5a5535d9e0501a8f03a78bb7e05d9c6e01d42ed718a0b62"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.4-x86_64-unknown-linux-gnu-corresponding-source.tar",
+      "sha256": "3d44232842563da559d72737ec6338f447c68d5ea7a825c020b382686ba342d9"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.4-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.4_amd64.deb",
+      "sha256": "4c93142b7f4743f1e3d8187029460d682c8b359adf663dd926b3a11cd5b0a76d"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.4-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.4_amd64.AppImage",
+      "sha256": "f72319128d75f2403348aff8e30bbbb0bbe9671eeecf5a199efd113f280ad320"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "gatherpack-x86_64-pc-windows-msvc",
+      "id": 12418140212,
+      "archiveBytes": 2889583,
+      "archiveDigest": "sha256:9295e1ba2c1020d42f2168763ad7f2758897b06e1507de4d4b9877ac67f2da41"
+    },
+    {
+      "name": "gatherpack-linux-x64-corresponding-source",
+      "id": 12418070730,
+      "archiveBytes": 538570462,
+      "archiveDigest": "sha256:8ca8448eb1b964206802fb2a3f725536e377835f2a3c95eb490b9fd6dc998f15"
+    },
+    {
+      "name": "gatherpack-linux-x64-checksums-and-licenses",
+      "id": 12417976488,
+      "archiveBytes": 255070,
+      "archiveDigest": "sha256:af9354f3462529f3a29f049f3d001f241fd780a1ddadb48d9299664042b98a27"
+    },
+    {
+      "name": "gatherpack-aarch64-apple-darwin",
+      "id": 12417971050,
+      "archiveBytes": 4259656,
+      "archiveDigest": "sha256:e25f6aedc387e1f32691e9b0dde25fd94276c071af1190a042a09267c3db46b8"
+    },
+    {
+      "name": "gatherpack-linux-x64-deb",
+      "id": 12417946284,
+      "archiveBytes": 5570908,
+      "archiveDigest": "sha256:59ec628c543d60cfa0a23209334a6ec20b5eadcd4671ac83fce534282b3941b8"
+    },
+    {
+      "name": "gatherpack-linux-x64-appimage",
+      "id": 12417677778,
+      "archiveBytes": 84544284,
+      "archiveDigest": "sha256:58606293293bf7714d599d4130991405515ccc9ca90887704dfdcc3a55ca191b"
+    },
+    {
+      "name": "gatherpack-x86_64-apple-darwin",
+      "id": 12417437946,
+      "archiveBytes": 4330939,
+      "archiveDigest": "sha256:758a7e2b3e9ce7bd68fae943e7c770dad8212961f8aae1e18856fc1885fa4c05"
+    }
+  ]
+}

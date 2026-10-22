@@ -12,7 +12,8 @@ if [ "${1:-selection}" = gnome ]; then
   system_bus_pid=$(dbus-daemon --system --fork --nopidfile --address="$DBUS_SYSTEM_BUS_ADDRESS" --print-pid)
   # The disposable chroot has no logind session. Let GNOME use its supported
   # non-systemd session path; restore the empty marker directory after testing.
-  rmdir /run/systemd/seats
-  trap 'kill "$system_bus_pid" 2>/dev/null || true; mkdir -p /run/systemd/seats' EXIT
+  had_seats=0
+  if [ -d /run/systemd/seats ]; then rmdir /run/systemd/seats; had_seats=1; fi
+  trap 'kill "$system_bus_pid" 2>/dev/null || true; if [ "$had_seats" = 1 ]; then mkdir -p /run/systemd/seats; fi' EXIT
 fi
 runuser -u easypack-test -- env -u XDG_RUNTIME_DIR dbus-run-session -- /bin/bash /work/scripts/validation-desktop-session-linux.sh "$@"

@@ -9,6 +9,7 @@ import time
 import zipfile
 import hashlib
 from collections import deque
+from file_hash import sha256_stream
 
 evidence = Path("/work/artifacts/validation")
 checks = []
@@ -366,7 +367,7 @@ try:
     finally:
         app.terminate(); app.wait(timeout=10); app_log.close()
     with open(executable, "rb") as binary:
-        executable_hash = hashlib.file_digest(binary, "sha256").hexdigest()
+        executable_hash = sha256_stream(binary)
     (evidence / "linux-selection-report.json").write_text(json.dumps({"passed": True, "executable": executable, "executableSHA256": executable_hash, "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "checks": checks}, ensure_ascii=False, indent=2))
     print(json.dumps({"passed": True, "checks": checks}, ensure_ascii=False))
 except Exception as error:

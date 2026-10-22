@@ -153,7 +153,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb dbus-x11 xauth ./artifacts/deb/*.deb
+          sudo apt-get install -y xvfb dbus-x11 xauth xdotool ./artifacts/deb/*.deb
           python3 scripts/check-glibc-linux.py /usr/bin/gatherpack artifacts/validation/glibc-installed.json
           ldd /usr/bin/gatherpack > artifacts/validation/ldd-installed.txt
           ! grep -q 'not found' artifacts/validation/ldd-installed.txt

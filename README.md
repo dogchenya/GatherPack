@@ -33,9 +33,9 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 ## 下载与安装
 
-当前版本：**0.1.0-alpha.6**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
+当前版本：**0.1.0-alpha.7**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
 
-打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/runs/39785533012)，在 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
+打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/runs/39800649107)，在 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 | Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | 约 5.3 MiB，安装 `.deb` |
 | Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | 约 80.4 MiB，赋予 `.AppImage` 执行权限后运行 |
 
-Ubuntu 升级前请先退出旧版。首次启用或升级后若快捷键提示桥接未加载，请保存文件管理器中的操作，手动退出并重新打开“文件”（Nautilus），再点击“重新注册”。
+在 Ubuntu 上升级 GatherPack 前，请先退出旧版应用。若快捷键提示桥接未加载或需要 `python3-nautilus`，请按 [Nautilus 快捷键排查](docs/nautilus-shortcut.md) 安装依赖并退出后台进程后重新打开“文件”。alpha.7 会区分缺少依赖与已安装但尚未加载，不再统一提示重复安装。
 
 Linux 安装包、对应源码和校验材料分别下载，普通安装只需选择 `.deb` 或 AppImage 其中一种。`x64`、`x86_64`、`amd64` 均指 Intel/AMD 64 位架构，目前没有 32 位 x86 包。
 
@@ -53,7 +53,7 @@ Linux 安装包、对应源码和校验材料分别下载，普通安装只需�
 
 安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。
 
-四目标构建、真实 IPC、Windows 安装卸载、双架构 Mac 包内运行，以及同一 Linux 安装包在 Ubuntu 22.04 / 24.04 的安装运行与桌面流程均已通过，证据见 [桌面交互与验证记录](docs/desktop-interaction.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
+安装包已通过四目标原生 IPC 与安装验证；同一批 Linux 包已在 Ubuntu 22.04 / 24.04 的 GNOME/X11 环境完成桌面与快捷键回归。见 [本次验证记录](docs/nautilus-shortcut.md#alpha7-validation) 与 [悬浮窗、关系图说明](docs/desktop-interaction.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
 
 ## 快速上手
 

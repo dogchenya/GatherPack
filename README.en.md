@@ -33,9 +33,9 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 ## Download and install
 
-Current version: **0.1.0-alpha.6**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
+Current version: **0.1.0-alpha.7**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
 
-Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs/39785533012), choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
+Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs/39800649107), choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs
 | Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | About 5.3 MiB; install the `.deb` |
 | Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | About 80.4 MiB; make the `.AppImage` executable and run it |
 
-Quit the previous version before upgrading Ubuntu. If the shortcut reports that the bridge has not loaded after installation or an upgrade, finish your file manager operations, manually quit and reopen Files (Nautilus), then select “重新注册” (re-register).
+Quit the previous GatherPack version before upgrading the app on Ubuntu. For an unloaded bridge or a `python3-nautilus` message, follow [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english) to install dependencies and restart the background Files process. Alpha.7 distinguishes missing dependencies from an installed but unloaded bridge.
 
 Linux installers, corresponding source, and verification materials are separate downloads. For normal installation, choose either the `.deb` or AppImage. `x64`, `x86_64`, and `amd64` all mean 64-bit Intel/AMD; 32-bit x86 builds are currently unavailable.
 
@@ -53,7 +53,7 @@ Corresponding source is under `gatherpack-linux-x64-corresponding-source` (the `
 
 Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup.
 
-Four-target builds, real IPC, Windows installation/uninstallation, both Mac package architectures, and installation/runtime/desktop flows of the same Linux packages on Ubuntu 22.04 / 24.04 have passed; see the [desktop interaction and validation record](docs/desktop-interaction.md) (Chinese). Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
+Installers passed native IPC and installation checks on all four targets; the same Linux packages passed desktop and shortcut regression on Ubuntu 22.04 / 24.04 GNOME/X11. See the [latest validation record](docs/nautilus-shortcut.md#alpha7-validation-en) and [floating window and graph notes](docs/desktop-interaction.md) (Chinese). Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
 
 ## Getting started
 

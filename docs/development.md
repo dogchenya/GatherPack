@@ -131,6 +131,8 @@ sudo apt-get install -y python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-3
 
 `.deb` 会安装系统扩展及依赖；源码运行或 AppImage 首次启动会在用户数据目录准备 Nautilus 扩展。安装后退出并重新启动 Nautilus，以加载扩展。应用不会自动关闭文件管理器。
 
+仅关闭窗口可能保留后台进程。请等待文件操作结束后执行 `nautilus -q`，再重新打开“文件”。依赖已安装而桥接未加载时无需重复安装，详见 [快捷键排查](nautilus-shortcut.md)。
+
 桥接仅读取前台窗口当前视图中的选择，不缓存历史选中项，也不读取剪贴板。Wayland 和其他文件管理器的状态见 [验证记录](prototype-validation.md)。
 
 ## CI 与产物

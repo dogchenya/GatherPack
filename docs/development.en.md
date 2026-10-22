@@ -131,6 +131,8 @@ sudo apt-get install -y python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-3
 
 The `.deb` installs the system extension and dependencies. Source runs and the AppImage prepare a Nautilus extension in the user's data directory on first launch. Quit and restart Nautilus after installation to load it. The application does not close the file manager automatically.
 
+Closing the window may leave the background process running. Wait for file operations to finish, run `nautilus -q`, then reopen Files. An installed but unloaded bridge does not require reinstalling the loader; see [shortcut troubleshooting](nautilus-shortcut.md#english).
+
 The bridge reads the foreground window's current view without caching previous selections or reading the clipboard. See the [validation record](prototype-validation.md) (Chinese) for Wayland and other file manager status.
 
 ## CI and artifacts

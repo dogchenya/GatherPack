@@ -13,7 +13,7 @@
 
 GatherPack is a desktop file collection and archiving tool for Windows, macOS, and Linux. Drop files and folders from different locations into a floating collection bar, organize the list, and export a ZIP, 7z, or tar.gz archive. Everything runs locally, without an account or network connection.
 
-On first launch, GatherPack imports the collection, settings, and reports from an existing easy_pack profile while keeping the original data. Re-enable launch at login in Settings after migration.
+On first launch, GatherPack imports the collection, settings, and reports from an existing easy_pack profile while keeping the original data. If you use launch at login, re-enable it in Settings after migration. On macOS, grant Finder Automation permission when prompted.
 
 ![GatherPack running on a Linux desktop](docs/assets/app-preview.png)
 

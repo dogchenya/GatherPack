@@ -13,7 +13,7 @@
 
 GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工具。把不同目录里的文件和文件夹拖进悬浮收集栏，整理好清单后，直接导出 ZIP、7z 或 tar.gz。整个过程在本机完成，无需账号或网络连接。
 
-旧版 easy_pack 用户首次启动时会导入清单、设置和报告；旧记录保留。迁移后请在设置中重新启用开机启动。
+旧版 easy_pack 用户首次启动时会导入清单、设置和报告；旧记录保留。迁移后如需开机启动，请在设置中重新启用；macOS 请按系统提示授予 Finder 自动化权限。
 
 ![GatherPack 在 Linux 桌面上的界面](docs/assets/app-preview.png)
 

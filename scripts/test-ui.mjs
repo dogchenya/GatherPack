@@ -25,9 +25,11 @@ try {
     const state = { entries: [], message: '', shortcutStatus: '快捷键已注册', settings, platform: 'windows', task: { running: false, phase: '', bytes: 0, totalBytes: 0, report: null }, expanded: false, trayAvailable: true };
     const plan = { sources: ['C:/one/report.txt', 'C:/two/report.txt', 'C:/missing.txt'], entries: [{ source: 'C:/one/report.txt', destination: 'report.txt', directory: false, size: 5 }, { source: 'C:/two/report.txt', destination: 'report (2).txt', directory: false, size: 7 }], issues: [{ source: 'C:/missing.txt', message: '不可用：文件不存在', blocking: true, file: false }], renames: [{ source: 'C:/two/report.txt', destination: 'report (2).txt' }], totalBytes: 12, files: 2, emptyDirectories: 0 };
     function emit(event, payload) { for (const id of events.get(event) ?? []) callbacks.get(id)?.({ event, payload: structuredClone(payload) }); }
+    window.__emitTestState = () => emit('collection-changed', state);
     window.__testState = state;
     window.__TAURI_EVENT_PLUGIN_INTERNALS__ = { unregisterListener() {} };
     window.__TAURI_INTERNALS__ = {
+      metadata: { currentWindow: { label: 'main' }, currentWebview: { label: 'main' } },
       transformCallback(fn) { const id = ++callbackId; callbacks.set(id, fn); return id; },
       async invoke(command, args) {
         switch (command) {
@@ -38,7 +40,10 @@ try {
           case 'set_expanded': state.expanded = args.expanded; break;
           case 'pick_entries': state.entries = plan.sources.map((path, i) => ({ path, name: path.split('/').pop(), isDirectory: false, size: i === 2 ? null : [5, 7][i], status: i === 2 ? '不可用' : '可用' })); break;
           case 'clear_entries': state.entries = []; break;
-          case 'prepare': return state.entries.length ? structuredClone(plan) : { ...plan, sources: [], entries: [], issues: [], renames: [], files: 0, totalBytes: 0 };
+          case 'prepare': return state.entries.length ? structuredClone(window.__previewPlan ?? plan) : { ...plan, sources: [], entries: [], issues: [], renames: [], files: 0, totalBytes: 0 };
+          case 'plugin:window|start_dragging': window.__dragCount = (window.__dragCount ?? 0) + 1; return;
+          case 'retry_shortcut': window.__shortcutRetries = (window.__shortcutRetries ?? 0) + 1; state.shortcutStatus = '快捷键已注册'; break;
+          case 'reveal': window.__revealedPath = args.path; return;
           case 'choose_output': return 'C:/out/archive.' + ({ Zip: 'zip', SevenZip: '7z', TarGz: 'tar.gz' })[args.format];
           case 'start_pack':
             window.__started = args;
@@ -61,6 +66,55 @@ try {
   await page.locator('main').dispatchEvent('drop', { dataTransfer: await page.evaluateHandle(() => new DataTransfer()) });
   await page.getByRole('alert').getByText('仅支持本地真实文件和文件夹', { exact: false }).waitFor();
   await page.getByRole('button', { name: '添加文件', exact: true }).click();
+  await page.getByRole('button', { name: '重新注册', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.__shortcutRetries), 1);
+  await page.getByRole('button', { name: '文件关系图', exact: true }).click();
+  await page.getByRole('button', { name: '文件：report (2).txt', exact: true }).click();
+  await page.locator('.graph-detail').getByText('C:/two/report.txt', { exact: true }).waitFor();
+  await page.getByRole('button', { name: '定位来源', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.__revealedPath), 'C:/two/report.txt');
+  await page.getByRole('button', { name: '文件夹：待处理项 (1)', exact: true }).click();
+  await page.getByRole('button', { name: '文件：missing.txt', exact: true }).press('Enter');
+  await page.locator('.graph-detail').getByText('不可用：文件不存在', { exact: true }).waitFor();
+  const graph = page.locator('.file-graph svg');
+  const transform = await graph.locator(':scope > g').getAttribute('transform');
+  await page.getByRole('button', { name: '放大关系图', exact: true }).click();
+  assert.notEqual(await graph.locator(':scope > g').getAttribute('transform'), transform);
+  await page.getByRole('button', { name: '适应画布', exact: true }).click();
+  assert.equal(await graph.locator(':scope > g').getAttribute('transform'), transform);
+  const originals = await page.evaluate(() => structuredClone(window.__testState.entries));
+  await page.evaluate(() => {
+    const entries = [{ source: '/work/项目', destination: '项目', directory: true, size: 0 }, { source: '/work/项目/文档', destination: '项目/文档', directory: true, size: 0 }, { source: '/work/项目/空目录', destination: '项目/空目录', directory: true, size: 0 }, ...Array.from({ length: 24 }, (_, i) => ({ source: `/work/项目/文档/资料-${i}.txt`, destination: `项目/文档/资料-${i}.txt`, directory: false, size: 256 + i }))];
+    window.__previewPlan = { sources: ['/work/项目'], entries, issues: [], renames: [], totalBytes: 6400, files: 24, emptyDirectories: 1 };
+    window.__testState.entries = [{ path: '/work/项目', name: '项目', isDirectory: true, size: null, status: '可用' }]; window.__emitTestState();
+  });
+  await page.getByRole('button', { name: '文件夹：项目', exact: true }).click();
+  await page.getByRole('button', { name: '文件夹：文档', exact: true }).click();
+  assert.equal(await page.getByRole('button', { name: '文件：资料-15.txt', exact: true }).count(), 0);
+  await page.getByRole('button', { name: '显示更多：还有 16 项', exact: true }).click();
+  await page.getByRole('button', { name: '文件：资料-15.txt', exact: true }).press('Enter');
+  await page.locator('.graph-detail').getByText('/work/项目/文档/资料-15.txt', { exact: true }).waitFor();
+  const graphBox = await graph.boundingBox();
+  await page.mouse.move(graphBox.x + 12, graphBox.y + 12);
+  const beforePan = await graph.locator(':scope > g').getAttribute('transform');
+  await page.mouse.down(); await page.mouse.move(graphBox.x + 62, graphBox.y + 42, { steps: 6 }); await page.mouse.up();
+  assert.notEqual(await graph.locator(':scope > g').getAttribute('transform'), beforePan);
+  const beforeWheel = await graph.locator(':scope > g').getAttribute('transform');
+  await page.mouse.wheel(0, -150);
+  await page.waitForFunction(previous => document.querySelector('.file-graph svg > g').getAttribute('transform') !== previous, beforeWheel);
+  await page.getByRole('button', { name: '适应画布', exact: true }).click();
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.screenshot({ path: 'artifacts/validation/ui-graph.png', fullPage: true });
+  await page.getByRole('button', { name: '文件夹：文档', exact: true }).click();
+  assert.equal(await page.getByRole('button', { name: '文件：资料-15.txt', exact: true }).count(), 0, 'collapsing a folder hides only its graph descendants');
+  await page.evaluate(entries => { delete window.__previewPlan; window.__testState.entries = entries; window.__emitTestState(); }, originals);
+  await page.getByRole('button', { name: '文件：report (2).txt', exact: true }).waitFor();
+  // Check broad header movement without accidentally turning settings into a drag.
+  await page.locator('header').scrollIntoViewIfNeeded();
+  const header = await page.locator('header').boundingBox();
+  await page.mouse.move(header.x + header.width * .55, header.y + 9);
+  await page.mouse.down(); await page.mouse.up();
+  assert.equal(await page.evaluate(() => window.__dragCount), 1);
   await page.getByRole('button', { name: '目录与问题' }).click();
   await page.locator('.tree').getByText('report (2).txt').waitFor();
   await page.getByRole('button', { name: '检查并打包 →' }).click();
@@ -85,6 +139,17 @@ try {
   assert.deepEqual(errors, []);
   await page.getByRole('button', { name: '收起面板' }).click();
   await page.locator('.orb').waitFor();
-  console.log('UI integration passed: collect, preview, collision map, issue acknowledgement, format override, background task isolation, report, collapse; no page errors.');
+  const orb = await page.locator('.orb').boundingBox();
+  await page.mouse.move(orb.x + 30, orb.y + 30);
+  await page.mouse.down(); await page.mouse.move(orb.x + 45, orb.y + 40, { steps: 5 }); await page.mouse.up();
+  assert.equal(await page.evaluate(() => window.__dragCount), 2, 'the whole compact icon starts native movement');
+  await page.locator('.orb').waitFor();
+  assert.equal(await page.locator('main').count(), 0, 'dragging must not expand the icon');
+  await page.locator('.orb').click();
+  await page.locator('main').waitFor();
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.__dragCount), 2, 'interactive header buttons never start dragging');
+  await page.getByRole('dialog', { name: '应用设置' }).getByRole('button', { name: '取消', exact: true }).click();
+  console.log('UI integration passed: collect, graph selection/issues/zoom/reveal, shortcut retry, full-header and compact-icon drag/click separation, preview, packing isolation and report; no page errors.');
 } finally { await browser.close(); server.close(); }
 

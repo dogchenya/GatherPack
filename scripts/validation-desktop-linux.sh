@@ -6,7 +6,7 @@ cp /work/src-tauri/scripts/gatherpack_selection.py /home/easypack-test/.local/sh
 chown -R easypack-test:easypack-test /home/easypack-test/.local
 chmod 1777 /tmp/.X11-unix
 chmod 777 /work/artifacts/validation
-if [ "${1:-selection}" = gnome ]; then
+if [[ "${1:-selection}" = gnome || "${1:-selection}" = shortcuts || "${1:-selection}" = drag ]]; then
   mkdir -p /run/dbus
   export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/gatherpack-validation-system-bus
   system_bus_pid=$(dbus-daemon --system --fork --nopidfile --address="$DBUS_SYSTEM_BUS_ADDRESS" --print-pid)

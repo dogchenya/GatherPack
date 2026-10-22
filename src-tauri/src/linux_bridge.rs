@@ -3,6 +3,32 @@ use tauri::Manager;
 
 const CONTENT: &str = include_str!("../scripts/gatherpack_selection.py");
 
+fn connection_notice() -> Option<String> {
+    let ready = std::process::Command::new("gdbus")
+        .args([
+            "call",
+            "--session",
+            "--timeout",
+            "2",
+            "--dest",
+            "org.freedesktop.DBus",
+            "--object-path",
+            "/org/freedesktop/DBus",
+            "--method",
+            "org.freedesktop.DBus.NameHasOwner",
+            "io.github.dogchenya.gatherpack.NautilusSelection",
+        ])
+        .output()
+        .is_ok_and(|output| {
+            output.status.success() && String::from_utf8_lossy(&output.stdout).trim() == "(true,)"
+        });
+    if ready {
+        None
+    } else {
+        Some("Nautilus 收集桥接尚未加载，快捷键可能已触发但无法取得文件。首次安装或升级后，请保存文件管理器中的操作，手动退出并重新打开“文件”（Nautilus），再点击“重新注册”检查连接。应用不会自动关闭文件管理器。".into())
+    }
+}
+
 /// AppIndicator can construct successfully even when no desktop tray exists.
 pub fn tray_host_available() -> bool {
     [
@@ -36,7 +62,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<Option<String>, String> {
     let system =
         std::path::Path::new("/usr/share/nautilus-python/extensions/gatherpack_selection.py");
     if fs::read_to_string(system).ok().as_deref() == Some(CONTENT) {
-        return Ok(None);
+        return Ok(connection_notice());
     }
     let directory = app
         .path()
@@ -46,7 +72,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<Option<String>, String> {
     fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
     let target = directory.join("gatherpack_selection.py");
     match fs::read_to_string(&target) {
-        Ok(existing) if existing == CONTENT => return Ok(None),
+        Ok(existing) if existing == CONTENT => return Ok(connection_notice()),
         Ok(existing) if !existing.starts_with("# gatherpack managed Nautilus selection bridge") => {
             return Err(format!(
                 "桥接位置已有非本应用管理的文件，未覆盖：{}",

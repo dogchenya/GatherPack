@@ -1,0 +1,56 @@
+:root { background: transparent; }
+body { background: transparent; }
+main { min-height: 100vh; background: #f5f7f4; border: 1px solid #dce5de; border-radius: 18px; }
+header { position: sticky; top: 0; z-index: 5; padding: 16px 20px; margin: -24px -24px 22px; min-height: 82px; border-bottom: 1px solid #e1e8e1; border-radius: 18px 18px 0 0; background: linear-gradient(120deg, #fff, #edf3ee); cursor: grab; user-select: none; touch-action: none; }
+header:active { cursor: grabbing; }
+header .logo { width: 42px; height: 42px; border: 1px solid #5b8a74; background: linear-gradient(145deg, #477c64, #173e30); box-shadow: inset 0 1px #ffffff30, 0 3px 8px #1c423025; font-size: 19px; cursor: inherit; }
+header .brand { cursor: inherit; min-width: 80px; }
+header h1 { font-size: 22px; }
+header button { flex-shrink: 0; }
+.compact { width: 94px; height: 102px; margin: 5px; padding: 3px 5px 7px; border-radius: 24px; border: 1px solid #b7cbbdaa; background: linear-gradient(145deg, #f8fcf9f5, #dce9dff5); box-shadow: inset 0 1px 1px #fff, 0 2px 5px #152e2540; cursor: grab; touch-action: none; user-select: none; }
+.compact:active { cursor: grabbing; }
+.compact .handle { display: flex; justify-content: center; gap: 3px; height: 14px; align-items: center; cursor: inherit; }
+.handle i { height: 3px; width: 3px; border-radius: 50%; background: #779382; }
+.orb { width: 60px; height: 60px; flex-shrink: 0; border-radius: 20px; border: 1px solid #446e59; background: radial-gradient(ellipse at 25% 0%, #5b9679, #2d654e 55%, #183e30); box-shadow: inset 0 1px 1px #ffffff50, inset 0 -2px 4px #0e332c70, 0 4px 8px #274e3a35; font-size: 25px; letter-spacing: -.7px; text-shadow: 0 1px 2px #183c2c; cursor: grab; touch-action: none; }
+.orb:hover { background: radial-gradient(ellipse at 25% 0%, #69a386, #36765a 55%, #204d3a); }
+.orb:active { cursor: grabbing; }
+.orb b { top: -4px; right: -6px; background: #f2f7ef; border-color: #e7f0e7; box-shadow: 0 1px 3px #183c2c25; text-shadow: none; letter-spacing: 0; }
+.compact small { margin-top: 5px; max-width: 80px; font-size: 9px; line-height: 12px; color: #526d5b; }
+.shortcut { flex-wrap: wrap; }
+.shortcut > span:not(.status-dot) { flex: 1; min-width: 150px; overflow-wrap: anywhere; }
+.shortcut .shortcut-retry { font-size: 10px; padding: 4px 7px; background: transparent; }
+.shortcut .status-dot { margin-left: 0; flex-shrink: 0; }
+.file-graph { margin-top: 14px; border: 1px solid #dbe5dc; border-radius: 14px; background: #fff; overflow: hidden; }
+.graph-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid #e8eee7; }
+.graph-toolbar strong { font-size: 12px; }
+.graph-toolbar p { margin: 4px 0 0; font-size: 10px; color: #7b8d81; }
+.graph-controls { display: flex; gap: 5px; }
+.graph-controls button { font-size: 11px; padding: 6px 9px; }
+.file-graph svg { display: block; width: 100%; height: 380px; background: #f8fbf8; touch-action: none; cursor: grab; user-select: none; }
+.file-graph svg:active { cursor: grabbing; }
+.graph-edge { fill: none; stroke: #a9c8b7; stroke-width: 2; }
+.graph-issue-edge { stroke: #dbb58d; }
+.graph-root { fill: #2c644b; stroke: #5d9377; stroke-width: 4; }
+.graph-root-label { fill: #fff; font-size: 14px; font-weight: 600; pointer-events: none; }
+.graph-root-count { fill: #cee4d7; font-size: 11px; pointer-events: none; }
+.graph-node { cursor: pointer; outline: none; }
+.graph-node rect { fill: #fff; stroke: #d6e4da; stroke-width: 1.5; }
+.graph-node:hover rect, .graph-node:focus-visible rect { stroke: #4e8c6a; fill: #eff7f0; stroke-width: 2.5; }
+.graph-node.selected rect { stroke: #347952; fill: #eaf5eb; stroke-width: 2.5; }
+.graph-node.has-issue rect { stroke: #d8ad7f; fill: #fff7ed; }
+.graph-node-icon { fill: #548669; font-size: 18px; }
+.graph-node.has-issue .graph-node-icon { fill: #ac7136; }
+.graph-node-name { fill: #304e3b; font-size: 14px; font-weight: 600; }
+.graph-node-meta { fill: #7e9584; font-size: 11px; }
+.graph-node-fold { fill: #568568; font-size: 15px; }
+.graph-caption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 10px; padding: 10px 16px; color: #7a8e80; border-top: 1px solid #e8eee7; }
+.graph-detail { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 14px 16px; background: #f1f6f1; min-height: 72px; }
+.graph-detail > div { min-width: 0; }
+.graph-detail strong { font-size: 12px; overflow-wrap: anywhere; }
+.graph-detail p { margin: 3px 0; font-size: 11px; color: #6a8371; }
+.graph-detail .graph-path { overflow-wrap: anywhere; color: #3e5d49; }
+.graph-detail button { flex-shrink: 0; }
+.graph-detail-empty { color: #829388; font-size: 11px; align-items: center; }
+.graph-limit { margin: 0; padding: 10px 16px; font-size: 11px; background: #fff4e4; color: #976d39; }
+@media (max-width: 550px) { header { margin: -16px -16px 18px; padding: 12px; gap: 8px; } header .brand p { display: none; } header h1 { font-size: 18px; } header .logo { width: 36px; height: 36px; font-size: 16px; } nav { gap: 0; } nav button { padding: 12px 9px; font-size: 12px; } .file-graph svg { height: 320px; } }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }

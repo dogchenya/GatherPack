@@ -22,7 +22,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     path::{Path, PathBuf},
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         Mutex,
     },
     time::{Duration, Instant},
@@ -87,6 +87,7 @@ struct AppState {
     expanded: AtomicBool,
     tray_available: AtomicBool,
     shortcut_available: AtomicBool,
+    shortcut_last_triggered: AtomicU64,
     validation: Option<validation::ValidationContext>,
 }
 #[derive(Clone, Serialize)]
@@ -95,6 +96,7 @@ struct Snapshot {
     entries: Vec<Entry>,
     message: String,
     shortcut_status: String,
+    shortcut_last_triggered: Option<u64>,
     settings: Settings,
     platform: &'static str,
     task: Task,
@@ -107,6 +109,10 @@ fn read_snapshot(state: &AppState) -> Snapshot {
         entries: state.collection.lock().unwrap().entries(),
         message: state.last_message.lock().unwrap().clone(),
         shortcut_status: state.shortcut_status.lock().unwrap().clone(),
+        shortcut_last_triggered: match state.shortcut_last_triggered.load(Ordering::Relaxed) {
+            0 => None,
+            value => Some(value),
+        },
         settings: state.settings.lock().unwrap().clone(),
         platform: std::env::consts::OS,
         task: state.task.lock().unwrap().clone(),
@@ -442,7 +448,10 @@ fn save_settings(
     if shortcut != old.shortcut && !state.shortcut_available.load(Ordering::Relaxed) {
         return Err("当前环境的全局快捷键后端不可用；仍可使用拖拽和添加文件".into());
     }
-    if shortcut != old.shortcut {
+    let needs_registration = shortcut != old.shortcut
+        || (state.shortcut_available.load(Ordering::Relaxed)
+            && !app.global_shortcut().is_registered(shortcut.as_str()));
+    if needs_registration {
         app.global_shortcut()
             .register(shortcut.as_str())
             .map_err(|e| format!("快捷键冲突或无法注册：{e}"))?;
@@ -455,7 +464,7 @@ fn save_settings(
         app.autolaunch().disable()
     };
     if let Err(e) = auto_result {
-        if shortcut != old.shortcut {
+        if needs_registration {
             let _ = app.global_shortcut().unregister(shortcut.as_str());
         }
         return Err(format!("开机启动设置失败：{e}"));
@@ -480,6 +489,42 @@ fn save_settings(
     persist(&app);
     emit(&app);
     Ok(())
+}
+#[tauri::command]
+fn retry_shortcut(app: tauri::AppHandle) -> Result<(), String> {
+    let state = app.state::<AppState>();
+    if !state.shortcut_available.load(Ordering::Relaxed) {
+        return Err(
+            "全局快捷键后端不可用，请退出后重新启动应用；Ubuntu 请使用 GNOME/X11 会话".into(),
+        );
+    }
+    let shortcut = state.settings.lock().unwrap().shortcut.clone();
+    let result = (|| {
+        if app.global_shortcut().is_registered(shortcut.as_str()) {
+            app.global_shortcut()
+                .unregister(shortcut.as_str())
+                .map_err(|error| error.to_string())?;
+        }
+        app.global_shortcut()
+            .register(shortcut.as_str())
+            .map_err(|error| {
+                format!("快捷键注册失败，请关闭占用此组合键的其他程序，或在设置中换键：{error}")
+            })
+    })();
+    *state.shortcut_status.lock().unwrap() = match &result {
+        Ok(()) => "快捷键已注册".into(),
+        Err(error) => error.clone(),
+    };
+    if result.is_ok() {
+        *state.last_message.lock().unwrap() =
+            "快捷键已重新注册。请切回文件管理器，选中文件后按收集快捷键。".into();
+        #[cfg(target_os = "linux")]
+        if let Ok(Some(message)) = linux_bridge::install(&app) {
+            *state.last_message.lock().unwrap() = message;
+        }
+    }
+    emit(&app);
+    result
 }
 fn expand(app: &tauri::AppHandle, expanded: bool, focus: bool) {
     let state = app.state::<AppState>();
@@ -570,9 +615,18 @@ fn reveal(app: tauri::AppHandle, path: String) -> Result<(), String> {
 }
 fn collect_from_selection(app: tauri::AppHandle) {
     let state = app.state::<AppState>();
+    state.shortcut_last_triggered.store(
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64,
+        Ordering::Relaxed,
+    );
     if state.collecting.swap(true, Ordering::SeqCst) {
         return;
     }
+    *state.last_message.lock().unwrap() = "已收到快捷键，正在读取前台文件管理器的选中项…".into();
+    emit(&app);
     std::thread::spawn(move || {
         let result = selection::capture();
         let state = app.state::<AppState>();
@@ -603,6 +657,7 @@ fn main() {
     let mut context = tauri::generate_context!();
     #[cfg(target_os = "linux")]
     for window in &mut context.config_mut().app.windows {
+        window.transparent = true;
         window.resizable = true;
         window.min_width = Some(window.width);
         window.min_height = Some(window.height);
@@ -736,13 +791,15 @@ fn main() {
                             let available = true;
                             state.tray_available.store(available, Ordering::Relaxed);
                             if !available {
-                                *state.last_message.lock().unwrap() =
-                                    "当前桌面没有系统托盘，收集栏将保留窗口入口".into();
+                                let mut message = state.last_message.lock().unwrap();
+                                if !message.is_empty() { message.push('\n'); }
+                                message.push_str("当前桌面没有系统托盘，收集栏将保留窗口入口");
                             }
                         }
                         Err(e) => {
-                            *state.last_message.lock().unwrap() =
-                                format!("托盘不可用，仍可通过窗口操作：{e}");
+                            let mut message = state.last_message.lock().unwrap();
+                            if !message.is_empty() { message.push('\n'); }
+                            message.push_str(&format!("托盘不可用，仍可通过窗口操作：{e}"));
                         }
                     }
                 }
@@ -784,6 +841,7 @@ fn main() {
             start_pack,
             cancel_pack,
             save_settings,
+            retry_shortcut,
             set_expanded,
             hide_window,
             exit_app,

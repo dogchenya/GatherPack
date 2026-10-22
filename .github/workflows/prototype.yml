@@ -25,6 +25,7 @@ jobs:
           components: rustfmt
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: node scripts/test-graph.mjs
       - run: pnpm exec playwright install --with-deps chromium
       - run: node scripts/test-ui.mjs
       - run: cargo fmt --all --check

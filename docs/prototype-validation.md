@@ -22,6 +22,7 @@
 | Linux 桌面 | Xvfb 1280×900、X11；Openbox 与 GNOME Shell 46.0-0ubuntu6~24.04.16 分别测试；Nautilus 1:46.4-0ubuntu0.2 |
 | Linux WebView | WebKitGTK 2.52.6-0ubuntu0.24.04.1 |
 | Linux 工具链 | 官方 Rust 1.98.1；复用锁定 Cargo 下载缓存并离线编译，校验由 Cargo 执行；前端生产资源由 Node.js 24 构建 |
+| 远端 macOS | macOS 15.7.9 / 24G830；GitHub Actions macos-15 ARM64 与 macos-15-intel x64；provenance 分别确认 aarch64-apple-darwin 与 x86_64-apple-darwin 原生 host |
 
 GNOME Shell 使用独立 D-Bus 与无 logind 的测试会话，不是物理机完整登录会话。未因此宣称所有 GNOME/Wayland 环境通过。准备环境时，跨 Shell 变量传递错误曾改写 WSL 宿主 sources.list，已立即恢复 Ubuntu 22.04 对应源，未执行宿主发行版升级；后续使用独立脚本明确根目录。宿主仅新增 debootstrap，开发依赖与测试安装均位于独立 rootfs。
 
@@ -44,6 +45,11 @@ GNOME Shell 使用独立 D-Bus 与无 logind 的测试会话，不是物理机�
 | Cargo/npm 授权 | 531 项，missingLicenseText=[]；39 项明确提供 SPDX 完整条款与来源元数据，4 项同版本主包原始声明继承；完整 NSIS COPYING 并入声明 |
 | AppImage 系统库 | 原始 copyright 与通用授权覆盖 126 个包，unresolved=[]；98 个确切源码包版本的原始压缩包、.dsc 与 Ubuntu 补丁保留，运行时原始声明及构建源码另附 |
 | 最终交付核对 | Windows 安装包、Linux .deb/AppImage 与对应源码共 4 个文件的 SHA256 全部匹配；桌面验证记录绑定最终安装包哈希；对应源码归档逐一核对 2286 个源文件 |
+| 远端 Windows / macOS | 构建提交 961a2fc：Windows、Mac ARM64、Mac Intel 的安装包构建、许可证门禁与各 27 项真实 IPC 均通过；下载的 Windows CI 安装包在本机再次完成安装/27 项 IPC/卸载 |
+| Mac 最终 DMG | 两种架构在对应原生 runner 上挂载交付 DMG，核对 SHA256、源码提交、包内声明与原始 Rust 通知字节，直接执行包内应用，各通过 22 项核心及 5 项恢复断言，随后成功卸载卷 |
+| 四目标 CI | [39734269501](https://github.com/dogchenya/easy_pack/actions/runs/39734269501) 全部通过：前端、格式、核心、ZIP64、Windows/Linux/Mac ARM64/Mac Intel 安装包及原生运行；四目标各 27 项，共 108 项真实 IPC 断言；下载产物 SHA256 与提交均匹配 |
+| CI AppImage 声明 | CI 主机的实际打包库覆盖 124 个发行版包，unresolved=[]，对应 97 个确切源码包版本；这些数量与此前独立 rootfs 构建分别记录，不能混用其哈希 |
+| CI Linux 安装包复验 | 下载 CI 的 .deb/AppImage 后，在上述独立 GNOME/X11 会话分别通过安装包内真实 IPC 27 项及完整桌面 70 项；.deb 卸载成功；对应源码归档 2283 个文件逐一核对通过。GUI 报告绑定此次 CI 包的确切 SHA256 |
 
 真实 IPC 场景包括三格式、去重/重叠、冻结计划期间清空或追加清单、第二任务拒绝、开始写入后的取消、目标冲突与禁止写进源目录、过期计划拒绝、失效来源与明确跳过、默认设置/上次目录/报告恢复。原生侧另外核对源字节、格式签名、取消无输出、临时文件清理与持久化磁盘记录。
 
@@ -62,6 +68,9 @@ Windows 隐藏启动曾观察到 WebView 退出时窗口注销错误 1412，但�
 - Linux 故障/大文件/安装与 AppImage 日志：artifacts/validation/linux-faults.json、linux-large-files.log、linux-install-run.log、linux-appimage-native.log。
 - Linux compact 原生证据导出至 artifacts/validation/linux/native-*/，不导出测试源大文件内容。
 - UI 截图 artifacts/validation/ui-report.png 使用模拟数据，不能替代原生证据。
+- 可公开核对的本地断言与哈希：[local-alpha.3.json](validation/local-alpha.3.json)。原始大体积测试夹具未纳入源码。
+- 可公开核对的 CI 产物、安装复验及桌面断言：[ci-alpha.3.json](validation/ci-alpha.3.json)。本地完整复验报告位于 artifacts/ci/39734269501/linux-installed/；脚本 verify-ci-artifacts.mjs 核对四目标的提交、哈希、原生主机、原始声明及安装验证。
+- 远端构建与运行：[Actions 39734269501](https://github.com/dogchenya/easy_pack/actions/runs/39734269501)；Mac 交付包验证：[Actions 39735416940](https://github.com/dogchenya/easy_pack/actions/runs/39735416940)。安装包与原生 JSON 报告分别保存在 Actions Artifacts，本地下载于 artifacts/ci/39734269501/。
 
 2026-10-22 用户完成 GitHub CLI 设备授权，确认账号 dogchenya；按已批准的公开源码要求创建 [dogchenya/easy_pack](https://github.com/dogchenya/easy_pack)，源码首次提交 193f251 并推送 master。远端 Actions 已启动，结果以实际运行记录为准。此前本地产物的 provenance 仍保留 uncommitted，不倒填为新提交的构建。凭据保存在系统凭据库，未纳入仓库。
 
@@ -71,8 +80,7 @@ Windows 隐藏启动曾观察到 WebView 退出时窗口注销错误 1412，但�
 | --- | --- |
 | Windows 实际文件管理器操作 | UI 自动化捕获后无法激活窗口，恢复仍返回 failed to activate captured window，已停止使用该助手，未用另一种 Windows UI 自动化绕过。实际 Explorer 多窗口/多标签/桌面、物理热键/拖入、原生选择器及开机启动交互仍需验收 |
 | Windows 桌面选择 | 当前适配器对无法唯一匹配的 Explorer 标签页或桌面视图明确拒绝，不列为已通过支持项 |
-| macOS ARM64/x64 | 无 Mac 主机；未构建、安装或实测 Finder 权限、热键、拖入及核心流程，不能以 Windows/Linux 结果替代 |
-| GitHub Actions | 公开源码已上传，远端工作流已启动；等待四目标实际构建与原生 IPC 结果，启动不等于成功 |
+| macOS ARM64/x64 桌面交互 | 两种架构已在远端原生 Mac 构建并通过包内真实 IPC；Finder 自动化权限、实际热键、拖入、原生对话框及系统启动交互仍需独立桌面验收，IPC 结果不覆盖这些行为 |
 | Wayland/其他 Linux 管理器 | 尚未独立验证，不列为已通过兼容承诺 |
 | 原生对话框与其他系统设置 | Linux 最终两种发布包已通过文件/文件夹/保存选择器和实际开机启动注册开关；Windows/macOS 对应交互仍需验证，直接 IPC 不能替代系统 UI |
 | 性能验收 | 代表性数量、容量与量化阈值仍待补充；4 GiB 一致性不是正式性能承诺 |

@@ -2,7 +2,9 @@
 
 跨平台文件收集与迁移打包助手，原创代码按 MIT 许可证交付。Tauri 2 + Rust + React + TypeScript，本地离线处理，无账号。
 
-当前为 **0.1.0-alpha.3 一期候选实现**。Windows 与 Linux 的真实 IPC、重启恢复及三种压缩格式已通过验证；Linux X11 的直接收集快捷键与原生拖入已实测。三端验收尚未全部完成，详见 [开发与验证记录](docs/prototype-validation.md)。
+当前为 **0.1.0-alpha.3 一期候选实现**。四目标 CI 已全部通过，Windows、Linux、Mac ARM64/Intel 的真实 IPC、重启恢复及三种压缩格式均已验证；Linux X11 的直接收集快捷键与原生拖入已实测。Windows/macOS 完整桌面验收尚未完成，详见 [开发与验证记录](docs/prototype-validation.md)。
+
+安装包可在 [已通过的 CI 运行](https://github.com/dogchenya/easy_pack/actions/runs/39734269501) 底部 Artifacts 下载，按目标系统及架构选择 easy-pack 包。Linux AppImage 需连同对应源码归档一起分发；Mac 包内运行验证见 [独立检查](https://github.com/dogchenya/easy_pack/actions/runs/39735416940)。[最终 CI 产物与复验摘要](docs/validation/ci-alpha.3.json) 记录确切提交、哈希及断言。
 
 ## 使用
 
@@ -70,7 +72,7 @@ bash scripts/build-linux-release.sh
 | 环境 | 实现方式 | 实测状态 |
 | --- | --- | --- |
 | Windows 11 x64 / Explorer | 前台句柄 + 隐藏 STA PowerShell + Shell COM | 编译通过；多窗口、多标签页、桌面选择及真实热键操作仍需验收 |
-| macOS 14+ ARM64/x64 / Finder | 前台应用检查 + JXA Finder selection | 尚未在 Mac 构建实测 |
+| macOS 14+ ARM64/x64 / Finder | 前台应用检查 + JXA Finder selection | 两种架构均在 GitHub 原生 Mac 构建 DMG，并运行包内应用通过各 27 项真实 IPC；Finder 权限、热键、拖入等完整桌面交互尚待验收 |
 | Ubuntu 24.04 x64 / GNOME Shell 46.0 或 Openbox / X11 / Nautilus 46.4 | 进程内 MIT Python 桥接，按实际前台 XID 读取当前映射文件视图的实时选择 | 独立 rootfs + Xvfb 中两种窗口管理器均通过：多窗口、多标签、混选、空选、实际全局键、不抢焦点、剪贴板保持和原生拖入；GNOME 使用无 logind 的独立测试会话，不冒充物理机登录验证 |
 | Linux Wayland | 尝试全局快捷键后端并反馈注册结果 | 原生全局键、置顶及 AT-SPI 行为均未验收 |
 

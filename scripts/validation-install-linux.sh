@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 cd /work
-deb=/var/cache/easy-pack/target/release/bundle/deb/easy_pack_0.1.0-alpha.3_amd64.deb
+deb=${1:-/var/cache/easy-pack/target/release/bundle/deb/easy_pack_0.1.0-alpha.3_amd64.deb}
 export EASY_PACK_TEST_PACKAGE_SHA256=$(sha256sum "$deb" | cut -d ' ' -f 1)
 if dpkg-query -W -f='${Status}' easy-pack 2>/dev/null | grep -q 'install ok installed'; then
   echo 'Refusing to replace an existing installation' >&2

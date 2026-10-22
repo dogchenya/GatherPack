@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Installer)
+param([Parameter(Mandatory=$true)][string]$Installer, [string]$ReportPath)
 $ErrorActionPreference = 'Stop'
 $workspace = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $installerPath = (Resolve-Path -LiteralPath $Installer).Path
@@ -31,5 +31,6 @@ $remaining = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\U
 if ($remaining) { throw 'Uninstall left its registration behind' }
 $checks.Add('Silent uninstall removes the executable and installation registration')
 $report = @{ passed=$true; installer=$installerPath; installerSHA256=(Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant(); installation=$installPath; checks=$checks }
-$report | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $workspace 'artifacts\validation\windows-install-report.json') -Encoding utf8
+if (-not $ReportPath) { $ReportPath = Join-Path $workspace 'artifacts\validation\windows-install-report.json' }
+$report | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $ReportPath -Encoding utf8
 $report | ConvertTo-Json -Depth 5

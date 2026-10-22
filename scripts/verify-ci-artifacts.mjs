@@ -45,6 +45,27 @@ for (const target of ['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-
     artifacts.push({ name, sha256: expected });
   }
   assert.ok(artifacts.length > 0);
+  if (target.includes('apple-darwin')) {
+    const installation = JSON.parse(await readFile(join(root, 'installed-' + target, 'macos-install-' + target + '.json'), 'utf8'));
+    assert.equal(installation.passed, true);
+    assert.equal(installation.commit, commit);
+    assert.equal(installation.target, target);
+  } else if (target.includes('windows')) {
+    const installation = JSON.parse((await readFile(join(root, 'windows-installed-report.json'), 'utf8')).replace(/^\uFEFF/, ''));
+    assert.equal(installation.passed, true);
+    assert.ok(artifacts.some(file => file.name.endsWith('.exe') && file.sha256 === installation.installerSHA256));
+  } else {
+    for (const [kind, extension] of [['deb', '.deb'], ['appimage', '.AppImage']]) {
+      const gui = JSON.parse(await readFile(join(root, 'linux-installed', 'linux-' + kind + '-gui-report.json'), 'utf8'));
+      assert.equal(gui.passed, true);
+      assert.equal(gui.checks.length, 70);
+      assert.ok(gui.checks.every(check => check.passed));
+      const testedSHA = kind === 'deb' ? gui.packageSHA256 : gui.executableSHA256;
+      assert.ok(artifacts.some(file => file.name.endsWith(extension) && file.sha256 === testedSHA));
+    }
+    const source = JSON.parse(await readFile(join(root, 'linux-installed', 'source-archive-report.json'), 'utf8'));
+    assert.equal(source.passed, true);
+  }
   const validation = await reports(join(root, 'native-' + target));
   assert.equal(validation.length, 2);
   let assertions = 0;

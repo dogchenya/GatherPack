@@ -34,7 +34,7 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 当前版本：**0.1.0-alpha.4**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。
 
-打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml)，选择已完成的构建，在其 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
+打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/runs/39748220404)，在 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。AppImage 的再分发需同时提供下载项中的 `corresponding-source.tar`。
 
-新品牌版本正在进行完整构建验证，当前进度见 [品牌迁移记录](docs/brand-migration.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
+四目标构建、真实 IPC、Windows 安装卸载、双架构 Mac 包内运行及 Linux 桌面流程已通过，证据见 [品牌迁移记录](docs/brand-migration.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
 
 ## 快速上手
 

@@ -46,4 +46,18 @@
 - Windows 产品属性、Debian 包名、桌面启动器、包内路径和新品牌截图已核对。
 - 531 项组件授权门禁、安装包哈希和对应源码归档的 2286 个文件校验通过。
 
-本地预提交结果见 [local-alpha.4.json](validation/local-alpha.4.json)。四目标远端验证正在独立分支运行；完成后补充确切源码提交、运行编号及最终产物哈希，再切换仓库名和默认分支。
+本地预提交结果见 [local-alpha.4.json](validation/local-alpha.4.json)。最终交付包证据见 [ci-alpha.4.json](validation/ci-alpha.4.json)。
+
+## 最终交付验证
+
+- 四目标构建及每目标 27 项真实 IPC：[CI 39748220404](https://github.com/dogchenya/GatherPack/actions/runs/39748220404)，产物源码提交 `0c4564c8578a515506d6951a38b75c7b4805c3fb`。
+- 两种 Mac 架构均挂载实际下载的 DMG，核对名称与标识、授权文本、包内程序 27 项真实 IPC，再卸载卷：[Mac 包验证 39750241415](https://github.com/dogchenya/GatherPack/actions/runs/39750241415)。
+- 最终 Windows 安装器通过 6 项安装、产品属性、授权、程序运行和卸载检查；最终 Linux .deb / AppImage 分别通过 27 项真实 IPC 和 70 项 GNOME/X11 桌面断言。
+- 最终 AppImage 普通启动导入、重启保护和原始数据保留 3 项通过；对应源码归档 2283 个文件校验通过。
+- 每个交付产物的 SHA256、版本、目标架构、源码提交和许可证均已交叉核对；完整值保存在 JSON 证据中。
+
+CI 镜像中预装的 curl/systemd 旧二进制版本曾与已更新的源码索引不一致。构建前现在同步可升级的运行库；无同名升级候选的兼容 ABI 保留。最终包的逐库精确源码检查保持启用。musl 官方站点连接超时后，改为随源码保存此前取得的原始版权全文，并验证固定 SHA256，保留完整授权声明。
+
+以上检查全部通过后才更新默认分支并重命名原仓库，保留提交历史、问题与历史构建。最终证据文档提交不改变已验证的应用源码。
+
+Windows Explorer / macOS Finder 完整桌面交互、Wayland 与其他 Linux 文件管理器仍待专项验证；不将本次构建及 IPC 结果等同于这些环境的验收。

@@ -34,7 +34,7 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 Current version: **0.1.0-alpha.4**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions.
 
-Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml), select a completed build, choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
+Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs/39748220404), choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/work
 
 Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup. When redistributing the AppImage, include the accompanying `corresponding-source.tar`.
 
-The renamed version is undergoing full build validation; see the [migration record](docs/brand-migration.md) (Chinese) for progress. Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
+Four-target builds, real IPC, Windows installation/uninstallation, both Mac package architectures, and Linux desktop flows have passed; see the [migration record](docs/brand-migration.md) (Chinese) for evidence. Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
 
 ## Getting started
 

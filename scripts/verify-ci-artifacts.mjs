@@ -65,6 +65,10 @@ for (const target of ['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-
     }
     const source = JSON.parse(await readFile(join(root, 'linux-installed', 'source-archive-report.json'), 'utf8'));
     assert.equal(source.passed, true);
+    const migration = JSON.parse(await readFile(join(root, 'linux-installed', 'profile-migration-report.json'), 'utf8'));
+    assert.equal(migration.passed, true);
+    assert.equal(migration.checks.length, 3);
+    assert.ok(artifacts.some(file => file.name.endsWith('.AppImage') && file.sha256 === migration.executableSHA256));
   }
   const validation = await reports(join(root, 'native-' + target));
   assert.equal(validation.length, 2);

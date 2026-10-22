@@ -24,7 +24,7 @@ await writeFile(join(legacy, 'last-report.json'), report);
 await writeFile(join(legacy, 'reports/old.json'), report);
 async function startAndInspect(inspect) {
   let stderr = '';
-  const child = spawn(executable, [], { env: { ...process.env, XDG_DATA_HOME: data, XDG_CONFIG_HOME: join(root, 'config'), XDG_CACHE_HOME: join(root, 'cache') }, stdio: ['ignore', 'ignore', 'pipe'] });
+  const child = spawn(executable, [], { env: { ...process.env, XDG_DATA_HOME: data, XDG_CONFIG_HOME: join(root, 'config'), XDG_CACHE_HOME: join(root, 'cache') }, detached: true, stdio: ['ignore', 'ignore', 'pipe'] });
   child.stderr.on('data', bytes => { stderr = (stderr + bytes).slice(-4000); });
   const exited = new Promise((resolve, reject) => { child.once('exit', resolve); child.once('error', reject); });
   try {
@@ -36,10 +36,15 @@ async function startAndInspect(inspect) {
     assert.ok(ready, 'Ordinary startup must finish profile loading and prepare its isolated bridge: ' + stderr);
     await inspect();
   } finally {
-    child.kill();
-    const timer = setTimeout(() => child.kill('SIGKILL'), 5000);
+    // AppImage may launch the real executable as a descendant of its wrapper.
+    const stop = signal => {
+      if (!child.pid) return;
+      try { process.kill(-child.pid, signal); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+    };
+    stop('SIGTERM');
+    const timer = setTimeout(() => stop('SIGKILL'), 5000);
     timer.unref();
-    try { await exited; } finally { clearTimeout(timer); }
+    try { await exited; } finally { clearTimeout(timer); stop('SIGKILL'); child.stderr.destroy(); }
   }
 }
 await startAndInspect(async () => {

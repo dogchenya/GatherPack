@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "gatherpack · 文件收集与打包",
+        "title": "GatherPack · 文件收集与打包",
         "width": 104,
         "height": 112,
         "minWidth": 80,

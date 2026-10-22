@@ -12,6 +12,10 @@ if ($process.ExitCode -ne 0) { throw "Installer exited $($process.ExitCode)" }
 $executable = Join-Path $installPath 'gatherpack.exe'
 if (-not (Test-Path -LiteralPath $executable)) { throw 'Installed application executable is missing' }
 $checks.Add('Silent install succeeds and installs the expected executable')
+$expected = Get-Content (Join-Path $workspace 'src-tauri\tauri.conf.json') -Raw | ConvertFrom-Json
+$metadata = (Get-Item -LiteralPath $executable).VersionInfo
+if ($metadata.ProductName -ne $expected.productName -or $metadata.ProductVersion -ne $expected.version) { throw 'Installed executable branding or version metadata is incorrect' }
+$checks.Add('Installed executable product name and version match the current brand')
 $licenses = Get-ChildItem -LiteralPath $installPath -Filter THIRD_PARTY_NOTICES.md -Recurse
 if ($licenses.Count -ne 1 -or -not (Select-String -LiteralPath $licenses[0].FullName -SimpleMatch 'NSIS installer tooling' -Quiet)) { throw 'Installed licenses or NSIS notices are missing' }
 $checks.Add('Installed resources include dependency and NSIS license notices')

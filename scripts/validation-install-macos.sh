@@ -43,11 +43,13 @@ for name in LICENSE THIRD_PARTY_NOTICES.md third-party.md license-audit.json Rus
 done
 cmp docs/installer-notices/Rust-COPYRIGHT-library.html "$app/Contents/Resources/licenses/Rust-COPYRIGHT-library.html"
 plutil -lint "$app/Contents/Info.plist"
+test "$(plutil -extract CFBundleName raw -o - "$app/Contents/Info.plist")" = "$(node -p 'require("./src-tauri/tauri.conf.json").productName')"
+test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = "$(node -p 'require("./src-tauri/tauri.conf.json").identifier')"
 node scripts/test-native.mjs "$app/Contents/MacOS/gatherpack"
 hdiutil detach "$mount" >/dev/null
 mounted=0
 GATHERPACK_VALIDATION_TARGET="$target" GATHERPACK_VALIDATION_COMMIT="$commit" node --input-type=module <<'JS'
 import { writeFile } from 'node:fs/promises';
 const target = process.env.GATHERPACK_VALIDATION_TARGET;
-await writeFile('artifacts/validation/macos-install-' + target + '.json', JSON.stringify({passed: true, target, commit: process.env.GATHERPACK_VALIDATION_COMMIT, checks: ['DMG SHA256 and build provenance match', 'DMG mounts read-only on matching native architecture', 'Bundled executable and license resources exist', 'Original Rust standard-library notice bytes match', 'Bundled executable passes 22 core and 5 restart native IPC assertions', 'DMG detaches after the application exits']}, null, 2) + '\n');
+await writeFile('artifacts/validation/macos-install-' + target + '.json', JSON.stringify({passed: true, target, commit: process.env.GATHERPACK_VALIDATION_COMMIT, checks: ['DMG SHA256 and build provenance match', 'DMG mounts read-only on matching native architecture', 'Bundled executable and license resources exist', 'Original Rust standard-library notice bytes match', 'Bundle display name and identifier match the current brand', 'Bundled executable passes 22 core and 5 restart native IPC assertions', 'DMG detaches after the application exits']}, null, 2) + '\n');
 JS

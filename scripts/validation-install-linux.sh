@@ -12,6 +12,9 @@ fi
 dpkg -i "$deb"
 dpkg-query -L "$package" > /work/artifacts/validation/linux-installed-files.txt
 test -f /usr/bin/gatherpack
+desktop=$(dpkg-query -L "$package" | grep '/applications/GatherPack.desktop$')
+grep -Fxq 'Name=GatherPack' "$desktop"
+grep -Fq 'Exec=gatherpack' "$desktop"
 cmp /usr/share/nautilus-python/extensions/gatherpack_selection.py src-tauri/scripts/gatherpack_selection.py
 notice=$(dpkg-query -L "$package" | grep '/licenses/THIRD_PARTY_NOTICES.md$')
 test -n "$notice"
@@ -24,5 +27,5 @@ cp artifacts/validation/linux-selection-report.json artifacts/validation/linux-d
 dpkg --remove "$package"
 test ! -e /usr/bin/gatherpack
 test ! -e /usr/share/nautilus-python/extensions/gatherpack_selection.py
-printf '%s\n' '{"passed":true,"checks":["deb dependencies installed","system Nautilus bridge matches source","installed licenses complete","installed binary native IPC and restart passed","package removal removes binary and bridge"]}' > artifacts/validation/linux-install-report.json
+printf '%s\n' '{"passed":true,"checks":["deb dependencies installed","desktop launcher uses the GatherPack name and executable","system Nautilus bridge matches source","installed licenses complete","installed binary native IPC and restart passed","package removal removes binary and bridge"]}' > artifacts/validation/linux-install-report.json
 cat artifacts/validation/linux-install-report.json

@@ -1,111 +1,87 @@
+<p align="center">
+  <img src="app-icon.svg" width="88" alt="easy_pack 图标">
+</p>
+
 # easy_pack
 
-跨平台文件收集与迁移打包助手，原创代码按 MIT 许可证交付。Tauri 2 + Rust + React + TypeScript，本地离线处理，无账号。
+**简体中文** | [English](README.en.md)
 
-当前为 **0.1.0-alpha.3 一期候选实现**。四目标 CI 已全部通过，Windows、Linux、Mac ARM64/Intel 的真实 IPC、重启恢复及三种压缩格式均已验证；Linux X11 的直接收集快捷键与原生拖入已实测。Windows/macOS 完整桌面验收尚未完成，详见 [开发与验证记录](docs/prototype-validation.md)。
+[![构建状态](https://github.com/dogchenya/easy_pack/actions/workflows/prototype.yml/badge.svg?branch=master)](https://github.com/dogchenya/easy_pack/actions/workflows/prototype.yml)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-安装包可在 [已通过的 CI 运行](https://github.com/dogchenya/easy_pack/actions/runs/39734269501) 底部 Artifacts 下载，按目标系统及架构选择 easy-pack 包。Linux AppImage 需连同对应源码归档一起分发；Mac 包内运行验证见 [独立检查](https://github.com/dogchenya/easy_pack/actions/runs/39735416940)。[最终 CI 产物与复验摘要](docs/validation/ci-alpha.3.json) 记录确切提交、哈希及断言。
+**把分散的文件收集到一起，一次打包带走。**
 
-## 使用
+easy_pack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工具。把不同目录里的文件和文件夹拖进悬浮收集栏，整理好清单后，直接导出 ZIP、7z 或 tar.gz。整个过程在本机完成，无需账号或网络连接。
 
-1. 启动后显示小悬浮图标。拖入文件/文件夹，或点击图标展开后使用“添加文件”“添加文件夹”。
-2. 从不同目录继续追加。快捷键默认 Windows/Linux 为 Ctrl+Alt+Shift+E，macOS 为 Command+Option+Shift+E；直接读取前台文件管理器选择，不读取剪贴板。
-3. 在“目录与问题”查看最终包内路径、重命名及问题；先修正，或在打包确认页明确跳过已列出的问题。
-4. 点击“检查并打包”，选择本次格式与保存位置。默认包名带本地日期时间；已有文件一律拒绝覆盖。
-5. 查看进度和本机报告。取消通过独立入口执行；公共清单在打包期间可以继续收集、移除和清空，变更供下次任务使用。
-6. 面板“收起”回到小图标；菜单或托盘可显隐、退出。任务执行中先取消并等待清理，再退出。
+![easy_pack 在 Linux 桌面上的界面](docs/assets/app-preview.png)
 
-ZIP、7z、tar.gz 均为真实压缩格式，使用内置标准等级，流式读写。文件夹包含隐藏项、.git 和空文件夹，不提供内部排除；不跟随链接/目录联接。独立文件位于包根目录，文件夹保留内部结构；跨平台非法名称、大小写和 Unicode 规范化冲突自动改名，并可预览。
+*Linux/X11 界面示例。当前应用界面使用简体中文。*
 
-清单、默认格式、快捷键、上次输出目录与开机启动设置保存于系统应用数据目录；最新报告为 last-report.json，历史报告位于 reports/。源文件路径仅用于本机记录，不写入共享包。清单不保存文件内容；源文件变化时使用打包时可读取的内容。
+## 功能
 
-## 开发与源码构建
+- **跨目录收集**：拖入文件、整个文件夹，或通过快捷键收集文件管理器中的选中项。
+- **轻量悬浮栏**：收起时保留小图标，随时展开查看和管理清单。
+- **三种压缩格式**：支持 ZIP、7z、tar.gz，保存默认格式，也可为单次任务临时切换。
+- **打包前预览**：查看包内目录结构、重名处理结果和不可用来源，确认后再开始。
+- **保留原文件**：收集阶段记录路径；移除、清空和取消操作不删除或移动源文件。
+- **随时继续整理**：后台打包、进度与取消、结果报告、清单跨重启恢复。
 
-需要 Rust **1.98.1**（rust-toolchain.toml）、Node.js **24**、pnpm **11.25.0**。先安装对应平台的原生工具链：
+文件夹会保留内部目录结构、隐藏内容和空文件夹。同名项目自动编号；链接等不支持的项目会列为问题，需处理或明确跳过。
 
-- Windows：Visual Studio C++ Build Tools、Windows SDK、WebView2。
-- macOS 14+：Xcode Command Line Tools；Finder 选择读取需授予自动化权限。
-- Ubuntu 24.04：以下公开系统依赖。其他发行版可按包名适配自行编译，不默认宣称兼容。
+## 下载与安装
+
+当前版本：**0.1.0-alpha.3**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。
+
+打开 [已通过的构建](https://github.com/dogchenya/easy_pack/actions/runs/39734269501)，在页面底部 **Artifacts** 中选择对应系统的下载项，解压后安装。下载 Artifacts 需要登录 GitHub。
+
+| 平台 | 下载项 | 安装方式 |
+| --- | --- | --- |
+| Windows x64 | `easy-pack-x86_64-pc-windows-msvc` | 运行 `.exe` 安装程序 |
+| macOS 14+ · Apple Silicon | `easy-pack-aarch64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
+| macOS 14+ · Intel | `easy-pack-x86_64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
+| Linux x64 · Ubuntu 24.04 | `easy-pack-x86_64-unknown-linux-gnu` | 安装 `.deb`，或赋予 `.AppImage` 执行权限后运行 |
+
+安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。AppImage 的再分发需同时提供下载项中的 `corresponding-source.tar`。
+
+四个目标的构建与真实 IPC 测试已通过。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
+
+## 快速上手
+
+1. **收集**：启动应用，把文件或文件夹拖到悬浮图标上；也可以展开面板，点击“添加文件”或“添加文件夹”。
+2. **整理**：继续从其他目录添加，移除不需要的项目，在“目录与问题”中检查输出结构。
+3. **打包**：点击“检查并打包”，选择格式、保存位置和包名，处理提示的问题后开始。
+4. **查看结果**：完成后查看报告或打开输出目录。原文件和收集清单都会保留。
+
+| 快捷键 | 操作 |
+| --- | --- |
+| Windows / Linux：`Ctrl + Alt + Shift + E` | 收集前台文件管理器中的选中项 |
+| macOS：`Command + Option + Shift + E` | 收集 Finder 中的选中项 |
+
+可在“设置”中修改快捷键、默认格式和开机启动选项。快捷键收集无需先复制文件，不读取剪贴板。
+
+## 从源码运行
+
+技术栈：**Tauri 2 · Rust · React · TypeScript**。
+
+安装 Rust **1.98.1**、Node.js **24**、pnpm **11.25.0** 及[平台依赖](docs/development.md#prerequisites)，然后运行：
 
 ```sh
-sudo apt-get update
-sudo apt-get install -y build-essential file libssl-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libfuse2t64 python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4.0 x11-utils
-```
-
-```sh
+git clone https://github.com/dogchenya/easy_pack.git
+cd easy_pack
 pnpm install --frozen-lockfile
 pnpm desktop:dev
 ```
 
-pnpm dev 仅用于浏览器界面预览；系统选择和打包必须使用桌面程序。
+测试、安装包构建和 Linux 自行编译步骤见 [开发指南](docs/development.md)。
 
-```sh
-pnpm build
-cargo fmt --all --check
-cargo test --locked -p easy-pack-collection
-cargo test --locked -p easy-pack
-cargo check --locked -p easy-pack
-# 按需执行：实际读取并校验超过 4 GiB 的文件
-cargo test --locked --release -p easy-pack-collection -- --ignored
-```
+## 参与贡献
 
-界面集成测试使用可复现的模拟 IPC，不代表真实桌面验收。Windows 默认使用已安装的 Edge；其他平台先运行 pnpm exec playwright install chromium，再执行 pnpm test:ui。
+欢迎通过 [Issues](https://github.com/dogchenya/easy_pack/issues) 反馈问题或建议，也欢迎提交 Pull Request。反馈兼容性问题时，请附上系统版本、文件管理器、复现步骤和错误信息。
 
-生产程序构建后，运行 node scripts/test-native.mjs 可用独立临时配置和自动生成的测试源验证真实 Rust IPC、三种输出、取消、报告与重启恢复。该测试不会修改普通用户配置。Linux 无头环境可用 xvfb-run -a dbus-run-session -- node scripts/test-native.mjs。
+- [开发指南](docs/development.md)
+- [兼容性与验证记录](docs/prototype-validation.md)
+- [第三方组件与分发说明](docs/third-party.md)
 
-生成安装包：
+## 许可证
 
-```sh
-# Windows x64
-pnpm tauri build --bundles nsis -- --locked
-# macOS ARM64 或 x64（使用对应 target）
-pnpm tauri build --target aarch64-apple-darwin --bundles dmg -- --locked
-pnpm tauri build --target x86_64-apple-darwin --bundles dmg -- --locked
-# Linux x64
-bash scripts/build-linux-release.sh
-```
-
-本机安装包位于 target/release/bundle/，程序为 target/release/easy-pack（Windows 添加 .exe）。未使用发布证书签名或 macOS 公证。
-
-## 文件管理器与桌面边界
-
-| 环境 | 实现方式 | 实测状态 |
-| --- | --- | --- |
-| Windows 11 x64 / Explorer | 前台句柄 + 隐藏 STA PowerShell + Shell COM | 编译通过；多窗口、多标签页、桌面选择及真实热键操作仍需验收 |
-| macOS 14+ ARM64/x64 / Finder | 前台应用检查 + JXA Finder selection | 两种架构均在 GitHub 原生 Mac 构建 DMG，并运行包内应用通过各 27 项真实 IPC；Finder 权限、热键、拖入等完整桌面交互尚待验收 |
-| Ubuntu 24.04 x64 / GNOME Shell 46.0 或 Openbox / X11 / Nautilus 46.4 | 进程内 MIT Python 桥接，按实际前台 XID 读取当前映射文件视图的实时选择 | 独立 rootfs + Xvfb 中两种窗口管理器均通过：多窗口、多标签、混选、空选、实际全局键、不抢焦点、剪贴板保持和原生拖入；GNOME 使用无 logind 的独立测试会话，不冒充物理机登录验证 |
-| Linux Wayland | 尝试全局快捷键后端并反馈注册结果 | 原生全局键、置顶及 AT-SPI 行为均未验收 |
-
-Linux 的 .deb 安装上述运行依赖和 Nautilus 桥接；源码运行或 AppImage 首次启动会在当前用户数据目录准备桥接，需安装依赖并重新打开 Nautilus 才能加载。应用不会自动关闭文件管理器。桥接不缓存选择、不拼接猜测路径，也不读取剪贴板。其他文件管理器使用保守的 AT-SPI URI 读取，尚未逐个验收。没有系统托盘时保留窗口入口。快捷键不可用或冲突时显示原因；系统选择读取有 12 秒超时。
-
-最终 alpha.3 的 .deb 与 AppImage 在上述 GNOME/X11 测试会话各通过 70 项桌面断言，覆盖原生文件/文件夹/保存选择器、完整打包、开机启动注册开关及悬浮栏收起/移动/展开/退出。Windows 安装包通过安装后的 27 项真实 IPC 与卸载验证。证据及仍缺少的三端验收见 [验证记录](docs/prototype-validation.md)，最终包校验见 artifacts/validation/release-checks.json。
-
-## CI、产物与源码追溯
-
-[GitHub Actions](.github/workflows/prototype.yml) 包含 Linux 核心测试、ZIP64 实测及四目标安装包。推送 main/master、手动执行或推送版本标签生成安装产物；版本标签创建草稿 Release。没有配置远端仓库时，工作流只存在于本地，不能宣称远端执行通过。
-
-| runner | Rust 目标 | 安装格式 | 构建关系 |
-| --- | --- | --- | --- |
-| windows-2025 | x86_64-pc-windows-msvc | NSIS .exe | 原生 |
-| macos-15 | aarch64-apple-darwin | .dmg | ARM64 原生，执行前核对实际 host |
-| macos-15-intel | x86_64-apple-darwin | .dmg | Intel 原生，执行前核对实际 host |
-| ubuntu-24.04 | x86_64-unknown-linux-gnu | .deb / AppImage | 原生 |
-
-macOS 两个 target 分别使用 ARM64 和 Intel runner；执行前仍核对 rustc -vV 的实际 host，若不匹配则明确跳过目标程序执行。保留 --target 构建与对应工具链配置，不把不同系统分别原生构建称为跨操作系统交叉编译。本期未承诺 Linux ARM64 安装包。runner 标签依据 [GitHub 官方参考](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)。
-
-Actions 运行页的 Artifacts 可以下载对应目标安装包、SHA256SUMS、源码提交/工具链 provenance 及许可证声明；安装包文件名包含版本、目标系统及 CPU 架构。Release 保持草稿，待目标环境安装与核心流程验收后再发布。
-
-AppImage 额外包含系统库的原始 copyright、完整通用授权及运行时声明；其对应的 source.tar 与 AppImage 一起交付和分发。本地候选的对应源码约 612 MiB。Linux 发布脚本还需要启用匹配的 deb-src 并运行 apt-get update；Ubuntu 24.04 的 /etc/apt/sources.list.d/ubuntu.sources 可将 Types: deb 改为 Types: deb deb-src。运行时固定验证为 fedfad5 及 SHA256；遇到变更或缺少确切源码时会失败，需要核对后更新，不能跳过声明检查直接分发原始 AppImage。
-
-## 文档与许可证
-
-- [一期产品需求](docs/requirements.md)
-- [开发与验证记录](docs/prototype-validation.md)
-- [第三方组件说明](docs/third-party.md)
-- [依赖许可证及随包声明](docs/THIRD_PARTY_NOTICES.md)
-- [依赖声明审计](docs/license-audit.json)
-- [技术建议](docs/technical-recommendations.md)
-- [MIT LICENSE](LICENSE)
-
-公开源码仓库：[dogchenya/easy_pack](https://github.com/dogchenya/easy_pack)。531 个依赖条目均已提供适用授权全文；39 个条目明确使用 SPDX 完整标准条款及来源元数据，4 个平台包继承同版本主包的原始声明，审计完整记录其来源。NSIS 原始 COPYING 也已并入交付材料。第三方许可证不因应用采用 MIT 而改变。
-
+easy_pack 的原创代码使用 [MIT License](LICENSE)。第三方组件保留各自许可证，详见 [第三方声明](docs/THIRD_PARTY_NOTICES.md)。

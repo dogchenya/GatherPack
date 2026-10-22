@@ -105,5 +105,5 @@ AppImage 额外包含系统库的原始 copyright、完整通用授权及运行�
 - [技术建议](docs/technical-recommendations.md)
 - [MIT LICENSE](LICENSE)
 
-公开仓库地址尚未配置。531 个依赖条目均已提供适用授权全文；39 个条目明确使用 SPDX 完整标准条款及来源元数据，4 个平台包继承同版本主包的原始声明，审计完整记录其来源。NSIS 原始 COPYING 也已并入交付材料。第三方许可证不因应用采用 MIT 而改变。
+公开源码仓库：[dogchenya/easy_pack](https://github.com/dogchenya/easy_pack)。531 个依赖条目均已提供适用授权全文；39 个条目明确使用 SPDX 完整标准条款及来源元数据，4 个平台包继承同版本主包的原始声明，审计完整记录其来源。NSIS 原始 COPYING 也已并入交付材料。第三方许可证不因应用采用 MIT 而改变。
 

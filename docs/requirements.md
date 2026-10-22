@@ -201,7 +201,7 @@
 3. 完成 ZIP、7z、tar.gz 配置与导出、目录预览、问题检查、重名处理、进度、取消、失败处理及简版结果报告。
 4. 完成 MIT 开源材料、源码自编译说明、GitHub Actions 构建与安装包产出，以及三端场景验收。
 
-已实现一期候选功能与 CI 工作流。alpha.3 已在 Windows 与 Linux 完成真实 IPC、压缩/恢复及安装卸载验证；Linux 最终 .deb 与 AppImage 在独立 GNOME/X11 会话各通过 70 项桌面断言，包含直接收集、拖入、原生对话框、打包、启动注册及悬浮栏生命周期。macOS、Windows 完整桌面场景及远端 CI 尚未全部验收，未上传或发布源码仓库。详细证据与剩余项目见 [开发与验证记录](prototype-validation.md)，不据局部结果改变三端一期范围。
+已实现一期候选功能与 CI 工作流。alpha.3 已在 Windows 与 Linux 完成真实 IPC、压缩/恢复及安装卸载验证；Linux 最终 .deb 与 AppImage 在独立 GNOME/X11 会话各通过 70 项桌面断言，包含直接收集、拖入、原生对话框、打包、启动注册及悬浮栏生命周期。源码已上传至 dogchenya/easy_pack，远端 CI 已启动；macOS、Windows 完整桌面场景及远端构建尚未全部验收。详细证据与剩余项目见 [开发与验证记录](prototype-validation.md)，不据局部结果改变三端一期范围。
 
 ## 决策记录
 

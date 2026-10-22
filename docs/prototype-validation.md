@@ -63,7 +63,7 @@ Windows 隐藏启动曾观察到 WebView 退出时窗口注销错误 1412，但�
 - Linux compact 原生证据导出至 artifacts/validation/linux/native-*/，不导出测试源大文件内容。
 - UI 截图 artifacts/validation/ui-report.png 使用模拟数据，不能替代原生证据。
 
-本地没有 Git 提交与 remote，provenance 如实标记 uncommitted，不声称可追溯到不存在的提交。源码、锁文件、工作流、验证脚本与 MIT/第三方声明保存在工作区，未自动公开上传。
+2026-10-22 用户完成 GitHub CLI 设备授权，确认账号 dogchenya；按已批准的公开源码要求创建 [dogchenya/easy_pack](https://github.com/dogchenya/easy_pack)，源码首次提交 193f251 并推送 master。远端 Actions 已启动，结果以实际运行记录为准。此前本地产物的 provenance 仍保留 uncommitted，不倒填为新提交的构建。凭据保存在系统凭据库，未纳入仓库。
 
 ## 尚未完成的目标环境验收
 
@@ -72,7 +72,7 @@ Windows 隐藏启动曾观察到 WebView 退出时窗口注销错误 1412，但�
 | Windows 实际文件管理器操作 | UI 自动化捕获后无法激活窗口，恢复仍返回 failed to activate captured window，已停止使用该助手，未用另一种 Windows UI 自动化绕过。实际 Explorer 多窗口/多标签/桌面、物理热键/拖入、原生选择器及开机启动交互仍需验收 |
 | Windows 桌面选择 | 当前适配器对无法唯一匹配的 Explorer 标签页或桌面视图明确拒绝，不列为已通过支持项 |
 | macOS ARM64/x64 | 无 Mac 主机；未构建、安装或实测 Finder 权限、热键、拖入及核心流程，不能以 Windows/Linux 结果替代 |
-| GitHub Actions/公开源码 | 未提供目标仓库地址、GitHub 插件未连接；未创建 remote/提交或远端执行矩阵，本地工作流不等于 CI 成功 |
+| GitHub Actions | 公开源码已上传，远端工作流已启动；等待四目标实际构建与原生 IPC 结果，启动不等于成功 |
 | Wayland/其他 Linux 管理器 | 尚未独立验证，不列为已通过兼容承诺 |
 | 原生对话框与其他系统设置 | Linux 最终两种发布包已通过文件/文件夹/保存选择器和实际开机启动注册开关；Windows/macOS 对应交互仍需验证，直接 IPC 不能替代系统 UI |
 | 性能验收 | 代表性数量、容量与量化阈值仍待补充；4 GiB 一致性不是正式性能承诺 |

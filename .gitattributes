@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.icns binary
+# Preserve original upstream notice bytes for the pinned SHA256 audit.
+docs/installer-notices/* -text

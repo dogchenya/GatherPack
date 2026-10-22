@@ -4,29 +4,8 @@ use tauri::Manager;
 const CONTENT: &str = include_str!("../scripts/gatherpack_selection.py");
 
 fn connection_notice() -> Option<String> {
-    let ready = std::process::Command::new("gdbus")
-        .args([
-            "call",
-            "--session",
-            "--timeout",
-            "2",
-            "--dest",
-            "org.freedesktop.DBus",
-            "--object-path",
-            "/org/freedesktop/DBus",
-            "--method",
-            "org.freedesktop.DBus.NameHasOwner",
-            "io.github.dogchenya.gatherpack.NautilusSelection",
-        ])
-        .output()
-        .is_ok_and(|output| {
-            output.status.success() && String::from_utf8_lossy(&output.stdout).trim() == "(true,)"
-        });
-    if ready {
-        None
-    } else {
-        Some("Nautilus 收集桥接尚未加载，快捷键可能已触发但无法取得文件。首次安装或升级后，请保存文件管理器中的操作，手动退出并重新打开“文件”（Nautilus），再点击“重新注册”检查连接。应用不会自动关闭文件管理器。".into())
-    }
+    crate::selection::linux_bridge_notice()
+        .unwrap_or_else(|error| Some(format!("无法检查 Nautilus 桥接连接：{error}")))
 }
 
 /// AppIndicator can construct successfully even when no desktop tray exists.
@@ -87,5 +66,5 @@ pub fn install(app: &tauri::AppHandle) -> Result<Option<String>, String> {
         .map_err(|e| e.to_string())?;
     file.as_file().sync_all().map_err(|e| e.to_string())?;
     file.persist(&target).map_err(|e| e.to_string())?;
-    Ok(Some("已准备 Nautilus 直接收集桥接。请确认安装 python3-nautilus，并重新打开 Nautilus 使其加载；不会自动关闭你的文件管理器。".into()))
+    Ok(connection_notice())
 }

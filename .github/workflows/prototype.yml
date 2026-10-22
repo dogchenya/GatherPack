@@ -26,6 +26,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/test-graph.mjs
+      - run: python3 scripts/test-linux-bridge-diagnostics.py
       - run: pnpm exec playwright install --with-deps chromium
       - run: node scripts/test-ui.mjs
       - run: cargo fmt --all --check

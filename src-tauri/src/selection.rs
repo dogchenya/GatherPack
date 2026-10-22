@@ -129,20 +129,31 @@ fn capture_impl() -> Result<Selection, String> {
 }
 
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+fn linux_helper() -> std::process::Command {
+    let mut command = std::process::Command::new("/usr/bin/python3");
+    command
+        // AppImage/Conda paths must not redirect the system Python/GI
+        // helper into the application's bundled runtime or module tree.
+        .env_remove("PYTHONHOME")
+        .env_remove("PYTHONPATH")
+        .env_remove("LD_LIBRARY_PATH")
+        .env_remove("GI_TYPELIB_PATH")
+        .env_remove("GTK_PATH")
+        .env_remove("GIO_EXTRA_MODULES")
+        .env_remove("GIO_MODULE_DIR")
+        .args(["-c", include_str!("../scripts/selection-linux.py")]);
+    command
+}
+
+#[cfg(target_os = "linux")]
+pub fn linux_bridge_notice() -> Result<Option<String>, String> {
+    let output = run_helper(linux_helper().arg("--bridge-status"))?;
+    Ok(decode_output(output)?.error)
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "macos")))]
 fn capture_impl() -> Result<Selection, String> {
-    let output = run_helper(
-        std::process::Command::new("/usr/bin/python3")
-            // AppImage/Conda paths must not redirect the system Python/GI
-            // helper into the application's bundled runtime or module tree.
-            .env_remove("PYTHONHOME")
-            .env_remove("PYTHONPATH")
-            .env_remove("LD_LIBRARY_PATH")
-            .env_remove("GI_TYPELIB_PATH")
-            .env_remove("GTK_PATH")
-            .env_remove("GIO_EXTRA_MODULES")
-            .env_remove("GIO_MODULE_DIR")
-            .args(["-c", include_str!("../scripts/selection-linux.py")]),
-    )
-    .map_err(|e| format!("Linux 选择读取需要系统 Python3 与 python3-pyatspi：{e}"))?;
+    let output = run_helper(&mut linux_helper())
+        .map_err(|e| format!("Linux 选择读取需要系统 Python3 与 python3-pyatspi：{e}"))?;
     decode_output(output)
 }

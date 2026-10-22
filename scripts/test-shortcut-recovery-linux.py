@@ -163,10 +163,12 @@ try:
     primary = launch([executable], primary_env, "shortcut-primary")
     primary_window = wait(lambda: app_window(primary), "Primary app must start normally")
     expand(primary_window)
-    wait(lambda: "重新打开 Nautilus" in app_text(), "First-install UI must explain loading the bridge")
+    wait(lambda: "nautilus -q" in app_text(), "First-install UI must explain exiting the background process")
+    check("已安装，无需重复安装" in app_text(), "installed loader is diagnosed without asking to install it again")
     check(True, "first installation explains that the running Nautilus must load its new bridge")
     collect(files)
     wait(lambda: "桥接尚未加载" in app_text(), "Missing bridge must be visible instead of a silent hotkey")
+    check("已安装，无需重复安装" in app_text() and "sudo apt install" not in app_text(), "actual hotkey reports an unloaded bridge separately from missing dependencies")
     check(not (primary_data / "io.github.dogchenya.gatherpack/state.json").exists(), "unloaded bridge cannot collect stale or unrelated paths")
     # Restart only the file-manager process created by this isolated test.
     stop(first_nautilus)

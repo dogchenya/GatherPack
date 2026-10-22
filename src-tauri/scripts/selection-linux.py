@@ -3,8 +3,49 @@ import json
 import os
 import re
 import subprocess
+import sys
 from collections import deque
 from urllib.parse import urlparse, unquote
+
+
+def bridge_unavailable_reason():
+    """A missing D-Bus owner alone does not prove the loader is missing."""
+    try:
+        package = subprocess.run(
+            ["/usr/bin/dpkg-query", "-W", "-f=${Status}", "python3-nautilus"],
+            capture_output=True, text=True, timeout=2,
+        )
+        if package.returncode == 0 and package.stdout.strip() == "install ok installed":
+            return (
+                "Nautilus 桥接尚未加载，python3-nautilus 已安装，无需重复安装。"
+                "请先等待文件复制、移动等操作结束，再执行 nautilus -q，重新打开“文件”后重试。"
+                "仅关闭文件窗口可能仍保留后台进程；若仍失败，请注销并重新登录桌面以重新加载扩展。"
+            )
+        if package.returncode in (0, 1):
+            return (
+                "Nautilus 桥接尚未加载，缺少或未完整安装 python3-nautilus。"
+                "请执行 sudo apt install python3-nautilus python3-gi；"
+                "等待文件操作结束后执行 nautilus -q，再重新打开“文件”重试。"
+            )
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    return (
+        "Nautilus 桥接尚未加载，无法确认 python3-nautilus 安装状态。"
+        "请检查系统的 Nautilus Python 扩展支持；等待文件操作结束后退出 Nautilus 后台进程并重新打开。"
+    )
+
+
+def bridge_proxy():
+    try:
+        from gi.repository import Gio
+    except ImportError:
+        raise RuntimeError("系统 Python 无法加载 GI，请执行 sudo apt install python3-gi")
+    return Gio.DBusProxy.new_for_bus_sync(
+        Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_AUTO_START, None,
+        "io.github.dogchenya.gatherpack.NautilusSelection",
+        "/io/github/dogchenya/GatherPack/NautilusSelection",
+        "io.github.dogchenya.gatherpack.NautilusSelection1", None,
+    )
 
 def local_paths(uris):
     paths, rejected = [], []
@@ -41,9 +82,9 @@ def nautilus_x11_selection():
             return None
     try:
         from gi.repository import Gio, GLib
-        proxy = Gio.DBusProxy.new_for_bus_sync(Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_AUTO_START, None, "io.github.dogchenya.gatherpack.NautilusSelection", "/io/github/dogchenya/GatherPack/NautilusSelection", "io.github.dogchenya.gatherpack.NautilusSelection1", None)
+        proxy = bridge_proxy()
         if proxy.get_name_owner() is None:
-            raise RuntimeError("桥接尚未加载，请安装 python3-nautilus 并重启 Nautilus")
+            raise RuntimeError(bridge_unavailable_reason())
         response = proxy.call_sync("ReadSelection", GLib.Variant("(u)", (window,)), Gio.DBusCallFlags.NONE, 3000, None)
         result = json.loads(response.unpack()[0])
         if result.get("error"):
@@ -53,7 +94,7 @@ def nautilus_x11_selection():
         paths, rejected = local_paths(result["uris"])
         return paths, rejected, "linux-nautilus-live-model"
     except ImportError:
-        raise RuntimeError("Nautilus 桥接需要 python3-gi 和 python3-nautilus")
+        raise RuntimeError("系统 Python 无法加载 GI，请执行 sudo apt install python3-gi")
 
 
 def capture():
@@ -119,7 +160,12 @@ def capture():
     return paths, rejected, "linux-atspi"
 
 try:
-    paths, rejected, source = capture()
+    if sys.argv[1:] == ["--bridge-status"]:
+        if bridge_proxy().get_name_owner() is None:
+            raise RuntimeError(bridge_unavailable_reason())
+        paths, rejected, source = [], [], "linux-nautilus-bridge-status"
+    else:
+        paths, rejected, source = capture()
     print(json.dumps({"source": source, "paths": paths, "rejected": rejected, "error": None}, ensure_ascii=False))
 except Exception as error:
     print(json.dumps({"source": "linux-atspi", "paths": [], "error": str(error)}, ensure_ascii=False))

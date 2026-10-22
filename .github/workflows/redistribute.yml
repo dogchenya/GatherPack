@@ -1,0 +1,59 @@
+name: Prepare separate installer downloads
+run-name: Prepare downloads from build ${{ inputs.build_run_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful build run containing the original collected target artifacts
+        required: true
+      build_commit:
+        description: Full original build commit from provenance
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  validate-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require a successful original build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+          BUILD_COMMIT: ${{ inputs.build_commit }}
+        run: |
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$BUILD_COMMIT" =~ ^[a-f0-9]{40}$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > build-run.json
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFile } from 'node:fs/promises';
+          const run = JSON.parse(await readFile('build-run.json', 'utf8'));
+          assert.equal(run.status, 'completed');
+          assert.equal(run.conclusion, 'success');
+          assert.equal(run.head_sha, process.env.BUILD_COMMIT);
+          assert.equal(run.path, '.github/workflows/prototype.yml');
+          JS
+  downloads:
+    needs: validate-build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-pc-windows-msvc, aarch64-apple-darwin, x86_64-apple-darwin, x86_64-unknown-linux-gnu]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: gatherpack-${{ matrix.target }}
+          path: collected/${{ matrix.target }}
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+      - uses: ./.github/actions/upload-installers
+        with:
+          target: ${{ matrix.target }}
+          directory: collected/${{ matrix.target }}
+          expected-commit: ${{ inputs.build_commit }}

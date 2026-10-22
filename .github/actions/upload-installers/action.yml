@@ -1,0 +1,64 @@
+name: Upload installer downloads
+description: Verify packages and publish Linux formats and source separately.
+inputs:
+  target:
+    description: Rust target triple
+    required: true
+  directory:
+    description: Collected installer directory
+    required: true
+  expected-commit:
+    description: Original build commit when redistributing an existing build
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Verify download bytes and build provenance
+      shell: bash
+      env:
+        DOWNLOAD_DIRECTORY: ${{ inputs.directory }}
+        DOWNLOAD_TARGET: ${{ inputs.target }}
+        DOWNLOAD_COMMIT: ${{ inputs.expected-commit || github.sha }}
+      run: node scripts/verify-download-input.mjs "$DOWNLOAD_DIRECTORY" "$DOWNLOAD_TARGET" "$DOWNLOAD_COMMIT"
+    - name: Upload Windows or macOS package
+      if: inputs.target != 'x86_64-unknown-linux-gnu'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gatherpack-${{ inputs.target }}
+        path: ${{ inputs.directory }}/
+        if-no-files-found: error
+    - name: Upload Linux Debian installer
+      if: inputs.target == 'x86_64-unknown-linux-gnu'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gatherpack-linux-x64-deb
+        path: ${{ inputs.directory }}/*.deb
+        compression-level: 0
+        if-no-files-found: error
+    - name: Upload Linux AppImage
+      if: inputs.target == 'x86_64-unknown-linux-gnu'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gatherpack-linux-x64-appimage
+        path: ${{ inputs.directory }}/*.AppImage
+        compression-level: 0
+        if-no-files-found: error
+    - name: Upload Linux corresponding source
+      if: inputs.target == 'x86_64-unknown-linux-gnu'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gatherpack-linux-x64-corresponding-source
+        path: ${{ inputs.directory }}/*-corresponding-source.tar
+        if-no-files-found: error
+    - name: Upload Linux checksums and license notices
+      if: inputs.target == 'x86_64-unknown-linux-gnu'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gatherpack-linux-x64-checksums-and-licenses
+        path: |
+          ${{ inputs.directory }}/SHA256SUMS.txt
+          ${{ inputs.directory }}/LICENSE
+          ${{ inputs.directory }}/*.json
+          ${{ inputs.directory }}/*.md
+          ${{ inputs.directory }}/*.html
+        if-no-files-found: error

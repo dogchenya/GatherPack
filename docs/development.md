@@ -103,6 +103,8 @@ Tauri CLI 自动使用生产协议。直接通过 Cargo 构建发布程序时，
 
 发布脚本需要匹配的源码索引。在 Ubuntu 24.04 的 `/etc/apt/sources.list.d/ubuntu.sources` 中，将 `Types: deb` 改为 `Types: deb deb-src`，然后运行 `sudo apt-get update`。
 
+使用较旧的 CI 镜像时，可在更新源码索引后运行 `sudo python3 scripts/refresh-runtime-libraries-linux.py --apply`。它同步已安装但确切源码版本已退出索引的运行库，不降级较新的第三方包；不加参数时只读检查。
+
 `scripts/build-linux-release.sh` 会验证固定的 AppImage 运行时，构建 `.deb` 和 AppImage，补齐系统库原始声明，下载确切版本的对应源码，并收集安装包、校验和与构建来源到 `artifacts/x86_64-unknown-linux-gnu/`。
 
 分发 AppImage 时，同时提供生成的 `corresponding-source.tar`。运行时版本或源码校验失败时，需要核对来源并更新固定版本，不跳过声明和源码归档步骤。授权材料说明见 [第三方组件与分发说明](third-party.md)。

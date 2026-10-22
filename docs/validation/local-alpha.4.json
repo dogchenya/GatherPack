@@ -632,5 +632,26 @@
   },
   "limitations": [
     "Full Windows/macOS file-manager desktop acceptance remains outside these IPC and Linux GUI results"
-  ]
+  ],
+  "ordinaryStartupMigration": {
+    "passed": true,
+    "executableSHA256": "9742720c373c4e00a816e1da0294f79b24d881ac9eaf165a7def654bfd895a93",
+    "checks": [
+      "Ordinary startup imports legacy collection, settings and reports through the real Tauri data path",
+      "Ordinary restart preserves existing new state and report records",
+      "Legacy records and source bytes remain unchanged"
+    ]
+  },
+  "installedBrandMetadata": {
+    "windows": {
+      "productName": "GatherPack",
+      "productVersion": "0.1.0-alpha.4"
+    },
+    "linux": {
+      "package": "gather-pack",
+      "desktopName": "GatherPack",
+      "executable": "gatherpack",
+      "installedPathsContainLegacyBrand": false
+    }
+  }
 }

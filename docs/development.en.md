@@ -103,6 +103,8 @@ The Tauri CLI enables the production protocol automatically. A direct Cargo rele
 
 The release script requires matching source indexes. In Ubuntu 24.04's `/etc/apt/sources.list.d/ubuntu.sources`, change `Types: deb` to `Types: deb deb-src`, then run `sudo apt-get update`.
 
+Before building on an older CI image, run `sudo python3 scripts/refresh-runtime-libraries-linux.py --apply` after refreshing source indexes. It upgrades installed runtime libraries whose exact source versions have expired from the indexes, without downgrading newer third-party packages. The default invocation is read-only.
+
 `scripts/build-linux-release.sh` verifies the pinned AppImage runtime, builds `.deb` and AppImage packages, adds original system library notices, downloads the exact corresponding source versions, and collects installers, checksums, and provenance under `artifacts/x86_64-unknown-linux-gnu/`.
 
 Distribute the generated `corresponding-source.tar` alongside the AppImage. If runtime or source verification fails, review the sources and update the pinned version; keep the notice and source archive steps in place. See [third-party distribution notes](third-party.md) (Chinese) for details.

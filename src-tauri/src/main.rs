@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #[cfg(target_os = "linux")]
 mod linux_bridge;
+mod profile;
 mod selection;
 mod validation;
 
@@ -14,7 +15,7 @@ impl Drop for DialogTopmostGuard {
         let _ = self.0.set_always_on_top(true);
     }
 }
-use easy_pack_collection::{
+use gatherpack_collection::{
     build_plan, build_plan_with_cancel, pack, Collection, Entry, Format, Plan, Report,
 };
 use serde::{Deserialize, Serialize};
@@ -254,7 +255,7 @@ async fn choose_output(app: tauri::AppHandle, format: Format) -> Result<Option<S
         });
         let settings = app.state::<AppState>().settings.lock().unwrap().clone();
         let name = format!(
-            "easy_pack_{}.{}",
+            "GatherPack_{}.{}",
             chrono::Local::now().format("%Y%m%d_%H%M%S"),
             format.extension()
         );
@@ -332,7 +333,7 @@ async fn start_pack(
         {
             return Err("输出扩展名与压缩格式不一致".into());
         }
-        easy_pack_collection::validate_output(&plan, &output)?;
+        gatherpack_collection::validate_output(&plan, &output)?;
         {
             let mut task = state.task.lock().unwrap();
             task.phase = "打包中".into();
@@ -625,6 +626,16 @@ fn main() {
         .setup(move |app| {
             let handle = app.handle();
             let state = app.state::<AppState>();
+            let migration_notice = if !smoke_test && state.validation.is_none() {
+                match app.path().data_dir().map_err(|e| e.to_string()).and_then(|base| {
+                    let target = app.path().app_data_dir().map_err(|e| e.to_string())?;
+                    profile::import_legacy(&base.join(profile::LEGACY_IDENTIFIER), &target)
+                }) {
+                    Ok(true) => Some("已导入旧版清单、设置与报告；旧记录保留。开机启动请在新版本设置中重新启用。".to_string()),
+                    Ok(false) => None,
+                    Err(error) => Some(format!("旧版配置未导入，原记录保留：{error}")),
+                }
+            } else { None };
             if let Some(context) = &state.validation {
                 validation::seed(context).map_err(std::io::Error::other)?;
             }
@@ -694,11 +705,11 @@ fn main() {
                     let show = MenuItem::with_id(app, "show", "打开收集栏", true, None::<&str>)?;
                     let hide = MenuItem::with_id(app, "hide", "隐藏收集栏", true, None::<&str>)?;
                     let quit =
-                        MenuItem::with_id(app, "quit", "退出 easy_pack", true, None::<&str>)?;
+                        MenuItem::with_id(app, "quit", "退出 GatherPack", true, None::<&str>)?;
                     let menu = Menu::with_items(app, &[&show, &hide, &quit])?;
                     let mut tray = TrayIconBuilder::new()
                         .menu(&menu)
-                        .tooltip("easy_pack · 文件收集与打包")
+                        .tooltip("GatherPack · 文件收集与打包")
                         .on_menu_event(|app, event| match event.id.as_ref() {
                             "show" => expand(app, true, true),
                             "hide" => {
@@ -735,6 +746,11 @@ fn main() {
                         }
                     }
                 }
+            }
+            if let Some(notice) = migration_notice {
+                let mut message = state.last_message.lock().unwrap();
+                if !message.is_empty() { message.push('\n'); }
+                message.push_str(&notice);
             }
             let window = app.get_webview_window("main").unwrap();
             window.on_window_event({
@@ -777,7 +793,7 @@ fn main() {
             validation::validation_done
         ])
         .build(context)
-        .expect("启动 easy_pack 失败")
+        .expect("启动 GatherPack 失败")
         .run(|app, event| {
             if let tauri::RunEvent::ExitRequested { api, .. } = event {
                 if app.state::<AppState>().running.load(Ordering::Relaxed) {

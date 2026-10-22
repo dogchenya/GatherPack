@@ -25,7 +25,7 @@ JS
 shopt -s nullglob
 images=("$directory"/*.dmg)
 test "${#images[@]}" -eq 1
-mount=$(mktemp -d /tmp/easy-pack-dmg-XXXXXX)
+mount=$(mktemp -d /tmp/gatherpack-dmg-XXXXXX)
 mounted=0
 cleanup() {
   if [ "$mounted" -eq 1 ]; then hdiutil detach "$mount" >/dev/null || return; fi
@@ -37,17 +37,17 @@ mounted=1
 apps=("$mount"/*.app)
 test "${#apps[@]}" -eq 1
 app=${apps[0]}
-test -x "$app/Contents/MacOS/easy-pack"
+test -x "$app/Contents/MacOS/gatherpack"
 for name in LICENSE THIRD_PARTY_NOTICES.md third-party.md license-audit.json Rust-COPYRIGHT-library.html; do
   test -s "$app/Contents/Resources/licenses/$name"
 done
 cmp docs/installer-notices/Rust-COPYRIGHT-library.html "$app/Contents/Resources/licenses/Rust-COPYRIGHT-library.html"
 plutil -lint "$app/Contents/Info.plist"
-node scripts/test-native.mjs "$app/Contents/MacOS/easy-pack"
+node scripts/test-native.mjs "$app/Contents/MacOS/gatherpack"
 hdiutil detach "$mount" >/dev/null
 mounted=0
-EASY_PACK_VALIDATION_TARGET="$target" EASY_PACK_VALIDATION_COMMIT="$commit" node --input-type=module <<'JS'
+GATHERPACK_VALIDATION_TARGET="$target" GATHERPACK_VALIDATION_COMMIT="$commit" node --input-type=module <<'JS'
 import { writeFile } from 'node:fs/promises';
-const target = process.env.EASY_PACK_VALIDATION_TARGET;
-await writeFile('artifacts/validation/macos-install-' + target + '.json', JSON.stringify({passed: true, target, commit: process.env.EASY_PACK_VALIDATION_COMMIT, checks: ['DMG SHA256 and build provenance match', 'DMG mounts read-only on matching native architecture', 'Bundled executable and license resources exist', 'Original Rust standard-library notice bytes match', 'Bundled executable passes 22 core and 5 restart native IPC assertions', 'DMG detaches after the application exits']}, null, 2) + '\n');
+const target = process.env.GATHERPACK_VALIDATION_TARGET;
+await writeFile('artifacts/validation/macos-install-' + target + '.json', JSON.stringify({passed: true, target, commit: process.env.GATHERPACK_VALIDATION_COMMIT, checks: ['DMG SHA256 and build provenance match', 'DMG mounts read-only on matching native architecture', 'Bundled executable and license resources exist', 'Original Rust standard-library notice bytes match', 'Bundled executable passes 22 core and 5 restart native IPC assertions', 'DMG detaches after the application exits']}, null, 2) + '\n');
 JS

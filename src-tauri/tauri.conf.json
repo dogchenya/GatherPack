@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "easy_pack",
-  "version": "0.1.0-alpha.3",
-  "identifier": "io.github.easy-pack.prototype",
+  "productName": "GatherPack",
+  "version": "0.1.0-alpha.4",
+  "identifier": "io.github.dogchenya.gatherpack",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://127.0.0.1:1420",
@@ -10,30 +10,60 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [{
-      "label": "main",
-      "title": "easy_pack · 文件收集与打包",
-      "width": 104,
-      "height": 112,
-      "minWidth": 80,
-      "minHeight": 80,
-      "maxWidth": 104,
-      "maxHeight": 112,
-      "decorations": false,
-      "resizable": false,
-      "alwaysOnTop": true,
-      "dragDropEnabled": true
-    }],
-    "security": { "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; img-src 'self' data:" }
+    "windows": [
+      {
+        "label": "main",
+        "title": "gatherpack · 文件收集与打包",
+        "width": 104,
+        "height": 112,
+        "minWidth": 80,
+        "minHeight": 80,
+        "maxWidth": 104,
+        "maxHeight": 112,
+        "decorations": false,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    }
   },
   "bundle": {
     "active": true,
     "targets": "all",
     "shortDescription": "Collect files and folders into ZIP, 7z and tar.gz archives",
     "category": "Utility",
-    "linux": {"deb": {"depends": ["python3-gi", "python3-nautilus", "python3-pyatspi", "gir1.2-gtk-4.0", "x11-utils"], "files": {"/usr/share/nautilus-python/extensions/easy_pack_selection.py": "scripts/easy_pack_selection.py"}}},
-    "resources": {"../LICENSE": "licenses/LICENSE", "../docs/THIRD_PARTY_NOTICES.md": "licenses/THIRD_PARTY_NOTICES.md", "../docs/third-party.md": "licenses/third-party.md", "../docs/license-audit.json": "licenses/license-audit.json", "../docs/installer-notices/Rust-COPYRIGHT-library.html": "licenses/Rust-COPYRIGHT-library.html"},
-    "icon": ["icons/icon.png", "icons/icon.ico", "icons/icon.icns"],
-    "macOS": { "minimumSystemVersion": "14.0", "infoPlist": "Info.plist" }
+    "linux": {
+      "deb": {
+        "depends": [
+          "python3-gi",
+          "python3-nautilus",
+          "python3-pyatspi",
+          "gir1.2-gtk-4.0",
+          "x11-utils"
+        ],
+        "files": {
+          "/usr/share/nautilus-python/extensions/gatherpack_selection.py": "scripts/gatherpack_selection.py"
+        }
+      }
+    },
+    "resources": {
+      "../LICENSE": "licenses/LICENSE",
+      "../docs/THIRD_PARTY_NOTICES.md": "licenses/THIRD_PARTY_NOTICES.md",
+      "../docs/third-party.md": "licenses/third-party.md",
+      "../docs/license-audit.json": "licenses/license-audit.json",
+      "../docs/installer-notices/Rust-COPYRIGHT-library.html": "licenses/Rust-COPYRIGHT-library.html"
+    },
+    "icon": [
+      "icons/icon.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "14.0",
+      "infoPlist": "Info.plist"
+    }
   }
 }

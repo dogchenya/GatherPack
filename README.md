@@ -1,19 +1,21 @@
 <p align="center">
-  <img src="app-icon.svg" width="88" alt="easy_pack 图标">
+  <img src="app-icon.svg" width="88" alt="GatherPack 图标">
 </p>
 
-# easy_pack
+# GatherPack
 
 **简体中文** | [English](README.en.md)
 
-[![构建状态](https://github.com/dogchenya/easy_pack/actions/workflows/prototype.yml/badge.svg?branch=master)](https://github.com/dogchenya/easy_pack/actions/workflows/prototype.yml)
+[![构建状态](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml/badge.svg?branch=master)](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **把分散的文件收集到一起，一次打包带走。**
 
-easy_pack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工具。把不同目录里的文件和文件夹拖进悬浮收集栏，整理好清单后，直接导出 ZIP、7z 或 tar.gz。整个过程在本机完成，无需账号或网络连接。
+GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工具。把不同目录里的文件和文件夹拖进悬浮收集栏，整理好清单后，直接导出 ZIP、7z 或 tar.gz。整个过程在本机完成，无需账号或网络连接。
 
-![easy_pack 在 Linux 桌面上的界面](docs/assets/app-preview.png)
+旧版 easy_pack 用户首次启动时会导入清单、设置和报告；旧记录保留。迁移后请在设置中重新启用开机启动。
+
+![GatherPack 在 Linux 桌面上的界面](docs/assets/app-preview.png)
 
 *Linux/X11 界面示例。当前应用界面使用简体中文。*
 
@@ -30,20 +32,20 @@ easy_pack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工�
 
 ## 下载与安装
 
-当前版本：**0.1.0-alpha.3**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。
+当前版本：**0.1.0-alpha.4**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。
 
-打开 [已通过的构建](https://github.com/dogchenya/easy_pack/actions/runs/39734269501)，在页面底部 **Artifacts** 中选择对应系统的下载项，解压后安装。下载 Artifacts 需要登录 GitHub。
+打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml)，选择已完成的构建，在其 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
-| Windows x64 | `easy-pack-x86_64-pc-windows-msvc` | 运行 `.exe` 安装程序 |
-| macOS 14+ · Apple Silicon | `easy-pack-aarch64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
-| macOS 14+ · Intel | `easy-pack-x86_64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
-| Linux x64 · Ubuntu 24.04 | `easy-pack-x86_64-unknown-linux-gnu` | 安装 `.deb`，或赋予 `.AppImage` 执行权限后运行 |
+| Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | 运行 `.exe` 安装程序 |
+| macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
+| macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
+| Linux x64 · Ubuntu 24.04 | `gatherpack-x86_64-unknown-linux-gnu` | 安装 `.deb`，或赋予 `.AppImage` 执行权限后运行 |
 
 安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。AppImage 的再分发需同时提供下载项中的 `corresponding-source.tar`。
 
-四个目标的构建与真实 IPC 测试已通过。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
+新品牌版本正在进行完整构建验证，当前进度见 [品牌迁移记录](docs/brand-migration.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
 
 ## 快速上手
 
@@ -66,8 +68,8 @@ easy_pack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工�
 安装 Rust **1.98.1**、Node.js **24**、pnpm **11.25.0** 及[平台依赖](docs/development.md#prerequisites)，然后运行：
 
 ```sh
-git clone https://github.com/dogchenya/easy_pack.git
-cd easy_pack
+git clone https://github.com/dogchenya/GatherPack.git
+cd GatherPack
 pnpm install --frozen-lockfile
 pnpm desktop:dev
 ```
@@ -76,7 +78,7 @@ pnpm desktop:dev
 
 ## 参与贡献
 
-欢迎通过 [Issues](https://github.com/dogchenya/easy_pack/issues) 反馈问题或建议，也欢迎提交 Pull Request。反馈兼容性问题时，请附上系统版本、文件管理器、复现步骤和错误信息。
+欢迎通过 [Issues](https://github.com/dogchenya/GatherPack/issues) 反馈问题或建议，也欢迎提交 Pull Request。反馈兼容性问题时，请附上系统版本、文件管理器、复现步骤和错误信息。
 
 - [开发指南](docs/development.md)
 - [兼容性与验证记录](docs/prototype-validation.md)
@@ -84,4 +86,4 @@ pnpm desktop:dev
 
 ## 许可证
 
-easy_pack 的原创代码使用 [MIT License](LICENSE)。第三方组件保留各自许可证，详见 [第三方声明](docs/THIRD_PARTY_NOTICES.md)。
+GatherPack 的原创代码使用 [MIT License](LICENSE)。第三方组件保留各自许可证，详见 [第三方声明](docs/THIRD_PARTY_NOTICES.md)。

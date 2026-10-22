@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import assert from 'node:assert/strict';
-const executable = resolve(process.argv[2] ?? ('target/release/easy-pack' + (process.platform === 'win32' ? '.exe' : '')));
+const executable = resolve(process.argv[2] ?? ('target/release/gatherpack' + (process.platform === 'win32' ? '.exe' : '')));
 await mkdir('artifacts/validation', { recursive: true });
 const root = await mkdtemp(resolve('artifacts/validation/native-'));
 for (const scenario of ['core', 'restore']) {

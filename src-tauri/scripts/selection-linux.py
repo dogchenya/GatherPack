@@ -41,7 +41,7 @@ def nautilus_x11_selection():
             return None
     try:
         from gi.repository import Gio, GLib
-        proxy = Gio.DBusProxy.new_for_bus_sync(Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_AUTO_START, None, "io.github.easy_pack.NautilusSelection", "/io/github/easy_pack/NautilusSelection", "io.github.easy_pack.NautilusSelection1", None)
+        proxy = Gio.DBusProxy.new_for_bus_sync(Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_AUTO_START, None, "io.github.dogchenya.gatherpack.NautilusSelection", "/io/github/dogchenya/GatherPack/NautilusSelection", "io.github.dogchenya.gatherpack.NautilusSelection1", None)
         if proxy.get_name_owner() is None:
             raise RuntimeError("桥接尚未加载，请安装 python3-nautilus 并重启 Nautilus")
         response = proxy.call_sync("ReadSelection", GLib.Variant("(u)", (window,)), Gio.DBusCallFlags.NONE, 3000, None)

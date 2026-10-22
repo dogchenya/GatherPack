@@ -79,14 +79,14 @@ function App() {
   const preventWebDrop = (event: DragEvent<HTMLElement>) => { event.preventDefault(); if (!event.dataTransfer.files.length) setError('仅支持本地真实文件和文件夹，文本或网页链接不会加入清单。'); };
   if (!state.expanded) return <div className="compact" onDragOver={e => e.preventDefault()} onDrop={preventWebDrop}>
     <div className="handle" onPointerDown={drag} title="拖动悬浮栏">⠿</div>
-    <button className="orb" onClick={() => run('set_expanded', { expanded: true })} title={state.message || '点击展开，或拖入文件'}><span>ep</span><b>{state.entries.length}</b></button>
+    <button className="orb" onClick={() => run('set_expanded', { expanded: true })} title={state.message || '点击展开，或拖入文件'}><span>GP</span><b>{state.entries.length}</b></button>
     <small role="status" title={error || state.message}>{error || (state.message ? state.message.split('\n')[0] : '拖入收集')}</small>
   </div>;
   return <main onDragOver={e => e.preventDefault()} onDrop={preventWebDrop}>
-    <header><span className="logo" onPointerDown={drag}>ep</span><div className="brand" onPointerDown={drag}><h1>easy_pack</h1><p>分散的文件，一起带走。</p></div>
+    <header><span className="logo" onPointerDown={drag}>GP</span><div className="brand" onPointerDown={drag}><h1>GatherPack</h1><p>把分散的文件收集到一起，一次打包带走。</p></div>
       <button aria-label="设置" onClick={() => setSettings({ ...state.settings })}>设置</button>
       <button aria-label="收起面板" onClick={() => run('set_expanded', { expanded: false })}>收起</button>
-      <div className="menu-wrap"><button aria-label="应用菜单" aria-expanded={menu} onClick={() => setMenu(!menu)}>···</button>{menu && <div className="menu"><button disabled={!state.trayAvailable} onClick={() => { setMenu(false); run('hide_window'); }}>隐藏收集栏</button><button onClick={() => run('exit_app')}>退出 easy_pack</button></div>}</div>
+      <div className="menu-wrap"><button aria-label="应用菜单" aria-expanded={menu} onClick={() => setMenu(!menu)}>···</button>{menu && <div className="menu"><button disabled={!state.trayAvailable} onClick={() => { setMenu(false); run('hide_window'); }}>隐藏收集栏</button><button onClick={() => run('exit_app')}>退出 GatherPack</button></div>}</div>
     </header>
     {!desktop && <p className="message">这是浏览器界面预览。系统拖拽、快捷键、收集和打包请在桌面程序中使用。</p>}
     <section className="drop-area"><div className="drop-symbol">＋</div><div><h2>拖入文件或整个文件夹</h2><p>从不同目录继续收集，源文件保留原处</p></div><div className="add-actions"><button onClick={() => run('pick_entries', { directories: false })}>添加文件</button><button onClick={() => run('pick_entries', { directories: true })}>添加文件夹</button></div></section>

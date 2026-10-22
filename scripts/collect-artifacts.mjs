@@ -18,8 +18,12 @@ await mkdir(out, { recursive: true });
 const checksums = [];
 const version = JSON.parse(await readFile('package.json', 'utf8')).version;
 let commit = process.env.GITHUB_SHA ?? null;
+let dirty = false;
+if (!process.env.GITHUB_SHA) {
+  try { dirty = !!execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { dirty = true; }
+}
 if (!commit) { try { commit = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { commit = 'uncommitted'; } }
-await writeFile(join(out, `${target}-provenance.json`), JSON.stringify({ version, commit, target, rust: execFileSync('rustc', ['-vV'], { encoding: 'utf8' }), run: process.env.GITHUB_RUN_ID ?? null }, null, 2));
+await writeFile(join(out, `${target}-provenance.json`), JSON.stringify({ version, commit, dirty, target, rust: execFileSync('rustc', ['-vV'], { encoding: 'utf8' }), run: process.env.GITHUB_RUN_ID ?? null }, null, 2));
 for (const name of ['LICENSE', 'docs/THIRD_PARTY_NOTICES.md', 'docs/third-party.md', 'docs/license-audit.json', 'docs/installer-notices/Rust-COPYRIGHT-library.html']) {
   await copyFile(name, join(out, name.split('/').pop()));
 }
@@ -29,7 +33,7 @@ async function walk(directory) {
     if (item.isDirectory()) await walk(path);
     else if (/\.(exe|dmg|deb|AppImage)$/.test(item.name)) {
       if (!item.name.includes(version)) continue;
-      const artifactName = `easy_pack-${version}-${target}-${item.name}`;
+      const artifactName = `gatherpack-${version}-${target}-${item.name}`;
       await copyFile(path, join(out, artifactName));
       const checksum = await hashFile(path);
       checksums.push(`${checksum}  ${artifactName}`);

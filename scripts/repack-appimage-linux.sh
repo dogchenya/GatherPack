@@ -13,11 +13,11 @@ test -f "$notices/musl-COPYRIGHT"
 test -f "$notices/zstd-LICENSE"
 test -f "$notices/zlib-LICENSE"
 test -f "$notices/AppRun-upstream-source.c"
-mkdir -p "$appdir/usr/share/doc/easy-pack/appimage-runtime"
-cp "$notices/"* "$appdir/usr/share/doc/easy-pack/appimage-runtime/"
-"$runtime" --appimage-help > "$appdir/usr/share/doc/easy-pack/appimage-runtime/runtime-help.txt"
-"$runtime" --appimage-version > "$appdir/usr/share/doc/easy-pack/appimage-runtime/runtime-version.txt" 2>&1
-temporary=$(mktemp -d /tmp/easy-pack-appimage-tools-XXXXXX)
+mkdir -p "$appdir/usr/share/doc/gatherpack/appimage-runtime"
+cp "$notices/"* "$appdir/usr/share/doc/gatherpack/appimage-runtime/"
+"$runtime" --appimage-help > "$appdir/usr/share/doc/gatherpack/appimage-runtime/runtime-help.txt"
+"$runtime" --appimage-version > "$appdir/usr/share/doc/gatherpack/appimage-runtime/runtime-version.txt" 2>&1
+temporary=$(mktemp -d /tmp/gatherpack-appimage-tools-XXXXXX)
 trap 'test -n "$temporary" && rm -rf -- "$temporary"' EXIT
 plugin=${XDG_CACHE_HOME:-$HOME/.cache}/tauri/linuxdeploy-plugin-appimage.AppImage
 (cd "$temporary"; "$plugin" --appimage-extract > /dev/null)

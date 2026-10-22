@@ -1,7 +1,7 @@
 use std::{fs, io::Write};
 use tauri::Manager;
 
-const CONTENT: &str = include_str!("../scripts/easy_pack_selection.py");
+const CONTENT: &str = include_str!("../scripts/gatherpack_selection.py");
 
 /// AppIndicator can construct successfully even when no desktop tray exists.
 pub fn tray_host_available() -> bool {
@@ -34,7 +34,7 @@ pub fn tray_host_available() -> bool {
 /// Install the independent selection bridge without restarting the user's file manager.
 pub fn install(app: &tauri::AppHandle) -> Result<Option<String>, String> {
     let system =
-        std::path::Path::new("/usr/share/nautilus-python/extensions/easy_pack_selection.py");
+        std::path::Path::new("/usr/share/nautilus-python/extensions/gatherpack_selection.py");
     if fs::read_to_string(system).ok().as_deref() == Some(CONTENT) {
         return Ok(None);
     }
@@ -44,10 +44,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<Option<String>, String> {
         .map_err(|e| e.to_string())?
         .join("nautilus-python/extensions");
     fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
-    let target = directory.join("easy_pack_selection.py");
+    let target = directory.join("gatherpack_selection.py");
     match fs::read_to_string(&target) {
         Ok(existing) if existing == CONTENT => return Ok(None),
-        Ok(existing) if !existing.starts_with("# easy_pack managed Nautilus selection bridge") => {
+        Ok(existing) if !existing.starts_with("# gatherpack managed Nautilus selection bridge") => {
             return Err(format!(
                 "桥接位置已有非本应用管理的文件，未覆盖：{}",
                 target.display()

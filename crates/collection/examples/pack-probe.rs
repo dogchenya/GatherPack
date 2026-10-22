@@ -1,4 +1,4 @@
-use easy_pack_collection::{build_plan, pack, Format};
+use gatherpack_collection::{build_plan, pack, Format};
 use std::{path::Path, sync::atomic::AtomicBool};
 
 fn main() {

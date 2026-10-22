@@ -1,6 +1,6 @@
 # Third-party dependency notices
 
-Generated from the locked Cargo dependency metadata and installed pnpm packages by scripts/license-notices.mjs. All available shipped notices are preserved. For dependencies that declare a standard SPDX license but omit a standalone license file, the permitted license choice, complete canonical terms, package authors/source URL, and available source copyright lines are supplied explicitly; these are not presented as an original upstream license file. Includes build tools and platform-specific dependencies. Original easy_pack code is MIT; third-party components retain their own licenses. See third-party.md for installer/runtime notices.
+Generated from the locked Cargo dependency metadata and installed pnpm packages by scripts/license-notices.mjs. All available shipped notices are preserved. For dependencies that declare a standard SPDX license but omit a standalone license file, the permitted license choice, complete canonical terms, package authors/source URL, and available source copyright lines are supplied explicitly; these are not presented as an original upstream license file. Includes build tools and platform-specific dependencies. Original GatherPack code is MIT; third-party components retain their own licenses. See third-party.md for installer/runtime notices.
 
 ## adler2 2.0.1
 

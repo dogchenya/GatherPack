@@ -929,12 +929,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
-name = "easy-pack"
-version = "0.1.0-alpha.3"
+name = "gatherpack"
+version = "0.1.0-alpha.4"
 dependencies = [
  "base64 0.22.1",
  "chrono",
- "easy-pack-collection",
+ "gatherpack-collection",
  "serde",
  "serde_json",
  "tauri",
@@ -947,7 +947,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "easy-pack-collection"
+name = "gatherpack-collection"
 version = "0.1.0"
 dependencies = [
  "flate2",

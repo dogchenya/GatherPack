@@ -4,6 +4,7 @@ import { resolve, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 const version = JSON.parse(await readFile('package.json', 'utf8')).version;
+const validationRoot = resolve(process.env.GATHERPACK_VALIDATION_DIR ?? 'artifacts/validation');
 const audit = JSON.parse(await readFile('docs/license-audit.json', 'utf8'));
 assert.equal(audit.missingLicenseText.length, 0);
 const checks = [];
@@ -27,22 +28,22 @@ for (const target of process.argv.slice(2)) {
     for await (const bytes of createReadStream(file)) hash.update(bytes);
     assert.equal(hash.digest('hex'), expected, 'Checksum mismatch: ' + name);
     if (name.endsWith('.AppImage')) {
-      const gui = JSON.parse(await readFile('artifacts/validation/linux/linux-appimage-gui-report.json', 'utf8'));
+      const gui = JSON.parse(await readFile(resolve(validationRoot, 'linux/linux-appimage-gui-report.json'), 'utf8'));
       assert.ok(gui.passed && gui.checks.every(check => check.passed));
       assert.equal(gui.executableSHA256, expected, 'GUI test did not run this AppImage');
     }
     if (name.endsWith('.deb')) {
-      const gui = JSON.parse(await readFile('artifacts/validation/linux/linux-deb-gui-report.json', 'utf8'));
+      const gui = JSON.parse(await readFile(resolve(validationRoot, 'linux/linux-deb-gui-report.json'), 'utf8'));
       assert.ok(gui.passed && gui.checks.every(check => check.passed));
       assert.equal(gui.packageSHA256, expected, 'GUI test did not run this deb package');
     }
     if (name.endsWith('.exe')) {
-      const installation = JSON.parse(await readFile('artifacts/validation/windows-install-report.json', 'utf8'));
+      const installation = JSON.parse((await readFile(resolve(validationRoot, 'windows-install-report.json'), 'utf8')).replace(/^\uFEFF/, ''));
       assert.ok(installation.passed);
       assert.equal(installation.installerSHA256, expected, 'Installation test did not run this installer');
     }
     checks.push({ target, file: name, sha256: expected, passed: true });
   }
 }
-await writeFile('artifacts/validation/release-checks.json', JSON.stringify({ passed: true, version, licensePackages: audit.packages, checks }, null, 2) + '\n');
+await writeFile(resolve(validationRoot, 'release-checks.json'), JSON.stringify({ passed: true, version, licensePackages: audit.packages, checks }, null, 2) + '\n');
 console.log('Verified', checks.length, 'release artifacts, provenance versions and license audit.');

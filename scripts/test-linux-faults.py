@@ -13,7 +13,7 @@ import zipfile
 if os.geteuid() == 0:
     raise RuntimeError("fault tests must run unprivileged to validate permissions")
 probe = sys.argv[1]
-full = Path(os.environ["EASY_PACK_DISK_FULL_DIR"])
+full = Path(os.environ["GATHERPACK_DISK_FULL_DIR"])
 checks = []
 
 def run(source, output, format="zip", skip=False):
@@ -25,7 +25,7 @@ def check(condition, label):
     if not condition:
         raise AssertionError(label)
 
-with tempfile.TemporaryDirectory(prefix="easy-pack-faults-") as temporary:
+with tempfile.TemporaryDirectory(prefix="gatherpack-faults-") as temporary:
     root = Path(temporary)
     source = root / "entropy.bin"
     source.write_bytes(random.Random(7).randbytes(1024 * 1024))

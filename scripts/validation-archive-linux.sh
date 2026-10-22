@@ -16,6 +16,6 @@ for file in sorted(root.rglob('*')):
 (root / 'SHA256SUMS.txt').write_text('\n'.join(lines) + '\n')
 PY
 node scripts/collect-artifacts.mjs x86_64-unknown-linux-gnu /var/cache/easy-pack/target/release/bundle
-tar -C /var/cache/easy-pack -cf artifacts/x86_64-unknown-linux-gnu/easy_pack-0.1.0-alpha.3-x86_64-unknown-linux-gnu-corresponding-source.tar corresponding-source
+tar -C /var/cache/easy-pack -cf artifacts/x86_64-unknown-linux-gnu/gatherpack-0.1.0-alpha.4-x86_64-unknown-linux-gnu-corresponding-source.tar corresponding-source
 cd artifacts/x86_64-unknown-linux-gnu
 sha256sum *corresponding-source.tar >> SHA256SUMS.txt

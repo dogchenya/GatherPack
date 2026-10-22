@@ -41,9 +41,9 @@ pnpm desktop:dev
 ```sh
 pnpm build
 cargo fmt --all --check
-cargo test --locked -p easy-pack-collection
-cargo test --locked -p easy-pack
-cargo check --locked -p easy-pack
+cargo test --locked -p gatherpack-collection
+cargo test --locked -p gatherpack
+cargo check --locked -p gatherpack
 ```
 
 UI integration tests:
@@ -57,9 +57,9 @@ pnpm test:ui
 UI tests use mocked IPC. Once a production executable has been built, run real Rust IPC checks for packing, cancellation, reports, and restart recovery:
 
 ```sh
-node scripts/test-native.mjs path/to/easy-pack
-# On Windows, the executable is named easy-pack.exe.
-# Headless Linux: xvfb-run -a dbus-run-session -- node scripts/test-native.mjs path/to/easy-pack
+node scripts/test-native.mjs path/to/gatherpack
+# On Windows, the executable is named gatherpack.exe.
+# Headless Linux: xvfb-run -a dbus-run-session -- node scripts/test-native.mjs path/to/gatherpack
 ```
 
 Native IPC tests create isolated profiles and fixtures without modifying the normal user profile. Native dialogs, file manager interaction, and physical shortcut input are validated separately.
@@ -67,7 +67,7 @@ Native IPC tests create isolated profiles and fixtures without modifying the nor
 Run large-file tests as needed. These create and read temporary files larger than 4 GiB:
 
 ```sh
-cargo test --locked --release -p easy-pack-collection -- --ignored
+cargo test --locked --release -p gatherpack-collection -- --ignored
 ```
 
 ## Build installers
@@ -95,7 +95,7 @@ pnpm tauri build --target x86_64-apple-darwin --bundles dmg -- --locked
 bash scripts/build-linux-release.sh
 ```
 
-Installers are written to `target/release/bundle/` by default, or `target/<target>/release/bundle/` when `--target` is specified. The executable is named `easy-pack`, with `.exe` on Windows. A custom `CARGO_TARGET_DIR` changes the output root.
+Installers are written to `target/release/bundle/` by default, or `target/<target>/release/bundle/` when `--target` is specified. The executable is named `gatherpack`, with `.exe` on Windows. A custom `CARGO_TARGET_DIR` changes the output root.
 
 The Tauri CLI enables the production protocol automatically. A direct Cargo release build needs `--features custom-protocol` to load the bundled frontend assets.
 
@@ -134,4 +134,4 @@ The [build workflow](../.github/workflows/prototype.yml) runs checks on main/mas
 
 The workflow records the actual Rust host and requested target, and executes native IPC only when they match. Four native build targets do not demonstrate cross-OS or Linux ARM64 cross-compilation. The separate [Mac package validation workflow](../.github/workflows/macos-package-validation.yml) can download artifacts from a selected build, mount each DMG, and validate its bundled executable.
 
-Artifacts contain installers, `SHA256SUMS.txt`, source commit/toolchain provenance, and third-party notices. Full local and remote evidence is linked from the [validation record](prototype-validation.md) (Chinese) and [CI summary](validation/ci-alpha.3.json).
+Artifacts contain installers, `SHA256SUMS.txt`, source commit/toolchain provenance, and third-party notices. Full local and remote evidence is linked from the [validation record](prototype-validation.md) (Chinese) and [CI summary](brand-migration.md).

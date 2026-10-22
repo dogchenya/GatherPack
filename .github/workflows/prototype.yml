@@ -28,9 +28,9 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: node scripts/test-ui.mjs
       - run: cargo fmt --all --check
-      - run: cargo test --locked -p easy-pack-collection
+      - run: cargo test --locked -p gatherpack-collection
       - name: ZIP64 large file roundtrip
-        run: cargo test --locked --release -p easy-pack-collection zip64_large_file_roundtrip -- --ignored
+        run: cargo test --locked --release -p gatherpack-collection zip64_large_file_roundtrip -- --ignored
 
   installers:
     if: github.event_name != 'pull_request'
@@ -80,7 +80,7 @@ jobs:
         shell: bash
         run: |
           bash scripts/download-appimage-runtime-linux.sh
-          echo "LDAI_RUNTIME_FILE=$HOME/.cache/tauri/easy-pack-runtime-x86_64" >> "$GITHUB_ENV"
+          echo "LDAI_RUNTIME_FILE=$HOME/.cache/tauri/gatherpack-runtime-x86_64" >> "$GITHUB_ENV"
       - run: pnpm tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
       - name: AppImage system notices and corresponding source
         if: runner.os == 'Linux'
@@ -89,7 +89,7 @@ jobs:
           sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
           sudo apt-get update
           version=$(node -p 'require("./package.json").version')
-          bash scripts/finalize-appimage-linux.sh "target/${{ matrix.target }}/release/bundle" "artifacts/${{ matrix.target }}/easy_pack-$version-${{ matrix.target }}-corresponding-source.tar"
+          bash scripts/finalize-appimage-linux.sh "target/${{ matrix.target }}/release/bundle" "artifacts/${{ matrix.target }}/gatherpack-$version-${{ matrix.target }}-corresponding-source.tar"
       - name: Real native IPC and restart validation on native host
         shell: bash
         env:
@@ -99,11 +99,14 @@ jobs:
           if [ "$host" != "$REQUESTED_TARGET" ]; then
             echo "Cross-built target: execution requires its matching target machine."
           elif [ "$RUNNER_OS" = Linux ]; then
-            xvfb-run -a dbus-run-session -- node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/easy-pack"
+            cargo test --locked --release --target "$REQUESTED_TARGET" -p gatherpack
+            xvfb-run -a dbus-run-session -- node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/gatherpack"
           elif [ "$RUNNER_OS" = Windows ]; then
-            node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/easy-pack.exe"
+            cargo test --locked --release --target "$REQUESTED_TARGET" -p gatherpack
+            node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/gatherpack.exe"
           else
-            node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/easy-pack"
+            cargo test --locked --release --target "$REQUESTED_TARGET" -p gatherpack
+            node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/gatherpack"
           fi
       - run: node scripts/collect-artifacts.mjs ${{ matrix.target }}
       - name: Upload native validation evidence
@@ -115,7 +118,7 @@ jobs:
           if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
-          name: easy-pack-${{ matrix.target }}
+          name: gatherpack-${{ matrix.target }}
           path: artifacts/${{ matrix.target }}/
           if-no-files-found: error
 
@@ -135,7 +138,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release create "$RELEASE_TAG" --draft --verify-tag --title "easy_pack $RELEASE_TAG" --notes "File collection and archive alpha. Review docs/prototype-validation.md for desktop compatibility and remaining verification."
+          gh release create "$RELEASE_TAG" --draft --verify-tag --title "GatherPack $RELEASE_TAG" --notes "File collection and archive alpha. Review docs/prototype-validation.md for desktop compatibility and remaining verification."
           find release-assets -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.deb' -o -name '*.AppImage' -o -name '*-corresponding-source.tar' -o -name '*-provenance.json' \) -print0 | xargs -0 -r gh release upload "$RELEASE_TAG"
           gh release upload "$RELEASE_TAG" "$(find release-assets -name THIRD_PARTY_NOTICES.md -print -quit)" "$(find release-assets -name LICENSE -print -quit)" "$(find release-assets -name third-party.md -print -quit)" "$(find release-assets -name license-audit.json -print -quit)"
           find release-assets -name SHA256SUMS.txt -exec cat {} + > SHA256SUMS.txt

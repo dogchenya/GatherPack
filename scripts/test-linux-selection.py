@@ -12,7 +12,7 @@ from collections import deque
 
 evidence = Path("/work/artifacts/validation")
 checks = []
-executable = os.environ.get("EASY_PACK_TEST_EXECUTABLE", "/var/cache/easy-pack/target/release/easy-pack")
+executable = os.environ.get("GATHERPACK_TEST_EXECUTABLE", "/var/cache/easy-pack/target/release/gatherpack")
 root = Path(tempfile.mkdtemp(prefix="selection-", dir=Path.home()))
 first, second = root / "first", root / "second"
 first.mkdir(); second.mkdir()
@@ -78,7 +78,7 @@ def click_app_button(name):
     import pyatspi
     focus(app_window)
     desktop = pyatspi.Registry.getDesktop(0)
-    apps = [app for app in desktop if "easy" in (app.name or "").lower()]
+    apps = [app for app in desktop if "gatherpack" in (app.name or "").lower()]
     queue, matches, trace = deque(apps), [], []
     while queue and len(trace) < 10000:
         widget = queue.popleft()
@@ -97,7 +97,7 @@ def click_app_button(name):
 
 def wait_native_dialog(title):
     for _ in range(300):
-        result = subprocess.run(["xdotool", "search", "--onlyvisible", "--class", "easy-pack"], capture_output=True, text=True)
+        result = subprocess.run(["xdotool", "search", "--onlyvisible", "--class", "gatherpack"], capture_output=True, text=True)
         inventory = [{"window": window, "title": command("xdotool", "getwindowname", window)} for window in result.stdout.split()]
         (evidence / "linux-native-window-inventory.json").write_text(json.dumps(inventory, ensure_ascii=False))
         windows = [item["window"] for item in inventory if item["title"] == title]
@@ -109,7 +109,7 @@ def wait_native_dialog(title):
 
 def toggle_autostart():
     import pyatspi
-    queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "easy" in (app.name or "").lower())
+    queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "gatherpack" in (app.name or "").lower())
     matches = []
     while queue:
         widget = queue.popleft()
@@ -124,7 +124,7 @@ def enter_native_path(dialog, path):
     if path.is_dir():
         # GTK's Recent projection only lists recent locations. Enter the real
         # filesystem browser through its visible Home sidebar before navigation.
-        queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "easy" in (app.name or "").lower())
+        queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "gatherpack" in (app.name or "").lower())
         homes = []
         while queue:
             widget = queue.popleft()
@@ -135,7 +135,7 @@ def enter_native_path(dialog, path):
         command("xdotool", "mousemove", str(bounds.x + bounds.width // 2), str(bounds.y + bounds.height // 2), "click", "1")
         time.sleep(.5)
     keys("ctrl+l")
-    queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "easy" in (app.name or "").lower())
+    queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "gatherpack" in (app.name or "").lower())
     focused = []
     while queue:
         widget = queue.popleft()
@@ -159,13 +159,13 @@ def enter_native_path(dialog, path):
     entry_action.doAction(names.index("activate"))
     time.sleep(.5)
     def chooser_visible():
-        visible = subprocess.run(["xdotool", "search", "--onlyvisible", "--class", "easy-pack"], capture_output=True, text=True)
+        visible = subprocess.run(["xdotool", "search", "--onlyvisible", "--class", "gatherpack"], capture_output=True, text=True)
         return dialog in visible.stdout.split()
     still_open = chooser_visible()
     if still_open:
         for _ in range(30):
             if not chooser_visible(): return
-            queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "easy" in (app.name or "").lower())
+            queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "gatherpack" in (app.name or "").lower())
             buttons = []
             trace = []
             while queue:
@@ -225,7 +225,7 @@ try:
     app = subprocess.Popen([executable], env={**os.environ, "XDG_DATA_HOME": str(app_data)}, stdout=app_log, stderr=app_log)
     try:
         time.sleep(1.5)
-        state_file = app_data / "io.github.easy-pack.prototype/state.json"
+        state_file = app_data / "io.github.dogchenya.gatherpack/state.json"
         # This is a dedicated test account; no personal application data is used.
         check(not state_file.exists(), "global shortcut test starts with a fresh isolated profile")
         subprocess.run(["xclip", "-selection", "clipboard"], input=b"unrelated clipboard sentinel", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
@@ -249,7 +249,7 @@ try:
         drag_source = second / "drag-only.txt"
         drag_source.write_bytes(b"native drag source remains intact")
         time.sleep(.7)
-        app_window = command("xdotool", "search", "--onlyvisible", "--name", "^easy_pack").splitlines()[0]
+        app_window = command("xdotool", "search", "--onlyvisible", "--name", "^GatherPack").splitlines()[0]
         command("xdotool", "windowmove", app_window, "1120", "50")
         app_geometry = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
         focus(second_window); sx, sy = click_content(second_window); keys("ctrl+a")
@@ -317,7 +317,7 @@ try:
         check(save_dialog != app_window, "pack confirmation opens a native save dialog")
         enter_native_path(save_dialog, output)
         time.sleep(.5); click_app_button("开始打包")
-        report_file = app_data / "io.github.easy-pack.prototype/last-report.json"
+        report_file = app_data / "io.github.dogchenya.gatherpack/last-report.json"
         for _ in range(150):
             if output.exists() and report_file.exists(): break
             time.sleep(.1)
@@ -356,7 +356,7 @@ try:
         check(int(expanded["WIDTH"]) >= 700, "clicking the compact icon reopens the collection panel")
         screenshot()
         click_app_button("应用菜单"); time.sleep(.2)
-        click_app_button("退出 easy_pack")
+        click_app_button("退出 GatherPack")
         check(app.wait(timeout=10) == 0, "application menu exits normally after packing")
     except Exception:
         command("python3", "/work/scripts/validation-screenshot-linux.py", str(evidence / "linux-ui-failure.png"))
@@ -367,7 +367,7 @@ try:
         app.terminate(); app.wait(timeout=10); app_log.close()
     with open(executable, "rb") as binary:
         executable_hash = hashlib.file_digest(binary, "sha256").hexdigest()
-    (evidence / "linux-selection-report.json").write_text(json.dumps({"passed": True, "executable": executable, "executableSHA256": executable_hash, "packageSHA256": os.environ.get("EASY_PACK_TEST_PACKAGE_SHA256"), "checks": checks}, ensure_ascii=False, indent=2))
+    (evidence / "linux-selection-report.json").write_text(json.dumps({"passed": True, "executable": executable, "executableSHA256": executable_hash, "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "checks": checks}, ensure_ascii=False, indent=2))
     print(json.dumps({"passed": True, "checks": checks}, ensure_ascii=False))
 except Exception as error:
     try: screenshot()

@@ -41,9 +41,9 @@ pnpm desktop:dev
 ```sh
 pnpm build
 cargo fmt --all --check
-cargo test --locked -p easy-pack-collection
-cargo test --locked -p easy-pack
-cargo check --locked -p easy-pack
+cargo test --locked -p gatherpack-collection
+cargo test --locked -p gatherpack
+cargo check --locked -p gatherpack
 ```
 
 界面集成测试：
@@ -57,9 +57,9 @@ pnpm test:ui
 界面测试使用模拟 IPC。生产程序构建后，可通过真实 Rust IPC 验证打包、取消、报告和重启恢复：
 
 ```sh
-node scripts/test-native.mjs path/to/easy-pack
-# Windows 的程序名为 easy-pack.exe
-# Linux 无头环境：xvfb-run -a dbus-run-session -- node scripts/test-native.mjs path/to/easy-pack
+node scripts/test-native.mjs path/to/gatherpack
+# Windows 的程序名为 gatherpack.exe
+# Linux 无头环境：xvfb-run -a dbus-run-session -- node scripts/test-native.mjs path/to/gatherpack
 ```
 
 真实 IPC 测试生成隔离配置和测试源，不修改普通用户配置。原生对话框、文件管理器和实际快捷键交互另行验证。
@@ -67,7 +67,7 @@ node scripts/test-native.mjs path/to/easy-pack
 按需执行大文件测试；该测试会创建并读取超过 4 GiB 的临时文件：
 
 ```sh
-cargo test --locked --release -p easy-pack-collection -- --ignored
+cargo test --locked --release -p gatherpack-collection -- --ignored
 ```
 
 ## 构建安装包
@@ -95,7 +95,7 @@ pnpm tauri build --target x86_64-apple-darwin --bundles dmg -- --locked
 bash scripts/build-linux-release.sh
 ```
 
-默认安装包目录是 `target/release/bundle/`；显式使用 `--target` 时是 `target/<target>/release/bundle/`。程序名为 `easy-pack`，Windows 添加 `.exe`。自定义 `CARGO_TARGET_DIR` 时以该目录为准。
+默认安装包目录是 `target/release/bundle/`；显式使用 `--target` 时是 `target/<target>/release/bundle/`。程序名为 `gatherpack`，Windows 添加 `.exe`。自定义 `CARGO_TARGET_DIR` 时以该目录为准。
 
 Tauri CLI 自动使用生产协议。直接通过 Cargo 构建发布程序时，需要 `--features custom-protocol` 才会加载打包后的前端资源。
 
@@ -134,4 +134,4 @@ sudo apt-get install -y python3-gi python3-nautilus python3-pyatspi gir1.2-gtk-4
 
 工作流记录实际 Rust host 和请求 target；只有架构匹配时才执行原生 IPC。四目标原生构建不等于跨操作系统或 Linux ARM64 交叉编译验证。独立的 [Mac 包验证工作流](../.github/workflows/macos-package-validation.yml) 可下载指定构建产物，挂载 DMG 并验证包内程序。
 
-Artifacts 包含安装包、`SHA256SUMS.txt`、源码提交/工具链来源记录和第三方声明。完整的本地与远端验证证据见 [验证记录](prototype-validation.md) 和 [CI 摘要](validation/ci-alpha.3.json)。
+Artifacts 包含安装包、`SHA256SUMS.txt`、源码提交/工具链来源记录和第三方声明。完整的本地与远端验证证据见 [验证记录](prototype-validation.md) 和 [CI 摘要](brand-migration.md)。

@@ -1,4 +1,4 @@
-use easy_pack_collection::*;
+use gatherpack_collection::*;
 use std::{
     fs,
     io::Read,

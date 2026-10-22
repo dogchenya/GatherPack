@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-cat > /etc/apt/sources.list.d/easy-pack-validation-source.list <<'SOURCES'
+cat > /etc/apt/sources.list.d/gatherpack-validation-source.list <<'SOURCES'
 deb-src http://archive.ubuntu.com/ubuntu noble main universe restricted multiverse
 deb-src http://archive.ubuntu.com/ubuntu noble-updates main universe restricted multiverse
 deb-src http://security.ubuntu.com/ubuntu noble-security main universe restricted multiverse

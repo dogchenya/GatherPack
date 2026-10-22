@@ -1,4 +1,4 @@
-# easy_pack managed Nautilus selection bridge v1; SPDX-License-Identifier: MIT
+# gatherpack managed Nautilus selection bridge v1; SPDX-License-Identifier: MIT
 """Read the live mapped GTK file selection on demand; never cache selections.
 
 This provider adds no context-menu entries. The extension interface is used only
@@ -13,10 +13,10 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("GdkX11", "4.0")
 from gi.repository import Gio, GLib, GObject, Gtk, GdkX11, Nautilus
 
-BUS_NAME = "io.github.easy_pack.NautilusSelection"
-OBJECT_PATH = "/io/github/easy_pack/NautilusSelection"
-INTERFACE = "io.github.easy_pack.NautilusSelection1"
-XML = """<node><interface name="io.github.easy_pack.NautilusSelection1">
+BUS_NAME = "io.github.dogchenya.gatherpack.NautilusSelection"
+OBJECT_PATH = "/io/github/dogchenya/GatherPack/NautilusSelection"
+INTERFACE = "io.github.dogchenya.gatherpack.NautilusSelection1"
+XML = """<node><interface name="io.github.dogchenya.gatherpack.NautilusSelection1">
 <method name="ReadSelection"><arg type="u" direction="in" name="expected_window"/>
 <arg type="s" direction="out" name="result"/></method></interface></node>"""
 
@@ -74,7 +74,7 @@ def read_window_selection(window, expected_window):
     return list(dict.fromkeys(selections[0]))
 
 
-class EasyPackSelectionBridge(GObject.GObject, Nautilus.MenuProvider):
+class GatherPackSelectionBridge(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
         super().__init__()
         self.owner = Gio.bus_own_name(Gio.BusType.SESSION, BUS_NAME, Gio.BusNameOwnerFlags.NONE, self.on_bus, None, None)

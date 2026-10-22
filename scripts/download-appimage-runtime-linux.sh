@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-runtime=${1:-${XDG_CACHE_HOME:-$HOME/.cache}/tauri/easy-pack-runtime-x86_64}
+runtime=${1:-${XDG_CACHE_HOME:-$HOME/.cache}/tauri/gatherpack-runtime-x86_64}
 mkdir -p "$(dirname "$runtime")"
 expected=617aa77314d57c8b8e4fae9c3f0b35af7b30d5529cb69e98f64f92510ed98a46
 if ! echo "$expected  $runtime" | sha256sum -c - >/dev/null 2>&1; then

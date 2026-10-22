@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 appdir = Path(sys.argv[1]).resolve(strict=True)
-destination = appdir / "usr/share/doc/easy-pack/bundled-libraries"
+destination = appdir / "usr/share/doc/gatherpack/bundled-libraries"
 destination.mkdir(parents=True, exist_ok=True)
 packages = {}
 unresolved = []

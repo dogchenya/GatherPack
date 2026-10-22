@@ -1,19 +1,21 @@
 <p align="center">
-  <img src="app-icon.svg" width="88" alt="easy_pack icon">
+  <img src="app-icon.svg" width="88" alt="GatherPack icon">
 </p>
 
-# easy_pack
+# GatherPack
 
 [简体中文](README.md) | **English**
 
-[![Build status](https://github.com/dogchenya/easy_pack/actions/workflows/prototype.yml/badge.svg?branch=master)](https://github.com/dogchenya/easy_pack/actions/workflows/prototype.yml)
+[![Build status](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml/badge.svg?branch=master)](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **Collect scattered files. Pack them together.**
 
-easy_pack is a desktop file collection and archiving tool for Windows, macOS, and Linux. Drop files and folders from different locations into a floating collection bar, organize the list, and export a ZIP, 7z, or tar.gz archive. Everything runs locally, without an account or network connection.
+GatherPack is a desktop file collection and archiving tool for Windows, macOS, and Linux. Drop files and folders from different locations into a floating collection bar, organize the list, and export a ZIP, 7z, or tar.gz archive. Everything runs locally, without an account or network connection.
 
-![easy_pack running on a Linux desktop](docs/assets/app-preview.png)
+On first launch, GatherPack imports the collection, settings, and reports from an existing easy_pack profile while keeping the original data. Re-enable launch at login in Settings after migration.
+
+![GatherPack running on a Linux desktop](docs/assets/app-preview.png)
 
 *Linux/X11 preview. The application currently uses Simplified Chinese.*
 
@@ -30,20 +32,20 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 ## Download and install
 
-Current version: **0.1.0-alpha.3**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions.
+Current version: **0.1.0-alpha.4**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions.
 
-Open the [successful build](https://github.com/dogchenya/easy_pack/actions/runs/39734269501), choose your platform under **Artifacts** at the bottom of the page, and extract the download before installing. Downloading Artifacts requires a GitHub account.
+Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/workflows/prototype.yml), select a completed build, choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
-| Windows x64 | `easy-pack-x86_64-pc-windows-msvc` | Run the `.exe` installer |
-| macOS 14+ · Apple Silicon | `easy-pack-aarch64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
-| macOS 14+ · Intel | `easy-pack-x86_64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
-| Linux x64 · Ubuntu 24.04 | `easy-pack-x86_64-unknown-linux-gnu` | Install the `.deb`, or make the `.AppImage` executable and run it |
+| Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | Run the `.exe` installer |
+| macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
+| macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
+| Linux x64 · Ubuntu 24.04 | `gatherpack-x86_64-unknown-linux-gnu` | Install the `.deb`, or make the `.AppImage` executable and run it |
 
 Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup. When redistributing the AppImage, include the accompanying `corresponding-source.tar`.
 
-Builds and real IPC tests have passed for all four targets. Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
+The renamed version is undergoing full build validation; see the [migration record](docs/brand-migration.md) (Chinese) for progress. Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
 
 ## Getting started
 
@@ -66,8 +68,8 @@ Built with **Tauri 2 · Rust · React · TypeScript**.
 Install Rust **1.98.1**, Node.js **24**, pnpm **11.25.0**, and the [platform dependencies](docs/development.en.md#prerequisites), then run:
 
 ```sh
-git clone https://github.com/dogchenya/easy_pack.git
-cd easy_pack
+git clone https://github.com/dogchenya/GatherPack.git
+cd GatherPack
 pnpm install --frozen-lockfile
 pnpm desktop:dev
 ```
@@ -76,7 +78,7 @@ See the [development guide](docs/development.en.md) for tests, installer builds,
 
 ## Contributing
 
-Bug reports, suggestions, and Pull Requests are welcome. Open an [issue](https://github.com/dogchenya/easy_pack/issues) with your OS version, file manager, reproduction steps, and error message when reporting compatibility problems.
+Bug reports, suggestions, and Pull Requests are welcome. Open an [issue](https://github.com/dogchenya/GatherPack/issues) with your OS version, file manager, reproduction steps, and error message when reporting compatibility problems.
 
 - [Development guide](docs/development.en.md)
 - [Compatibility and validation record](docs/prototype-validation.md) (Chinese)
@@ -84,4 +86,4 @@ Bug reports, suggestions, and Pull Requests are welcome. Open an [issue](https:/
 
 ## License
 
-Original easy_pack code is available under the [MIT License](LICENSE). Third-party components retain their own licenses; see [third-party notices](docs/THIRD_PARTY_NOTICES.md).
+Original GatherPack code is available under the [MIT License](LICENSE). Third-party components retain their own licenses; see [third-party notices](docs/THIRD_PARTY_NOTICES.md).

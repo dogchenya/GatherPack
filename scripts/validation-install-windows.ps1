@@ -2,14 +2,14 @@ param([Parameter(Mandatory=$true)][string]$Installer, [string]$ReportPath)
 $ErrorActionPreference = 'Stop'
 $workspace = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $installerPath = (Resolve-Path -LiteralPath $Installer).Path
-$existing = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like '*easy*pack*' }
-if ($existing) { throw 'An existing easy_pack installation must not be replaced by this isolated test.' }
+$existing = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like '*GatherPack*' }
+if ($existing) { throw 'An existing gatherpack installation must not be replaced by this isolated test.' }
 $installPath = Join-Path $workspace ('artifacts\validation\windows-install-' + [Guid]::NewGuid().ToString('N'))
 if (-not $installPath.StartsWith(($workspace + '\'), [StringComparison]::OrdinalIgnoreCase)) { throw 'Invalid test installation path' }
 $checks = [Collections.Generic.List[string]]::new()
 $process = Start-Process -FilePath $installerPath -ArgumentList @('/S', "/D=$installPath") -WindowStyle Hidden -Wait -PassThru
 if ($process.ExitCode -ne 0) { throw "Installer exited $($process.ExitCode)" }
-$executable = Join-Path $installPath 'easy-pack.exe'
+$executable = Join-Path $installPath 'gatherpack.exe'
 if (-not (Test-Path -LiteralPath $executable)) { throw 'Installed application executable is missing' }
 $checks.Add('Silent install succeeds and installs the expected executable')
 $licenses = Get-ChildItem -LiteralPath $installPath -Filter THIRD_PARTY_NOTICES.md -Recurse

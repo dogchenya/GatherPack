@@ -1,6 +1,8 @@
 # GatherPack 开发与验证记录
 
-当前 GatherPack alpha.4 的名称同步、旧配置兼容与验证进度见 [品牌迁移记录](brand-migration.md)。下文保留 easy_pack alpha.3 的历史环境、安装包名称、原始哈希与运行编号，不将其当作新品牌版本的测试证据。
+当前 alpha.5 的 Ubuntu 22.04 / 24.04 兼容性与最终安装包证据见 [Ubuntu 兼容性记录](ubuntu-compatibility.md)。
+
+GatherPack alpha.4 的名称同步、旧配置兼容与验证进度见 [品牌迁移记录](brand-migration.md)。下文保留 easy_pack alpha.3 的历史环境、安装包名称、原始哈希与运行编号，不将其当作新品牌版本的测试证据。
 
 历史记录日期：2026-10-22。历史候选：**0.1.0-alpha.3**。用户已恢复开发并要求持续完成验证；本文按实际证据记录，不将缺少环境的项目标记通过。
 

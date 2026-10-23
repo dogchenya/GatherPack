@@ -94,7 +94,11 @@ def click_app_button(name):
     time.sleep(.2)
     bounds = component.getExtents(pyatspi.DESKTOP_COORDS)
     check(bounds.width > 0 and bounds.height > 0, "UI button has a visible interaction target")
-    command("xdotool", "mousemove", str(bounds.x + bounds.width // 2), str(bounds.y + bounds.height // 2), "click", "1")
+    with (evidence / "linux-button-coordinates.jsonl").open("a") as trace_file:
+        trace_file.write(json.dumps({"name": name, "x": bounds.x, "y": bounds.y, "width": bounds.width, "height": bounds.height}) + "\n")
+    command("xdotool", "mousemove", "--sync", str(bounds.x + bounds.width // 2), str(bounds.y + bounds.height // 2))
+    time.sleep(.15)
+    command("xdotool", "click", "1")
 
 def wait_native_dialog(title):
     for _ in range(300):

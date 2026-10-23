@@ -94,7 +94,17 @@ jobs:
         run: |
           bash scripts/download-appimage-runtime-linux.sh
           echo "LDAI_RUNTIME_FILE=$HOME/.cache/tauri/gatherpack-runtime-x86_64" >> "$GITHUB_ENV"
-      - run: pnpm tauri build --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} -- --locked
+      - name: Build desktop installer
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if pnpm tauri build --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' -- --locked; then
+              exit 0
+            fi
+            # Finder / Spotlight can briefly hold the intermediate DMG volume.
+            if [ "$RUNNER_OS" != macOS ] || [ "$attempt" = 3 ]; then exit 1; fi
+            sleep 5
+          done
       - name: Enforce Ubuntu 22.04 glibc baseline
         if: runner.os == 'Linux'
         run: |

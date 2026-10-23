@@ -77,6 +77,7 @@ struct AppState {
     collection: Mutex<Collection>,
     undo_collection: Mutex<Option<(Vec<String>, Option<String>)>>,
     panel_wide: AtomicBool,
+    pinned: AtomicBool,
     settings: Mutex<Settings>,
     last_message: Mutex<String>,
     shortcut_status: Mutex<String>,
@@ -247,7 +248,11 @@ fn set_pinned(app: tauri::AppHandle, pinned: bool) -> Result<(), String> {
     app.get_webview_window("main")
         .ok_or("窗口不可用")?
         .set_always_on_top(pinned)
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+    app.state::<AppState>()
+        .pinned
+        .store(pinned, Ordering::Relaxed);
+    Ok(())
 }
 #[tauri::command]
 fn set_panel_wide(app: tauri::AppHandle, wide: bool) {
@@ -285,7 +290,7 @@ async fn relink_entry(
     tauri::async_runtime::spawn_blocking(move || {
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
-            let previous = window.is_always_on_top().unwrap_or(true);
+            let previous = app.state::<AppState>().pinned.load(Ordering::Relaxed);
             let _ = window.set_always_on_top(false);
             DialogTopmostGuard(window, previous)
         });
@@ -315,7 +320,7 @@ async fn pick_entries(app: tauri::AppHandle, directories: bool) -> Result<(), St
     tauri::async_runtime::spawn_blocking(move || {
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
-            let previous = window.is_always_on_top().unwrap_or(true);
+            let previous = app.state::<AppState>().pinned.load(Ordering::Relaxed);
             let _ = window.set_always_on_top(false);
             DialogTopmostGuard(window, previous)
         });
@@ -362,7 +367,7 @@ async fn choose_output(app: tauri::AppHandle, format: Format) -> Result<Option<S
     tauri::async_runtime::spawn_blocking(move || {
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
-            let previous = window.is_always_on_top().unwrap_or(true);
+            let previous = app.state::<AppState>().pinned.load(Ordering::Relaxed);
             let _ = window.set_always_on_top(false);
             DialogTopmostGuard(window, previous)
         });
@@ -785,6 +790,7 @@ fn main() {
     }
     tauri::Builder::default()
         .manage(AppState {
+            pinned: AtomicBool::new(true),
             smoke_test,
             validation,
             ..AppState::default()

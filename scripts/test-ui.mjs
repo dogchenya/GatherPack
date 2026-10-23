@@ -103,6 +103,17 @@ try {
   await page.getByRole('button', { name: '文件：missing.txt', exact: true }).press('Enter');
   await page.locator('.graph-detail').getByText('不可用：文件不存在', { exact: true }).waitFor();
   const graph = page.locator('.file-graph svg');
+  // Selecting a node can grow its detail card and resize the canvas. Wait for
+  // the native ResizeObserver layout before recording a fit/zoom baseline.
+  await graph.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+  await page.waitForFunction(() => {
+    const element = document.querySelector('.file-graph svg'), bounds = element.getBoundingClientRect();
+    return Math.abs(element.viewBox.baseVal.height - bounds.height) <= 1 && Math.abs(element.viewBox.baseVal.width - bounds.width) <= 1;
+  });
+  await page.getByRole('button', { name: '适应画布', exact: true }).click();
   const transform = await graph.locator(':scope > g').getAttribute('transform');
   await page.getByRole('button', { name: '放大关系图', exact: true }).click();
   assert.notEqual(await graph.locator(':scope > g').getAttribute('transform'), transform);

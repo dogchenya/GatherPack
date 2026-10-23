@@ -46,6 +46,8 @@
 
 `Prepare verified GitHub release` 接受构建运行编号、源码提交和 macOS 安装验证编号。只有四目标构建、双 Ubuntu 安装以及双 DMG 验证成功，并且来源、版本和 SHA256 一致时，才整理发布草稿。安装包、AppImage 对应源码、校验和及授权说明分别提供。
 
+安装包在主分支推送或手动触发时构建；发布标签复用已验证的产物，不再自动触发重复构建。仍可手动指定标签运行构建工作流。图谱缩放回归在节点详情引起的画布重排完成后采集坐标，避免将正常重排误判为缩放失败。
+
 [v0.1.0-alpha.8 已公开发布](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.8)。[发布校验运行](https://github.com/dogchenya/GatherPack/actions/runs/39890473333) 已通过，18 项资源完整上传，版本标签指向上述已验证的应用源码提交。
 
 ## 原型与研究参考

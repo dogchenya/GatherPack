@@ -19,6 +19,8 @@ On first launch, GatherPack imports the collection, settings, and reports from a
 
 *Production frontend with sample files. The application currently uses Simplified Chinese.*
 
+alpha.9 fixes the rectangular background outside the rounded window and legacy user extensions shadowing the system Nautilus bridge. On Ubuntu, after upgrading, wait for file operations to finish, run `nautilus -q`, and reopen Files to load the updated extension.
+
 The redesigned shelf adds undo, source relinking, window pinning, and continued collection during packing. See [UI and interaction notes](docs/ui-redesign.md).
 
 ## Features

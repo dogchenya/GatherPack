@@ -15,7 +15,8 @@ from file_hash import sha256_stream
 from gi.repository import GLib
 
 assert os.getuid() == 2000 and os.environ.get("XDG_SESSION_TYPE") == "x11"
-assert not Path("/usr/share/nautilus-python/extensions/gatherpack_selection.py").exists(), "Run after Debian removal to reproduce a fresh user bridge"
+system_upgrade = os.environ.get("GATHERPACK_TEST_SYSTEM_UPGRADE") == "1"
+assert Path("/usr/share/nautilus-python/extensions/gatherpack_selection.py").exists() == system_upgrade, "System-upgrade mode requires an installed deb; fresh-install mode requires Debian removal"
 evidence = Path("/work/artifacts/validation")
 root = Path(tempfile.mkdtemp(prefix="shortcut-recovery-", dir=Path.home()))
 source = root / "shortcut-source"
@@ -166,12 +167,23 @@ def collect(window, clear_modifiers=True):
 
 try:
     primary_env, primary_data = environment("primary")
+    if system_upgrade:
+        shadow = primary_data / "nautilus-python/extensions/gatherpack_selection.py"
+        shadow.parent.mkdir(parents=True)
+        # A successfully imported legacy module remains in sys.modules. Even
+        # Nautilus 42's loader can then reuse it when visiting the system path.
+        shadow.write_text("# gatherpack managed Nautilus selection bridge v1\nfrom pathlib import Path\nPath(__file__).with_suffix('.loaded').write_text('legacy bridge loaded')\n")
     first_nautilus = launch(["nautilus", "--new-window", str(source)], primary_env, "shortcut-nautilus-first")
     files = files_window()
+    if system_upgrade:
+        wait(lambda: shadow.with_suffix(".loaded").exists(), "Nautilus must actually import the old user module before repair")
+        check(True, "real Nautilus loader imports the legacy user module before repair")
     check(command("gdbus", "call", "--session", "--dest", "org.freedesktop.DBus", "--object-path", "/org/freedesktop/DBus", "--method", "org.freedesktop.DBus.NameHasOwner", "io.github.dogchenya.gatherpack.NautilusSelection") == "(false,)", "fresh Nautilus starts before the user bridge exists")
     primary = launch([executable], primary_env, "shortcut-primary")
     primary_window = wait(lambda: app_window(primary), "Primary app must start normally")
     expand(primary_window)
+    if system_upgrade:
+        check(not shadow.exists(), "installed app removes the faulty managed extension that actually prevented Nautilus from loading the system bridge")
     wait(lambda: "nautilus -q" in app_text(), "First-install UI must explain exiting the background process")
     check("已安装，无需重复安装" in app_text(), "installed loader is diagnosed without asking to install it again")
     check(True, "first installation explains that the running Nautilus must load its new bridge")
@@ -230,7 +242,7 @@ try:
     check((source / "one.txt").read_bytes() == b"first original" and (source / "two.txt").read_bytes() == b"second original", "recovery preserves original source bytes")
     with open(executable, "rb") as stream:
         sha = sha256_stream(stream)
-    report = {"passed": True, "executableSHA256": sha, "checks": checks}
+    report = {"passed": True, "executableSHA256": sha, "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "systemUpgrade": system_upgrade, "checks": checks}
 except Exception as error:
     report = {"passed": False, "error": str(error), "checks": checks}
     (evidence / "shortcut-recovery-accessibility.txt").write_text(app_text())

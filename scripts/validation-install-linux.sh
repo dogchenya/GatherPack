@@ -25,6 +25,8 @@ cmp "$rust_notice" docs/installer-notices/Rust-COPYRIGHT-library.html
 /bin/bash scripts/validation-desktop-linux.sh native /usr/bin/gatherpack
 /bin/bash scripts/validation-desktop-linux.sh gnome /usr/bin/gatherpack
 cp artifacts/validation/linux-selection-report.json artifacts/validation/linux-deb-gui-report.json
+GATHERPACK_TEST_SYSTEM_UPGRADE=1 /bin/bash scripts/validation-desktop-linux.sh shortcuts /usr/bin/gatherpack
+cp artifacts/validation/shortcut-recovery-report.json artifacts/validation/linux-deb-upgrade-report.json
 dpkg --remove "$package"
 test ! -e /usr/bin/gatherpack
 test ! -e /usr/share/nautilus-python/extensions/gatherpack_selection.py

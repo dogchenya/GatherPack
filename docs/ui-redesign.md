@@ -5,9 +5,24 @@
 ## alpha.9 修正
 
 - 清除新主题对根背景的覆盖；三个平台均启用透明原生窗口，圆角外显示窗口后方内容。收起图标保持外侧留白，面板与弹窗共用圆角裁切。
-- 使用 GNOME/X11 合成器像素验证：紫色测试窗口位于程序后方，104×112 收起窗口与 440×760 面板的四角均应显示紫色，面板内部保持不透明。测试脚本为 `scripts/test-window-corners-linux.py`，接入原有 GNOME 实机验证入口。
+- 使用 GNOME/X11 合成器像素验证：紫色测试窗口位于程序后方，104×112 收起窗口与 440×760 面板的四角均应显示紫色，面板内部保持不透明。测试脚本为 `scripts/test-window-corners-linux.py`，接入原有 GNOME 原生桌面验证入口。
 - 修复 deb 更新后旧用户桥接优先加载的问题；按宿主已加载的 Nautilus/GTK 版本选择 GI 命名空间，并增加实际扩展导入诊断，参见 [快捷键连接说明](nautilus-shortcut.md)。
 - 这些修正覆盖已复现的兼容路径，不能仅凭“依赖已安装”断定用户设备上的扩展已经成功加载。
+
+### alpha.9 交付验证
+
+应用产物源码为 `016f23bf5c0ffbc8dbc45eccc38a01f334c857a1`。后续验证脚本和记录更新不改变应用产物。
+
+- [四目标构建与双 Ubuntu 安装验证](https://github.com/dogchenya/GatherPack/actions/runs/39892565133)：全部成功，Linux 构建仍以 GLIBC 2.35 为上限。
+- [Apple Silicon / Intel 实际 DMG 挂载验证](https://github.com/dogchenya/GatherPack/actions/runs/39893439954)：两项成功，各自运行原生核心与重启恢复场景。
+- Windows 下载的实际 EXE：[安装与卸载](validation/alpha9-windows-installer.json) 成功，安装后的程序通过 28 项核心及 5 项恢复断言。
+- 同一个 deb 在 Ubuntu 22.04 / Nautilus 42 与 Ubuntu 24.04 / Nautilus 46 的隔离 GNOME/X11 桌面中安装运行：[22.04 桌面 119 项](validation/alpha9-ubuntu22-deb.json)、[24.04 桌面 119 项](validation/alpha9-ubuntu24-deb.json) 全部通过，验证后卸载成功。
+- 两系统均检查收起与展开窗口的四角合成像素，并在启动前植入旧托管用户扩展，验证实际程序清理覆盖文件：[22.04 圆角](validation/alpha9-ubuntu22-corners.json)、[24.04 圆角](validation/alpha9-ubuntu24-corners.json)。
+- 两系统均让实际 Nautilus 先导入一个不提供选择服务的旧用户模块，确认 D-Bus 服务缺失；启动新版应用后确认旧模块已移除，重启测试创建的 Nautilus，再通过实际快捷键收集原文件。此后继续验证快捷键冲突恢复、重新注册和 Caps Lock：[22.04 升级 24 项](validation/alpha9-ubuntu22-upgrade.json)、[24.04 升级 24 项](validation/alpha9-ubuntu24-upgrade.json) 全部通过。这项测试覆盖已导入旧模块被 Python 缓存后遮住系统模块的情况。
+- [无系统扩展时首次安装与恢复 22 项](validation/alpha9-shortcut-source.json) 通过。Python 3.10 / 当前系统 Python 的 9 项依赖和宿主版本诊断测试通过。
+- Ubuntu 24.04 上直接运行交付的 AppImage：[119 项桌面检查](validation/alpha9-ubuntu24-appimage.json) 与[收起、展开四角像素检查](validation/alpha9-appimage-corners.json) 通过。报告中的可执行文件 SHA256 对应最终 AppImage 包。
+
+[alpha.9 发布校验](https://github.com/dogchenya/GatherPack/actions/runs/39894081592) 已通过，18 项安装包、源码、校验与授权材料完整上传，实际测试包的 SHA256 与上传资源一致。
 
 ## 本次变化
 

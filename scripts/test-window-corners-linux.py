@@ -1,6 +1,8 @@
 """Inspect compositor pixels around the actual GTK/WebKit window, not a browser mock."""
 import json
+import hashlib
 import os
+import signal
 from pathlib import Path
 import subprocess
 import tempfile
@@ -38,6 +40,7 @@ def settle():
 
 
 checks = []
+executable = os.environ.get("GATHERPACK_TEST_EXECUTABLE", "/var/cache/easy-pack/target/release/gatherpack")
 with tempfile.TemporaryDirectory(prefix="gatherpack-corners-") as directory:
     env = {**os.environ, "XDG_DATA_HOME": directory, "XDG_CONFIG_HOME": directory, "XDG_CACHE_HOME": directory}
     system = Path("/usr/share/nautilus-python/extensions/gatherpack_selection.py")
@@ -45,11 +48,13 @@ with tempfile.TemporaryDirectory(prefix="gatherpack-corners-") as directory:
     if system.exists():
         shadow.parent.mkdir(parents=True)
         shadow.write_text("# gatherpack managed Nautilus selection bridge v1\nraise RuntimeError('old incompatible bridge')\n")
-    app = subprocess.Popen([os.environ.get("GATHERPACK_TEST_EXECUTABLE", "/var/cache/easy-pack/target/release/gatherpack")], env=env)
+    app = subprocess.Popen([executable], env=env, start_new_session=True)
     try:
         for _ in range(100):
             pump()
-            windows = subprocess.run(["xdotool", "search", "--onlyvisible", "--pid", str(app.pid), "--name", "GatherPack"], capture_output=True, text=True).stdout.splitlines()
+            # AppImage's extracting runtime may own the parent PID. This
+            # disposable desktop has exactly one GatherPack instance.
+            windows = subprocess.run(["xdotool", "search", "--onlyvisible", "--name", "^GatherPack"], capture_output=True, text=True).stdout.splitlines()
             if windows:
                 window = windows[-1]
                 break
@@ -90,9 +95,12 @@ with tempfile.TemporaryDirectory(prefix="gatherpack-corners-") as directory:
         command("xdotool", "click", "1")
         settle()
         pixels("expanded")
-        Path("/work/artifacts/validation/linux-corners-report.json").write_text(json.dumps({"passed": True, "checks": checks}, indent=2))
+        Path("/work/artifacts/validation/linux-corners-report.json").write_text(json.dumps({"passed": True, "executable": executable, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "checks": checks}, indent=2))
         print(json.dumps(checks))
     finally:
-        app.terminate()
+        try:
+            os.killpg(app.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
         app.wait(timeout=10)
         background.destroy()

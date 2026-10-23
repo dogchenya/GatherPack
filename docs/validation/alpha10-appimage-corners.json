@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "executable": "/work/ci-alpha10/gatherpack-0.1.0-alpha.10-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.10_amd64.AppImage",
+  "executableSHA256": "9165e83cb5dc12e22b79bd9d9c2cb71b3ab6fea02022b13329b3040e03809ce7",
+  "packageSHA256": null,
+  "checks": [
+    {
+      "mode": "compact",
+      "corners": [
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ]
+      ],
+      "width": 104,
+      "height": 112
+    },
+    {
+      "mode": "expanded",
+      "corners": [
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ]
+      ],
+      "width": 440,
+      "height": 760
+    }
+  ]
+}

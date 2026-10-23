@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "buildCommit": "b2d49ebd21ec2370e83b43cf9426e2a1f22c5e29",
+  "buildRun": 39895137974,
+  "deb": {
+    "packageSHA256": "ad13a3a1be2a84ad250cd1725566505028d70315fc0749d4e33774496ba50cba",
+    "executableSHA256": "ff8e0e9d1cdfbc4da57793c10c8900c090cf6d0f97388402831d792764ddd2db",
+    "verification": "Extracted the executable from the tested deb and matched its SHA256 to every installed-program position and corner report.",
+    "reports": [
+      "alpha10-ubuntu22-position.json",
+      "alpha10-ubuntu22-corners.json",
+      "alpha10-ubuntu24-position.json",
+      "alpha10-ubuntu24-corners.json"
+    ]
+  },
+  "appimageSHA256": "9165e83cb5dc12e22b79bd9d9c2cb71b3ab6fea02022b13329b3040e03809ce7",
+  "windowsInstallerSHA256": "73f846dcb19976af4d9c4af5bec2ba69faedb5a8fc0718fdbd1c6ad1ec439796"
+}

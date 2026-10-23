@@ -9,6 +9,18 @@
 - 无边框 GTK 窗口使用客户端位置计算必要移动，避免把包含隐藏装饰偏移的框架坐标反复写回。完整展开、收起时也只在位置确实需要约束时移动。
 - 原生 GNOME/X11 回归覆盖 48 次视图切换：普通位置、右侧边界、窗口下移、手动调整为 600 高度四种状态；逐次核对宽度、高度和坐标。`layout` 验证模式单独执行圆角与位置检查，完整 `gnome` 模式继续执行原有桌面交互检查。
 
+### alpha.10 交付验证
+
+应用产物源码：`b2d49ebd21ec2370e83b43cf9426e2a1f22c5e29`。后续记录和验证脚本元数据更新不改变安装包。
+
+- [四目标构建与 Ubuntu 22.04 / 24.04 安装检查](https://github.com/dogchenya/GatherPack/actions/runs/39895137974)、[两种架构实际 DMG 挂载与运行](https://github.com/dogchenya/GatherPack/actions/runs/39896470947) 全部成功。
+- 同一份实际 deb 在 Ubuntu 22.04 / Nautilus 42 和 Ubuntu 24.04 / Nautilus 46 隔离 GNOME/X11 桌面安装，分别通过 48 次位置、宽度和高度断言，随后卸载：[22.04 位置记录](validation/alpha10-ubuntu22-position.json)、[24.04 位置记录](validation/alpha10-ubuntu24-position.json)。两系统[圆角检查](validation/alpha10-ubuntu22-corners.json)和[旧托管扩展清理检查](validation/alpha10-ubuntu24-corners.json)继续通过。
+- 实际 AppImage 通过[48 次位置检查](validation/alpha10-appimage-position.json)和[圆角检查](validation/alpha10-appimage-corners.json)。Windows 实际安装包通过[安装、核心场景、重启恢复与卸载](validation/alpha10-windows-installer.json)。
+- 补丁候选程序在打包前通过[48 次位置检查](validation/alpha10-candidate-position.json)及[119 项桌面交互回归](validation/alpha10-candidate-gnome.json)。候选程序记录与上述交付包记录分别保留。
+- [工件核对记录](validation/alpha10-artifact-verification.json)从实际 deb 解出程序，对照四份安装后记录的程序 SHA256；AppImage、Windows 安装包和上传资源的 SHA256 也一致。[发布校验运行](https://github.com/dogchenya/GatherPack/actions/runs/39896548758)成功，18 项资源已上传。
+
+[v0.1.0-alpha.10 已公开发布](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.10)。
+
 ## alpha.9 修正
 
 - 清除新主题对根背景的覆盖；三个平台均启用透明原生窗口，圆角外显示窗口后方内容。收起图标保持外侧留白，面板与弹窗共用圆角裁切。

@@ -118,7 +118,7 @@ with tempfile.TemporaryDirectory(prefix="gatherpack-corners-") as directory:
             settle()
 
         transitions = []
-        position_report = {"passed": False, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "transitions": transitions}
+        position_report = {"passed": False, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "transitions": transitions}
         for phase, x, y, cycles in [("normal", 200, 80, 12), ("right-edge", 780, 90, 4), ("moved-down", 120, 200, 4), ("resized", 200, 100, 4)]:
             command("xdotool", "windowmove", window, str(x), str(y))
             if phase == "resized":

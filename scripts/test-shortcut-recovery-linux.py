@@ -188,8 +188,20 @@ try:
     check("已安装，无需重复安装" in app_text(), "installed loader is diagnosed without asking to install it again")
     check(True, "first installation explains that the running Nautilus must load its new bridge")
     collect(files)
-    wait(lambda: "桥接尚未加载" in app_text(), "Missing bridge must be visible instead of a silent hotkey")
-    check("已安装，无需重复安装" in app_text() and "sudo apt install" not in app_text(), "actual hotkey reports an unloaded bridge separately from missing dependencies")
+    # The startup hint has the same wording. Wait through the asynchronous
+    # "reading selection" state before checking the completed hotkey diagnostic.
+    settled_since = None
+    def completed_diagnostic():
+        global settled_since
+        current = app_text()
+        if "桥接尚未加载" not in current or "已安装，无需重复安装" not in current or "已收到快捷键，正在读取" in current:
+            settled_since = None
+            return None
+        if settled_since is None:
+            settled_since = time.monotonic()
+        return current if time.monotonic() - settled_since >= .5 else None
+    diagnostic = wait(completed_diagnostic, "Missing bridge must be visible after the hotkey finishes")
+    check("sudo apt install" not in diagnostic, "actual hotkey reports an unloaded bridge separately from missing dependencies")
     check(not (primary_data / "io.github.dogchenya.gatherpack/state.json").exists(), "unloaded bridge cannot collect stale or unrelated paths")
     # Restart only the file-manager process created by this isolated test.
     stop(first_nautilus)

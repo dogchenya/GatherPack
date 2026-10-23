@@ -10,6 +10,18 @@
 - 收集、文件全景、目录、打包与报告、诊断、提示及辅助功能标签均支持中英。原生窗口标题、托盘菜单和文件选择器标题随保存的语言更新；文件名、来源路径和输出位置保留原样。
 - 新增浏览器语言覆盖和文件名保护检查，以及真实 GNOME/X11 的左右隐藏、悬停、展开不隐藏、设置预览/取消、保存和重启恢复检查。安装包验证也执行这组检查。
 
+源码构建检查：[14 项贴边与语言断言](validation/alpha11-source-edge-language.json)、[124 项完整桌面交互](validation/alpha11-source-desktop.json)、[48 次视图位置切换](validation/alpha11-source-position.json)通过。桌面交互包含从 Nautilus 实际拖到隐藏窄条、恢复后收集且不重复加入来源；源码程序的 28 项核心 IPC 和 5 项重启恢复也通过。浏览器中英文界面、设置取消还原、文件名/路径保护、图谱及压缩核心回归均通过。
+
+### alpha.11 安装包验证
+
+应用产物源码提交：`de708b5d5223664c8fb5d491d31e376d6ff6cd6b`。后续产物收集与验证脚本修正不改变应用代码。
+
+- 同一实际 DEB 在 Ubuntu 22.04 和 24.04 安装后，分别通过 14 项新功能断言、124 项完整桌面交互、48 次视图位置切换，以及原生 IPC 和重启恢复；系统扩展升级恢复检查通过，随后卸载并确认程序及系统桥接已移除。[22.04 新功能](validation/alpha11-ubuntu22-features.json)、[24.04 新功能](validation/alpha11-ubuntu24-features.json)、[22.04 桌面](validation/alpha11-ubuntu22-desktop.json)、[24.04 桌面](validation/alpha11-ubuntu24-desktop.json)、[22.04 快捷键](validation/alpha11-ubuntu22-shortcuts.json)、[24.04 快捷键](validation/alpha11-ubuntu24-shortcuts.json)。两系统报告记录的程序 SHA256 一致，DEB SHA256 也一致。
+- Ubuntu 24.04 的快捷键验证脚本修正异步读取竞争：等待最终桥接诊断稳定后判断，避免把启动提示或“正在读取”中间态当成最终结果。仅重跑受影响的检查，未改应用程序。
+- [Windows 实际安装器](validation/alpha11-windows-installer.json)通过安装、授权资源、28 项核心 IPC、5 项重启恢复以及卸载清理。
+- Ubuntu 24.04 的实际 AppImage 通过[14 项新功能检查](validation/alpha11-appimage-features.json)、[22 项快捷键恢复](validation/alpha11-appimage-shortcuts.json)、28 项核心 IPC 和 5 项重启恢复；报告绑定实际下载的 AppImage SHA256。AppImage 使用独立桌面中的解压运行方式验证。
+- macOS DMG 打包重试可能留下包含当前版本号的临时磁盘镜像。收集器只接收当前版本和架构的最终文件名，并拒绝缺失或重复的最终包；新增四平台收集测试覆盖临时镜像、旧版、其他架构、缺失和重复包。上传前的完整数量、SHA256 和来源校验继续保留。
+
 ## alpha.10 窗口位置修正
 
 - 在 Ubuntu 22.04 上用 alpha.9 的实际 deb 程序复现：从清单切到全景一次，窗口顶端从 80 变成 43，见[修复前记录](validation/alpha10-reproduction-alpha9.json)。

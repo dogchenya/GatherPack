@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "Silent install succeeds and installs the expected executable",
+    "Installed executable product name and version match the current brand",
+    "Installed resources include dependency and NSIS license notices",
+    "Installed Rust standard-library copyright text matches the original SHA256",
+    "Installed executable passes core and restart native IPC scenarios",
+    "Silent uninstall removes the executable and installation registration"
+  ],
+  "passed": true,
+  "installer": "C:\\Users\\28993\\Documents\\ChatGPT\\easy_pack\\artifacts\\ci\\39899575054\\windows\\gatherpack-0.1.0-alpha.11-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.11_x64-setup.exe",
+  "installerSHA256": "095eb4c5d675c48554e48776c708685ce7ca476e481cab13250e38289c846dbf",
+  "installation": "C:\\Users\\28993\\Documents\\ChatGPT\\easy_pack\\artifacts\\validation\\windows-install-bb8cbf2272b44841a33f72a7cb1fc535"
+}

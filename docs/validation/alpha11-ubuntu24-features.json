@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "executableSHA256": "a48e15374be28b2f130d1b60826fa6b84811ca1549dabaaf78e8a0a55f80c67f",
+  "packageSHA256": "f750e193a2655a550aba5e4a01dc01795e8793390a5a0171e4a7874a84690e6e",
+  "checks": [
+    "fresh profile starts in Simplified Chinese",
+    "pointer inside the edge icon prevents hiding",
+    "left handle stays fully on screen",
+    "left edge reveal preserves its anchor",
+    "moving away from an edge detaches auto-hide",
+    "right handle remains reachable on screen",
+    "right edge reveal preserves its anchor",
+    "expanded collection never auto-hides",
+    "settings controls preview in English",
+    "cancelled language preview does not write preferences",
+    "native window title follows the saved language",
+    "English persists across a real process restart",
+    "Chinese and auto-hide opt-out persist together",
+    "disabling auto-hide keeps the edge icon visible"
+  ]
+}

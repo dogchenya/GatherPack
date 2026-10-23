@@ -28,7 +28,7 @@ Disable edge hiding in Settings if preferred; unpinning the window also pauses h
 
 <img src="docs/assets/edge-slide-alpha12.gif" width="156" alt="Native floating widget sliding out and back in">
 
-*Native GNOME/X11 recording with an empty collection. The expanded panel also supports sliding edge hide.*
+*Native GNOME/X11 recording with an empty collection. The expanded panel also supports sliding edge hide. System reduced-motion preferences simplify animations.*
 
 <img src="docs/assets/shelf-alpha12.png" width="440" alt="GatherPack collection shelf">
 

@@ -28,7 +28,7 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 <img src="docs/assets/edge-slide-alpha12.gif" width="156" alt="悬浮框滑出隐藏和滑回恢复动效">
 
-*GNOME/X11 原生窗口录屏，空清单演示。展开清单同样支持贴边滑动隐藏。*
+*GNOME/X11 原生窗口录屏，空清单演示。展开清单同样支持贴边滑动隐藏；系统开启减少动态效果时会简化动画。*
 
 <img src="docs/assets/shelf-alpha12.png" width="440" alt="GatherPack 收集面板">
 

@@ -22,6 +22,12 @@
 - Ubuntu 24.04 的实际 AppImage 通过[14 项新功能检查](validation/alpha11-appimage-features.json)、[22 项快捷键恢复](validation/alpha11-appimage-shortcuts.json)、28 项核心 IPC 和 5 项重启恢复；报告绑定实际下载的 AppImage SHA256。AppImage 使用独立桌面中的解压运行方式验证。
 - macOS DMG 打包重试可能留下包含当前版本号的临时磁盘镜像。收集器只接收当前版本和架构的最终文件名，并拒绝缺失或重复的最终包；新增四平台收集测试覆盖临时镜像、旧版、其他架构、缺失和重复包。上传前的完整数量、SHA256 和来源校验继续保留。
 
+[四目标构建与双 Ubuntu 安装检查](https://github.com/dogchenya/GatherPack/actions/runs/39899575054)和[双架构实际 DMG 挂载运行](https://github.com/dogchenya/GatherPack/actions/runs/39901228152)均已成功。Intel DMG 在干净构建重试后通过最终文件数量校验。
+
+[发布资源校验运行](https://github.com/dogchenya/GatherPack/actions/runs/39902527067)成功，18 项资源已完整上传。发布流程核对已存在标签的提交，再使用该标签创建发布，避免 Actions 令牌重复创建历史提交标签时的权限限制；不降低安装包来源和 SHA256 检查。
+
+[v0.1.0-alpha.11 已公开发布](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.11)。标签和发布目标均为上述应用产物提交。六份安装包及对应源码的 GitHub 资产摘要与发布校验和逐项一致，其中 Windows、DEB 和 AppImage 的摘要与实际下载测试包一致。发布页与 DEB 匿名访问均返回 HTTP 200，无需 GitHub 登录。
+
 ## alpha.10 窗口位置修正
 
 - 在 Ubuntu 22.04 上用 alpha.9 的实际 deb 程序复现：从清单切到全景一次，窗口顶端从 80 变成 43，见[修复前记录](validation/alpha10-reproduction-alpha9.json)。

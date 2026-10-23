@@ -1,0 +1,18 @@
+{
+  "sourceCommit": "d40899154bc76259316f5be04e41c6cd2cf8cc48",
+  "buildRun": "39887952283",
+  "version": "0.1.0-alpha.8",
+  "passed": true,
+  "package": "gatherpack-0.1.0-alpha.8-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.8_x64-setup.exe",
+  "packageSHA256": "a49ddf5ec03a81bd9dccfa43cd91e0eed5842483a4c2c10774b84e9968ff2009",
+  "nativeCoreChecks": 28,
+  "nativeRestartChecks": 5,
+  "checks": [
+    "Silent install succeeds and installs the expected executable",
+    "Installed executable product name and version match the current brand",
+    "Installed resources include dependency and NSIS license notices",
+    "Installed Rust standard-library copyright text matches the original SHA256",
+    "Installed executable passes core and restart native IPC scenarios",
+    "Silent uninstall removes the executable and installation registration"
+  ]
+}

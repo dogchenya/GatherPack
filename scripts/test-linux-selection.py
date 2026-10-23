@@ -384,11 +384,15 @@ try:
         click_app_button("完成")
         retry_source = first / "shortcut-retry.txt"
         retry_source.write_bytes(b"shortcut retry source")
+        # A resized shelf can cover Nautilus' content coordinate on GNOME 42.
+        # Collapse it before selecting; otherwise Ctrl+A selects the WebView.
+        click_app_button("收起面板")
         focus(first_window); time.sleep(.5); click_content(first_window); keys("ctrl+a"); keys("ctrl+alt+shift+e")
         for _ in range(100):
             if str(retry_source) in json.loads(state_file.read_text())["paths"]: break
             time.sleep(.1)
         check(str(retry_source) in json.loads(state_file.read_text())["paths"], "re-register button restores actual foreground collection hotkey")
+        click_app_button("展开收集面板")
         focus(app_window)
         expanded_before = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
         ex, ey = int(expanded_before["X"]), int(expanded_before["Y"])

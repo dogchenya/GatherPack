@@ -24,11 +24,21 @@
 
 | 实际环境 | 本轮结果 |
 | --- | --- |
-| Windows x64 / WebView2 | 最终 release 程序：28 项真实核心 IPC 和 5 项重启恢复通过 |
+| Windows x64 / WebView2 | 下载的最终 NSIS 安装器：安装、版本、授权资源、运行与卸载 6 项通过；安装后的程序通过 28 项核心 IPC 和 5 项重启恢复 |
+| Ubuntu 22.04 / GNOME / X11 / Nautilus | 下载的最终 `.deb`：安装后 119 项桌面检查通过，包括原生选择器、真实快捷键、关系图、重新定位及撤销、打包解压与拖动；原生 IPC 和重启恢复通过，已卸载并核对清理 |
+| Ubuntu 24.04 最终 Debian 安装器 | 同一 `.deb` 安装后 119 项桌面检查、28 项核心 IPC 和 5 项重启恢复通过，卸载清理通过 |
 | Ubuntu 24.04 / GNOME / X11 / Nautilus | 源码构建：115 项真实桌面检查通过，覆盖拖入、选中项快捷键、原生文件/文件夹/保存/重新定位选择器、取消置顶、撤销、图谱、打包与解压校验、开机启动和窗口移动 |
 | Ubuntu 24.04 快捷键恢复 | 22 项通过：首次加载桥接、实际热键读取、双实例冲突、原组合键恢复、重新注册和 Caps Lock |
+| Ubuntu 24.04 最终 AppImage | 119 项桌面检查、22 项快捷键恢复、28 项核心 IPC、5 项重启恢复及 3 项普通启动迁移检查通过，报告绑定实际下载包的 SHA256 |
+| macOS 15 / Apple Silicon 与 Intel | 两种实际 DMG 均挂载成功，核对 SHA256、来源、版本、包名及授权资源，包内程序通过核心 IPC 和重启恢复，随后卸载镜像 |
 
 桌面检查在独立的 WSL2 Ubuntu rootfs、Xvfb 和非 root 测试账户中运行。可追溯报告：[桌面 115 项](validation/alpha8-gnome-source.json)、[快捷键恢复 22 项](validation/alpha8-shortcut-source.json)。这两份报告验证源码构建程序，最终安装包另做校验。
+
+最终安装器报告：[Windows](validation/alpha8-windows-installer.json)、[Ubuntu 22.04 Debian](validation/alpha8-ubuntu22-deb.json)。包的 SHA256 与实际下载的字节核对一致。[macOS DMG 验证运行](https://github.com/dogchenya/GatherPack/actions/runs/39889134914) 覆盖两种架构。
+
+[Ubuntu 24.04 Debian 报告](validation/alpha8-ubuntu24-deb.json) 验证同一下载包。[最终构建及双 Ubuntu 安装验证](https://github.com/dogchenya/GatherPack/actions/runs/39887952283) 已通过，四个构建目标均完成真实原生 IPC 验证。CI 镜像切换脚本同时支持传统源文件和 Ubuntu runner 的 `apt-mirrors.txt` 间接镜像列表。
+
+最终 [Ubuntu 24.04 AppImage 报告](validation/alpha8-ubuntu24-appimage.json) 同时包含桌面、快捷键恢复与旧配置迁移结果。AppImage 在独立测试环境使用解压运行方式验证；源码包和授权材料由发布流程另外校验。
 
 ## GitHub 发布
 

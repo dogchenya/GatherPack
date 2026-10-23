@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GatherPack · UI 与交互原型</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<svg class="svg-library" aria-hidden="true"><defs>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10H3Z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6Z M14 3v5h4 M9 12h6 M9 16h6"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12 M18 6 6 18"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12 M8 12h12 M8 18h12 M3 6h.1 M3 12h.1 M3 18h.1"/></symbol>
+<symbol id="i-graph" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M12 9V4H4v4 M15 12h6v7h-5 M9 12H3v7h5"/><path d="M2 2h4v4H2Z M14 18h4v4h-4Z M6 18h4v4H6Z"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4v11l-9 4-9-4Z M3 7l9 4 9-4 M12 11v11 M8 5l9 4"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6h16 M4 12h16 M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></symbol>
+<symbol id="i-collapse" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15 m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="m9 3 9 3-3 5 2 5-6-1-4 5-2-1 4-6-3-4Z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2Z M12 9v5 M12 17h.01"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8 M6 9v12h12V9 M10 21v-7h4v7"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12 m-5-5 5 5 5-5 M4 16v5h16v-5"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="m8 4-5 5 5 5 M3 9h10a7 7 0 0 1 0 14"/></symbol>
+<symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5 M16 3h5v5 M3 16v5h5 M21 16v5h-5"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8Z"/></symbol>
+</defs></svg>
+<header class="review-header">
+ <div class="identity"><span class="brandmark"><svg><use href="#i-box"/></svg></span><div><strong>GatherPack <span>设计原型 / 02</span></strong><p>把分散的文件，轻轻收在一起。</p></div></div>
+ <div class="review-actions"><span class="prototype-tag">可交互原型 · 示例数据</span><button id="bridgeCase" class="quiet">连接异常</button><button id="scenario" class="quiet">路径异常</button><button id="reset" class="quiet">重置演示</button><button id="tour" class="primary"><svg><use href="#i-play"/></svg>自动演示</button></div>
+</header>
+<main>
+<div id="desktop" class="desktop">
+ <div class="os-bar"><span>活动 <span class="os-app">文件</span></span><span>10月22日 周四　14:26</span><span>◉　⌁　▰</span></div>
+ <div class="wallpaper"><i></i><i></i><i></i></div>
+ <div class="desktop-note"><span>少一点来回，<br>多一点从容。</span><small>GATHER · REVIEW · PACK</small></div>
+ <section id="filesWindow" class="files-window" aria-label="演示文件管理器">
+  <header class="files-title"><div class="window-dots"><i></i><i></i><i></i></div><span id="folderTitle">项目交付</span><span class="files-demo">演示文件窗口</span></header>
+  <div class="files-toolbar"><div class="breadcrumb"><svg><use href="#i-home"/></svg><span>主目录</span><svg><use href="#i-chevron"/></svg><b id="breadcrumb">项目交付</b></div><button class="icon-button" id="selectAll" title="选择全部" aria-label="选择全部"><svg><use href="#i-check"/></svg></button></div>
+  <div class="files-layout"><nav class="files-sidebar"><span>位置</span><button data-folder="project" class="active"><svg><use href="#i-folder"/></svg>项目交付</button><button data-folder="downloads"><svg><use href="#i-download"/></svg>下载</button><button data-folder="desktop"><svg><use href="#i-home"/></svg>桌面</button></nav><div class="files-content"><div id="sourceGrid" class="source-grid"></div><footer><span id="selectedCount">选择需要带走的文件</span><button id="collectSelected" class="small-button" disabled>收集选中项 <svg><use href="#i-arrow"/></svg></button></footer></div></div>
+ </section>
+ <div id="orbDock" class="orb-dock"><div class="drop-label">松手，加入收集清单 <svg><use href="#i-plus"/></svg></div><button id="orb" class="orb" aria-label="打开收集面板"><span class="orb-inner"><svg><use href="#i-box"/></svg></span><span id="orbCount" class="orb-count" hidden>0</span></button><span class="orb-caption">GatherPack</span></div>
+ <section id="shelf" class="shelf" aria-label="GatherPack 收集面板" hidden>
+  <header id="shelfHandle" class="shelf-header"><span class="drag-grip">⠿</span><span class="mini-brand"><svg><use href="#i-box"/></svg></span><div class="shelf-title"><strong>收集清单</strong><span id="shelfSummary">还没有文件，先放进来一些</span></div><button id="pin" class="icon-button active" title="始终置顶" aria-label="始终置顶" aria-pressed="true"><svg><use href="#i-pin"/></svg></button><button id="settings" class="icon-button" title="设置" aria-label="设置"><svg><use href="#i-settings"/></svg></button><button id="collapse" class="icon-button" title="收起" aria-label="收起面板"><svg><use href="#i-collapse"/></svg></button></header>
+  <div id="bridgeBanner" class="bridge-banner" hidden><svg><use href="#i-alert"/></svg><div><b>文件管理器尚未连接</b><small>快捷键已注册，可以查看连接指引</small></div><button id="bridgeHelp">查看指引</button></div>
+  <div class="shelf-tools"><div class="segments"><button id="listView" class="selected"><svg><use href="#i-list"/></svg>清单</button><button id="graphView"><svg><use href="#i-graph"/></svg>文件全景</button></div><button id="addSample" class="text-button"><svg><use href="#i-plus"/></svg>添加文件</button></div>
+  <div id="listContent" class="list-content"></div>
+  <div id="graphContent" class="graph-content" hidden><div class="graph-heading"><span>所有文件，一眼看清</span><small>点击文件夹展开 · 滚轮缩放 · 拖动画布</small></div><div id="graphViewport" class="graph-viewport"><div id="graphCanvas" class="graph-canvas"></div><div class="graph-controls"><button id="zoomOut" aria-label="缩小">−</button><span id="zoomLevel">100%</span><button id="zoomIn" aria-label="放大">+</button><button id="fitGraph" title="适应画布" aria-label="适应画布"><svg><use href="#i-expand"/></svg></button></div></div><div id="graphDetail" class="graph-detail"></div></div>
+  <div id="taskCard" class="task-card" hidden></div>
+  <div id="resultCard" class="result-card" hidden></div>
+  <footer class="shelf-footer"><div class="collection-meta"><span id="fileStats">0 个文件</span><button id="clear" class="subtle-button" disabled>清空</button></div><button id="pack" class="primary pack-button" disabled><svg><use href="#i-box"/></svg><span>检查并打包</span><svg><use href="#i-arrow"/></svg></button><div class="shelf-status"><span><i id="statusDot"></i><span id="connectionStatus">本地收集 · 已连接</span></span><kbd id="shortcutLabel">Ctrl Alt Shift E</kbd></div></footer>
+ </section>
+ <div id="toast" class="toast" role="status" hidden></div>
+ <div id="modalLayer" class="modal-layer" hidden><section id="modal" class="modal" role="dialog" aria-modal="true"></section></div>
+ <div id="dragGhost" class="drag-ghost" hidden></div>
+ <div id="demoCursor" class="demo-cursor" hidden><svg viewBox="0 0 26 32"><path d="M3 2v24l6-6 5 10 4-2-5-10h9Z" fill="white" stroke="#20372e" stroke-width="1.8"/></svg></div>
+</div>
+<footer class="review-footer"><div id="caption"><b>01 / 轻量收集</b><span>选择左侧文件，拖入收集点；手机上也可以点击“收集选中项”。</span></div><nav><button data-scene="collect" class="active"><i></i>收集</button><button data-scene="graph"><i></i>全景</button><button data-scene="pack"><i></i>打包</button></nav></footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

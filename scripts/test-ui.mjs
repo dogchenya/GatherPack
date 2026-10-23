@@ -39,7 +39,11 @@ try {
           case 'frontend_ready': return;
           case 'set_expanded': state.expanded = args.expanded; break;
           case 'pick_entries': state.entries = plan.sources.map((path, i) => ({ path, name: path.split('/').pop(), isDirectory: false, size: i === 2 ? null : [5, 7][i], status: i === 2 ? '不可用' : '可用' })); break;
-          case 'clear_entries': state.entries = []; break;
+          case 'remove_entry': window.__undoEntries = structuredClone(state.entries); state.entries = state.entries.filter(e => e.path !== args.path); break;
+          case 'clear_entries': window.__undoEntries = structuredClone(state.entries); state.entries = []; break;
+          case 'undo_collection': state.entries = [...window.__undoEntries, ...state.entries.filter(e => !window.__undoEntries.some(old => old.path === e.path))]; break;
+          case 'set_pinned': window.__pinned = args.pinned; return;
+          case 'set_panel_wide': window.__wide = args.wide; return;
           case 'prepare': return state.entries.length ? structuredClone(window.__previewPlan ?? plan) : { ...plan, sources: [], entries: [], issues: [], renames: [], files: 0, totalBytes: 0 };
           case 'plugin:window|start_dragging': window.__dragCount = (window.__dragCount ?? 0) + 1; return;
           case 'retry_shortcut': window.__shortcutRetries = (window.__shortcutRetries ?? 0) + 1; state.shortcutStatus = '快捷键已注册'; break;
@@ -66,9 +70,31 @@ try {
   await page.locator('main').dispatchEvent('drop', { dataTransfer: await page.evaluateHandle(() => new DataTransfer()) });
   await page.getByRole('alert').getByText('仅支持本地真实文件和文件夹', { exact: false }).waitFor();
   await page.getByRole('button', { name: '添加文件', exact: true }).click();
+  await page.locator('.connection-strip button').click();
   await page.getByRole('button', { name: '重新注册', exact: true }).click();
+  await page.getByRole('button', { name: '完成', exact: true }).click();
   assert.equal(await page.evaluate(() => window.__shortcutRetries), 1);
+  await page.setViewportSize({ width: 440, height: 760 });
+  await page.locator('.rename-badge').waitFor();
+  await page.screenshot({ path: 'artifacts/validation/ui-shelf.png' });
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await page.getByRole('button', { name: '置顶窗口' }).click();
+  assert.equal(await page.evaluate(() => window.__pinned), false);
+  await page.getByRole('button', { name: '移除 report.txt', exact: true }).first().click();
+  await page.getByRole('button', { name: '撤销', exact: true }).first().click();
+  assert.equal(await page.evaluate(() => window.__testState.entries.length), 3, 'undo restores removed reference');
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  const settingsDialog = page.getByRole('dialog', { name: '应用设置' });
+  await settingsDialog.getByRole('textbox').press('Control+Alt+K');
+  assert.equal(await settingsDialog.getByRole('textbox').inputValue(), 'Control+Alt+K');
+  await settingsDialog.getByRole('button', { name: '保存设置' }).focus();
+  await page.keyboard.press('Tab');
+  assert.match(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), /关闭应用设置/);
+  await page.keyboard.press('Escape');
+  await settingsDialog.waitFor({ state: 'hidden' });
+  await page.setViewportSize({ width: 900, height: 760 });
   await page.getByRole('button', { name: '文件关系图', exact: true }).click();
+  assert.equal(await page.evaluate(() => window.__wide), true);
   await page.getByRole('button', { name: '文件：report (2).txt', exact: true }).click();
   await page.locator('.graph-detail').getByText('C:/two/report.txt', { exact: true }).waitFor();
   await page.getByRole('button', { name: '定位来源', exact: true }).click();
@@ -119,12 +145,16 @@ try {
   await page.locator('.tree').getByText('report (2).txt').waitFor();
   await page.getByRole('button', { name: '检查并打包 →' }).click();
   const dialog = page.getByRole('dialog', { name: '确认打包' });
+  await page.setViewportSize({ width: 440, height: 760 });
+  const bounds = await dialog.boundingBox();
+  assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 440 && bounds.y >= 0 && bounds.y + bounds.height <= 760, 'pack dialog stays within compact shelf viewport');
+  await page.screenshot({ path: 'artifacts/validation/ui-pack-review.png' });
   await dialog.getByRole('combobox').selectOption('SevenZip');
   await dialog.getByRole('button', { name: '选择保存位置' }).click();
   assert.equal(await dialog.getByRole('button', { name: '开始打包', exact: true }).isDisabled(), true, 'issues require acknowledgement');
   await dialog.getByRole('checkbox').check();
   await dialog.getByRole('button', { name: '开始打包', exact: true }).click();
-  await dialog.getByRole('button', { name: '后台运行' }).click();
+  await dialog.waitFor({ state: 'hidden' });
   await page.getByRole('button', { name: '收集清单', exact: true }).click();
   await page.getByRole('button', { name: '清空清单', exact: true }).click();
   assert.equal(await page.evaluate(() => window.__started.expectedPlan.entries.length), 2, 'active plan is isolated');
@@ -150,6 +180,33 @@ try {
   await page.getByRole('button', { name: '设置', exact: true }).click();
   assert.equal(await page.evaluate(() => window.__dragCount), 2, 'interactive header buttons never start dragging');
   await page.getByRole('dialog', { name: '应用设置' }).getByRole('button', { name: '取消', exact: true }).click();
-  console.log('UI integration passed: collect, graph selection/issues/zoom/reveal, shortcut retry, full-header and compact-icon drag/click separation, preview, packing isolation and report; no page errors.');
+  if (process.env.CAPTURE_UI === '1') {
+    await page.setViewportSize({ width: 440, height: 760 });
+    await page.getByRole('button', { name: '收集清单', exact: true }).click();
+    await page.evaluate(() => {
+      const roots = [
+        ['/home/chen/Documents/项目交付/项目说明.pdf', '项目说明.pdf', false, 2516582],
+        ['/home/chen/Documents/项目交付/设计素材', '设计素材', true, null],
+        ['/home/chen/Documents/项目交付/预算表.xlsx', '预算表.xlsx', false, 88064],
+        ['/home/chen/Downloads/项目说明.pdf', '项目说明.pdf', false, 1153433],
+        ['/home/chen/Downloads/补充说明.docx', '补充说明.docx', false, 839680],
+      ];
+      const entries = roots.map(([source, name, directory, bytes], i) => ({ source, destination: i === 3 ? '项目说明 (2).pdf' : name, directory, size: bytes || 0 }));
+      for (const [name, bytes] of [['封面.png', 12582912], ['配色.png', 10485760], ['布局.png', 12582912]]) entries.push({ source: roots[1][0] + '/' + name, destination: '设计素材/' + name, directory: false, size: bytes });
+      window.__previewPlan = { sources: roots.map(r => r[0]), entries, issues: [], renames: [{ source: roots[3][0], destination: '项目说明 (2).pdf' }], totalBytes: entries.reduce((n,e) => n + e.size,0), files: 7, emptyDirectories: 0 };
+      window.__testState.entries = roots.map(([path,name,isDirectory,size]) => ({ path,name,isDirectory,size,status:'可用' }));
+      window.__testState.message = ''; window.__testState.task.report = null; window.__emitTestState();
+    });
+    await page.locator('.collection-summary').getByText('7 个文件', { exact: false }).waitFor();
+    await page.locator('.toast').waitFor({ state: 'hidden' });
+    await mkdir('docs/assets', { recursive: true });
+    await page.screenshot({ path: 'docs/assets/shelf-alpha8.png' });
+    await page.setViewportSize({ width: 900, height: 760 });
+    await page.getByRole('button', { name: '文件关系图', exact: true }).click();
+    await page.getByRole('button', { name: '文件夹：设计素材', exact: true }).click();
+    await page.getByRole('button', { name: '适应画布', exact: true }).click();
+    await page.screenshot({ path: 'docs/assets/graph-alpha8.png' });
+  }
+  console.log('UI integration passed (including 440px shelf/modal bounds, undo, native pin, graph width, keyboard capture/focus trap/Escape): collect, graph selection/issues/zoom/reveal, shortcut retry, full-header and compact-icon drag/click separation, preview, packing isolation and report; no page errors.');
 } finally { await browser.close(); server.close(); }
 

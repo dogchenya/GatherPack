@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GatherPack · 设计评审</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f6f1;color:#294136;font:14px/1.7 "Segoe UI","Microsoft YaHei",sans-serif}main{max-width:1180px;margin:auto;padding:38px 28px 52px}header{display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font-weight:700;font-size:20px;letter-spacing:-.7px}.tag{color:#71856a;font-size:11px;border:1px solid #d7e1d0;padding:5px 12px;border-radius:30px}h1{font-size:38px;letter-spacing:-1.5px;font-weight:600;margin:34px 0 8px}p{color:#71816a;margin:0}nav{display:flex;gap:10px;margin:23px 0 28px;flex-wrap:wrap}a{color:#3b7052;text-decoration:none}nav a{border:1px solid #d8e3ce;padding:11px 17px;border-radius:10px;background:#fff;font-size:12px}nav a.primary{background:#286b54;color:white;border-color:#286b54}video{width:100%;display:block;background:#d2ddd0;border-radius:15px;box-shadow:0 15px 50px #34543412;border:1px solid #dce5d7}.note{font-size:11px;margin:13px 0 30px;color:#87967f}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}.card{background:#fff;border:1px solid #e2e8dc;border-radius:13px;overflow:hidden}.card img{width:100%;aspect-ratio:1.6;object-fit:cover;display:block;background:#e7eddf}.card div{padding:15px 17px 18px}.card b{font-size:13px;font-weight:600}.card p{font-size:11px;margin-top:5px;line-height:1.9}footer{font-size:10px;color:#8b9882;border-top:1px solid #dfe5d8;margin-top:30px;padding-top:18px;line-height:2}footer a{margin-right:8px}h2{font-size:18px;margin:30px 0 16px;font-weight:500}.intro{max-width:760px;font-size:13px}.mobile{display:flex;gap:22px;align-items:center;margin-top:22px;background:#eaf0e3;border-radius:13px;padding:22px}.mobile img{width:100px;max-height:218px;object-fit:cover;object-position:top;border:1px solid #d5e0ca;border-radius:11px}.mobile b{font-size:14px}.mobile p{font-size:12px;max-width:650px;margin-top:8px}.mobile a{font-size:11px;display:inline-block;margin-top:9px}
+@media(max-width:680px){main{padding:23px 16px 35px}header{gap:8px}.brand{font-size:18px}.tag{font-size:8px;padding:4px 8px}h1{font-size:28px;margin-top:29px;letter-spacing:-.9px}.intro{font-size:12px}.grid{grid-template-columns:1fr}.card img{aspect-ratio:1.8}.mobile{padding:16px;gap:15px}.mobile img{width:83px}.mobile p{font-size:11px}nav a{font-size:11px;padding:10px 13px}}
+</style></head><body><main>
+<header><span class="brand">GatherPack</span><span class="tag">设计评审 / 02 · 可交互原型</span></header>
+<h1>轻一点，也顺手一点。</h1>
+<p class="intro">从小小的收集点，到看得清的文件全景，再到一次打包完成。先看一遍交互，再上手试试。</p>
+<nav><a class="primary" href="GatherPack-prototype.html">打开可点击原型 →</a><a href="GatherPack-interaction.mp4" download>下载交互视频 · MP4</a><a href="Design-notes.md">研究参考与设计说明</a></nav>
+<video controls playsinline preload="metadata" poster="GatherPack-cover.png"><source src="GatherPack-interaction.mp4" type="video/mp4"><a href="GatherPack-interaction.mp4">下载视频</a></video>
+<p class="note">体验说明：原型使用示例文件，打包、定位和连接恢复为演示状态；快捷键在原型页面内响应。视频由原型实际操作录制。</p>
+<h2>这版交互，重点改变了什么</h2>
+<div class="grid">
+<a class="card" href="02-collection.png"><img src="02-collection.png" alt="轻量收集面板"><div><b>01 / 收集，尽量少打扰</b><p>整块图标可移动，宽标题栏可拖动。跨文件夹持续收集，重复来源去重，移除后可撤销。</p></div></a>
+<a class="card" href="GatherPack-cover.png"><img src="GatherPack-cover.png" alt="双向展开的文件关系全景"><div><b>02 / 内容，整体看得清</b><p>清单与全景按需切换。展开文件夹，平移缩放，选中节点查看真实来源与最终路径。</p></div></a>
+<a class="card" href="05-pack-review.png"><img src="05-pack-review.png" alt="打包前的格式位置与目录确认"><div><b>03 / 打包，每一步有反馈</b><p>先处理问题，再确认格式与目录。打包中仍能收集；完成后可核对报告并定位压缩包。</p></div></a>
+</div>
+<section class="mobile"><a href="08-mobile.png"><img src="08-mobile.png" alt="手机端评审中的打包对话框"></a><div><b>手机也能查看与试用</b><p>可以直接点击示例文件，再点“收集选中项”。原型可离线打开，无需连接桌面应用。</p><a href="GatherPack-prototype.html">进入原型 →</a></div></section>
+<footer>研究参考：
+<a href="https://dropoverapp.com/">Dropover / 临时浮动收集架</a>
+<a href="https://apps.apple.com/us/app/yoink/id457622435?mt=12">Yoink / 跨窗口暂存</a>
+<a href="https://aptonic.com/">Dropzone / 快捷操作</a><br>
+本项目独立绘制视觉与实现代码。评审重点：悬浮点大小、面板密度、全景切换方式，以及检查到打包的流程是否顺手。
+</footer></main></body></html>

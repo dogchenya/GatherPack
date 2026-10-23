@@ -15,9 +15,11 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 旧版 easy_pack 用户首次启动时会导入清单、设置和报告；旧记录保留。迁移后如需开机启动，请在设置中重新启用；macOS 请按系统提示授予 Finder 自动化权限。
 
-![GatherPack 在 Linux 桌面上的界面](docs/assets/app-preview.png)
+<img src="docs/assets/shelf-alpha8.png" width="440" alt="GatherPack 新版收集面板">
 
-*Linux/X11 界面示例。当前应用界面使用简体中文。*
+*alpha.8 正式前端，示例文件截图。当前应用界面使用简体中文。*
+
+新版增加撤销整理、来源重新定位、实际窗口置顶及打包中的持续收集，详见 [界面与交互更新](docs/ui-redesign.md)。
 
 ## 功能
 
@@ -33,17 +35,17 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 ## 下载与安装
 
-当前版本：**0.1.0-alpha.7**，处于 Alpha 阶段，暂通过 GitHub Actions 提供安装包。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
+当前版本：**0.1.0-alpha.8**，处于 Alpha 阶段，安装包在 GitHub Releases 提供。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
 
-打开 [构建与下载](https://github.com/dogchenya/GatherPack/actions/runs/39800649107)，在 **Artifacts** 中下载对应系统的安装包，解压后安装。下载 Artifacts 需要登录 GitHub。
+打开 [发布与下载](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.8)，在 **Assets** 中下载对应系统的安装包；无需登录 GitHub。GitHub Actions 仍保留按系统与架构分开的构建产物。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
 | Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | 运行 `.exe` 安装程序 |
 | macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
 | macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | 约 5.3 MiB，安装 `.deb` |
-| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | 约 80.4 MiB，赋予 `.AppImage` 执行权限后运行 |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | 安装 `.deb` |
+| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | 赋予 `.AppImage` 执行权限后运行 |
 
 在 Ubuntu 上升级 GatherPack 前，请先退出旧版应用。若快捷键提示桥接未加载或需要 `python3-nautilus`，请按 [Nautilus 快捷键排查](docs/nautilus-shortcut.md) 安装依赖并退出后台进程后重新打开“文件”。alpha.7 会区分缺少依赖与已安装但尚未加载，不再统一提示重复安装。
 

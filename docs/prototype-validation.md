@@ -1,6 +1,8 @@
 # GatherPack 开发与验证记录
 
-当前 alpha.6 的悬浮窗、快捷键、关系图与双 Ubuntu 最终安装包证据见 [桌面交互记录](desktop-interaction.md)。alpha.5 的兼容性修复见 [Ubuntu 兼容性记录](ubuntu-compatibility.md)。
+alpha.8 正式界面更新及本轮验证见 [界面与交互更新](ui-redesign.md)。以下为历史验证记录。
+
+alpha.6 的悬浮窗、快捷键、关系图与双 Ubuntu 最终安装包证据见 [桌面交互记录](desktop-interaction.md)。alpha.5 的兼容性修复见 [Ubuntu 兼容性记录](ubuntu-compatibility.md)。
 
 GatherPack alpha.4 的名称同步、旧配置兼容与验证进度见 [品牌迁移记录](brand-migration.md)。下文保留 easy_pack alpha.3 的历史环境、安装包名称、原始哈希与运行编号，不将其当作新品牌版本的测试证据。
 

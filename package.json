@@ -1,6 +1,6 @@
 {
   "name": "gatherpack",
-  "version": "0.1.0-alpha.7",
+  "version": "0.1.0-alpha.8",
   "private": true,
   "license": "MIT",
   "packageManager": "pnpm@11.25.0",

@@ -57,9 +57,9 @@ try:
     assert after["WIDTH"] == 104 and after["HEIGHT"] == 112, "drag must not expand"
     command("xdotool", "mousemove", str(after["X"] + 52), str(after["Y"] + 44), "click", "1")
     for _ in range(100):
-        if geometry(window)["WIDTH"] >= 700: break
+        if geometry(window)["WIDTH"] >= 420: break
         time.sleep(.1)
-    assert geometry(window)["WIDTH"] >= 700, "ordinary icon click must still expand"
+    assert geometry(window)["WIDTH"] >= 420, "ordinary icon click must still expand"
     print("Native compact icon drag, click separation and ordinary expansion passed.")
 finally:
     app.terminate(); app.wait(timeout=10); log.close()

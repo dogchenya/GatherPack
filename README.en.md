@@ -15,9 +15,11 @@ GatherPack is a desktop file collection and archiving tool for Windows, macOS, a
 
 On first launch, GatherPack imports the collection, settings, and reports from an existing easy_pack profile while keeping the original data. If you use launch at login, re-enable it in Settings after migration. On macOS, grant Finder Automation permission when prompted.
 
-![GatherPack running on a Linux desktop](docs/assets/app-preview.png)
+<img src="docs/assets/shelf-alpha8.png" width="440" alt="GatherPack collection shelf">
 
-*Linux/X11 preview. The application currently uses Simplified Chinese.*
+*Production frontend with sample files. The application currently uses Simplified Chinese.*
+
+The redesigned shelf adds undo, source relinking, window pinning, and continued collection during packing. See [UI and interaction notes](docs/ui-redesign.md).
 
 ## Features
 
@@ -33,17 +35,17 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 ## Download and install
 
-Current version: **0.1.0-alpha.7**. This is an Alpha release candidate, with installers currently distributed through GitHub Actions. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
+Current version: **0.1.0-alpha.8**. This is an Alpha release candidate, with installers distributed through GitHub Releases. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
 
-Open [builds and downloads](https://github.com/dogchenya/GatherPack/actions/runs/39800649107), choose your platform under **Artifacts**, and extract the download before installing. Downloading Artifacts requires a GitHub account.
+Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.8), choose your platform under **Assets**, and install the package. No GitHub sign-in is required. Separate platform artifacts remain available in GitHub Actions.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
 | Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | Run the `.exe` installer |
 | macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
 | macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | About 5.3 MiB; install the `.deb` |
-| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | About 80.4 MiB; make the `.AppImage` executable and run it |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | Install the `.deb` |
+| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | Make the `.AppImage` executable and run it |
 
 Quit the previous GatherPack version before upgrading the app on Ubuntu. For an unloaded bridge or a `python3-nautilus` message, follow [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english) to install dependencies and restart the background Files process. Alpha.7 distinguishes missing dependencies from an installed but unloaded bridge.
 

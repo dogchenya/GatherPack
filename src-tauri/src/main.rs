@@ -8,11 +8,11 @@ mod validation;
 // GTK native choosers are separate windows. A floating window's ABOVE state
 // can otherwise cover its own modal chooser under GNOME/X11.
 #[cfg(target_os = "linux")]
-struct DialogTopmostGuard(tauri::WebviewWindow);
+struct DialogTopmostGuard(tauri::WebviewWindow, bool);
 #[cfg(target_os = "linux")]
 impl Drop for DialogTopmostGuard {
     fn drop(&mut self) {
-        let _ = self.0.set_always_on_top(true);
+        let _ = self.0.set_always_on_top(self.1);
     }
 }
 use gatherpack_collection::{
@@ -75,6 +75,8 @@ struct Task {
 struct AppState {
     smoke_test: bool,
     collection: Mutex<Collection>,
+    undo_collection: Mutex<Option<(Vec<String>, Option<String>)>>,
+    panel_wide: AtomicBool,
     settings: Mutex<Settings>,
     last_message: Mutex<String>,
     shortcut_status: Mutex<String>,
@@ -191,27 +193,131 @@ fn frontend_ready(app: tauri::AppHandle, state: State<'_, AppState>) {
 }
 #[tauri::command]
 fn remove_entry(path: String, app: tauri::AppHandle) {
-    app.state::<AppState>()
-        .collection
-        .lock()
-        .unwrap()
-        .remove(&path);
+    let state = app.state::<AppState>();
+    let mut collection = state.collection.lock().unwrap();
+    if collection.paths().contains(&path) {
+        *state.undo_collection.lock().unwrap() = Some((collection.paths(), None));
+        collection.remove(&path);
+    }
+    drop(collection);
     persist(&app);
     emit(&app);
 }
 #[tauri::command]
 fn clear_entries(app: tauri::AppHandle) {
-    app.state::<AppState>().collection.lock().unwrap().clear();
+    let state = app.state::<AppState>();
+    let mut collection = state.collection.lock().unwrap();
+    if !collection.paths().is_empty() {
+        *state.undo_collection.lock().unwrap() = Some((collection.paths(), None));
+        collection.clear();
+    }
+    drop(collection);
     persist(&app);
     emit(&app);
+}
+#[tauri::command]
+fn undo_collection(app: tauri::AppHandle) {
+    let state = app.state::<AppState>();
+    let mut collection = state.collection.lock().unwrap();
+    if let Some((mut previous, replacement)) = state.undo_collection.lock().unwrap().take() {
+        // Keep items collected after the removal and restore the original order.
+        for path in collection.paths() {
+            if replacement.as_ref() == Some(&path) {
+                continue;
+            }
+            if !previous.iter().any(|old| {
+                Path::new(old)
+                    .canonicalize()
+                    .unwrap_or_else(|_| PathBuf::from(old))
+                    == Path::new(&path)
+                        .canonicalize()
+                        .unwrap_or_else(|_| PathBuf::from(&path))
+            }) {
+                previous.push(path);
+            }
+        }
+        *collection = Collection::restore(previous);
+    }
+    drop(collection);
+    persist(&app);
+    emit(&app);
+}
+#[tauri::command]
+fn set_pinned(app: tauri::AppHandle, pinned: bool) -> Result<(), String> {
+    app.get_webview_window("main")
+        .ok_or("窗口不可用")?
+        .set_always_on_top(pinned)
+        .map_err(|e| e.to_string())
+}
+#[tauri::command]
+fn set_panel_wide(app: tauri::AppHandle, wide: bool) {
+    let state = app.state::<AppState>();
+    if state.panel_wide.swap(wide, Ordering::Relaxed) != wide
+        && state.expanded.load(Ordering::Relaxed)
+    {
+        expand(&app, true, false);
+    }
+}
+fn replace_reference(
+    app: &tauri::AppHandle,
+    path: &str,
+    replacement: PathBuf,
+) -> Result<(), String> {
+    let state = app.state::<AppState>();
+    let mut collection = state.collection.lock().unwrap();
+    let previous = collection.paths();
+    let replacement_path = replacement.to_string_lossy().into_owned();
+    collection.relink(path, replacement)?;
+    *state.undo_collection.lock().unwrap() = Some((previous, Some(replacement_path)));
+    drop(collection);
+    *state.last_message.lock().unwrap() =
+        "来源已重新定位，请核对更新后的目录预览；正在执行的任务不受影响。".into();
+    persist(app);
+    emit(app);
+    Ok(())
+}
+#[tauri::command]
+async fn relink_entry(
+    app: tauri::AppHandle,
+    path: String,
+    directory: bool,
+) -> Result<bool, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        #[cfg(target_os = "linux")]
+        let _topmost = app.get_webview_window("main").map(|window| {
+            let previous = window.is_always_on_top().unwrap_or(true);
+            let _ = window.set_always_on_top(false);
+            DialogTopmostGuard(window, previous)
+        });
+        let mut dialog = app
+            .dialog()
+            .file()
+            .set_title("重新定位来源（替换清单引用）");
+        if let Some(window) = app.get_webview_window("main") {
+            dialog = dialog.set_parent(&window);
+        }
+        let selected = if directory {
+            dialog.blocking_pick_folder()
+        } else {
+            dialog.blocking_pick_file()
+        };
+        let Some(replacement) = selected.and_then(|p| p.into_path().ok()) else {
+            return Ok(false);
+        };
+        replace_reference(&app, &path, replacement)?;
+        Ok(true)
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
 #[tauri::command]
 async fn pick_entries(app: tauri::AppHandle, directories: bool) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || {
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
+            let previous = window.is_always_on_top().unwrap_or(true);
             let _ = window.set_always_on_top(false);
-            DialogTopmostGuard(window)
+            DialogTopmostGuard(window, previous)
         });
         let mut dialog = app.dialog().file().set_title(if directories {
             "选择文件夹"
@@ -256,8 +362,9 @@ async fn choose_output(app: tauri::AppHandle, format: Format) -> Result<Option<S
     tauri::async_runtime::spawn_blocking(move || {
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
+            let previous = window.is_always_on_top().unwrap_or(true);
             let _ = window.set_always_on_top(false);
-            DialogTopmostGuard(window)
+            DialogTopmostGuard(window, previous)
         });
         let settings = app.state::<AppState>().settings.lock().unwrap().clone();
         let name = format!(
@@ -536,7 +643,14 @@ fn expand(app: &tauri::AppHandle, expanded: bool, focus: bool) {
         let _ = window.set_min_size(Some(tauri::LogicalSize::new(80.0, 80.0)));
         let _ = window.set_max_size(None::<tauri::PhysicalSize<u32>>);
         let (width, height) = if expanded {
-            (760.0_f64, 820.0_f64)
+            (
+                if state.panel_wide.load(Ordering::Relaxed) {
+                    900.0_f64
+                } else {
+                    440.0_f64
+                },
+                760.0_f64,
+            )
         } else {
             (104.0, 112.0)
         };
@@ -835,6 +949,10 @@ fn main() {
             frontend_ready,
             remove_entry,
             clear_entries,
+            undo_collection,
+            relink_entry,
+            set_pinned,
+            set_panel_wide,
             pick_entries,
             prepare,
             choose_output,
@@ -847,6 +965,7 @@ fn main() {
             exit_app,
             reveal,
             validation::validation_add,
+            validation::validation_relink,
             validation::validation_remove_source,
             validation::validation_done
         ])

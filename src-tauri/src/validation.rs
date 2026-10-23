@@ -106,6 +106,17 @@ pub fn validation_add(app: tauri::AppHandle, paths: Vec<String>) -> Result<(), S
     Ok(())
 }
 #[tauri::command]
+pub fn validation_relink(
+    app: tauri::AppHandle,
+    path: String,
+    replacement: String,
+) -> Result<(), String> {
+    let state = app.state::<AppState>();
+    checked_path(&state, &path)?;
+    let replacement = checked_path(&state, &replacement)?;
+    crate::replace_reference(&app, &path, replacement)
+}
+#[tauri::command]
 pub fn validation_remove_source(state: State<'_, AppState>, path: String) -> Result<(), String> {
     let path = checked_path(&state, &path)?;
     if path.file_name().and_then(|n| n.to_str()) != Some("new.txt") {

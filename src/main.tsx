@@ -2,10 +2,15 @@ import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react'
 import { createRoot } from 'react-dom/client';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import { Icon } from './Icon';
+import { Modal } from './Modal';
+import { ArchiveTree } from './ArchiveTree';
 import { FileGraph } from './FileGraph';
 import { useWindowDrag } from './windowDrag';
 import './style.css';
 import './desktop.css';
+import './shelf.css';
 
 type Format = 'Zip' | 'SevenZip' | 'TarGz';
 type Entry = { path: string; name: string; isDirectory: boolean; size: number | null; status: string };
@@ -32,7 +37,12 @@ function App() {
   const [skip, setSkip] = useState(false);
   const [starting, setStarting] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [visible, setVisible] = useState(300);
+  const [connection, setConnection] = useState(false);
+  const [pinned, setPinned] = useState(true);
+  const [undo, setUndo] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const taskWasRunning = useRef(false);
   const generation = useRef(0);
   const desktop = isTauri();
   const drag = useWindowDrag(setError);
@@ -50,6 +60,8 @@ function App() {
       if (disposed) { unlisten(); return; } stops.push(unlisten);
       const taskStop = await listen<Task>('task-progress', e => { if (!disposed) setState(s => ({ ...s, task: e.payload })); });
       if (disposed) { taskStop(); return; } stops.push(taskStop);
+      const dropStop = await getCurrentWindow().onDragDropEvent(e => { if (!disposed) setDragOver(e.payload.type === 'enter' || e.payload.type === 'over'); });
+      if (disposed) { dropStop(); return; } stops.push(dropStop);
       const initial = await invoke<Snapshot>('snapshot'); if (!disposed && !updated) setState(initial);
       await invoke('frontend_ready');
       if (initial.validation) { const { runNativeValidation } = await import('./validation'); await runNativeValidation(initial.validation); }
@@ -59,55 +71,78 @@ function App() {
   const refresh = useCallback(async () => {
     if (!desktop) return;
     const id = ++generation.current; setScanning(true);
-    try { const next = await invoke<Plan>('prepare'); if (id === generation.current) { setPlan(next); setSkip(false); setVisible(300); } }
+    try { const next = await invoke<Plan>('prepare'); if (id === generation.current) { setPlan(next); setSkip(false); } }
     catch (e) { if (id === generation.current) setError(String(e)); }
     finally { if (id === generation.current) setScanning(false); }
   }, [desktop]);
   const signature = JSON.stringify(state.entries.map(e => [e.path, e.status, e.size]));
   useEffect(() => { setPlan(null); if (state.validation) return; const timer = setTimeout(() => { void refresh(); }, 200); return () => { clearTimeout(timer); generation.current++; }; }, [signature, refresh, state.validation?.root]);
+  useEffect(() => {
+    if (desktop) void invoke('set_panel_wide', { wide: tab === 'graph' }).catch(e => setError(String(e)));
+  }, [tab, desktop]);
+  useEffect(() => {
+    if (taskWasRunning.current && !state.task.running && state.task.report) setTab('report');
+    taskWasRunning.current = state.task.running;
+  }, [state.task.running, state.task.report]);
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(''), 6000);
+    return () => clearTimeout(timer);
+  }, [notice]);
+  async function remove(path?: string) {
+    try { await act(path ? 'remove_entry' : 'clear_entries', path ? { path } : undefined); setUndo(true); setNotice(path ? '已移出清单，源文件保留原处' : '清单已清空，源文件保留原处'); } catch { /* inline error */ }
+  }
+  async function restore() { try { await act('undo_collection'); setUndo(false); setNotice('已撤销，并保留新收集的项目'); } catch { /* inline error */ } }
+  async function pin() { try { await act('set_pinned', { pinned: !pinned }); setPinned(!pinned); } catch { /* inline error */ } }
+  function relink(path: string, directory?: boolean) {
+    const root = state.entries.find(e => path === e.path || path.startsWith(e.path + '/') || path.startsWith(e.path + String.fromCharCode(92)));
+    if (root) void act('relink_entry', { path: root.path, directory: directory ?? root.isDirectory }).then(changed => { if (changed) { setUndo(true); void refresh(); } }).catch(() => {});
+  }
   async function openPack() {
-    setOutput(''); setSkip(false); setFormat(state.settings.format); setPackDialog(true); setTab('preview'); await refresh();
+    setOutput(''); setSkip(false); setFormat(state.settings.format); setPackDialog(true); await refresh();
   }
   async function choose() { try { const p = await act('choose_output', { format }); if (typeof p === 'string') setOutput(p); } catch { /* shown inline */ } }
   async function start() {
     setStarting(true);
-    try { await act('start_pack', { output, format, skipIssues: skip, expectedPlan: plan }); setPackDialog(false); setTab('report'); }
-    catch { await refresh(); }
+    try { const pending = act('start_pack', { output, format, skipIssues: skip, expectedPlan: plan }); setPackDialog(false); await pending; }
+    catch { setPackDialog(true); await refresh(); }
     finally { setStarting(false); }
   }
   const task = state.task;
   const blockers = plan?.issues.filter(i => i.blocking) ?? [];
   const changed = plan !== null && JSON.stringify(plan.sources) !== JSON.stringify(state.entries.map(e => e.path));
   const progress = task.totalBytes ? Math.min(100, Math.round(task.bytes / task.totalBytes * 100)) : 0;
-  const preventWebDrop = (event: DragEvent<HTMLElement>) => { event.preventDefault(); if (!event.dataTransfer.files.length) setError('仅支持本地真实文件和文件夹，文本或网页链接不会加入清单。'); };
+  const preventWebDrop = (event: DragEvent<HTMLElement>) => { event.preventDefault(); setDragOver(false); if (!event.dataTransfer.files.length) setError('仅支持本地真实文件和文件夹，文本或网页链接不会加入清单。'); };
   if (!state.expanded) return <div className="compact" onMouseDown={e => drag.down(e)} onMouseMove={drag.move} onMouseUp={drag.end} onDragOver={e => e.preventDefault()} onDrop={preventWebDrop}>
     <div className="handle" title="按住悬浮框任意空白或图标拖动"><i /><i /><i /></div>
-    <button className="orb" data-drag-click onClick={event => { if (event.detail === 0 || !drag.wasDragged()) run('set_expanded', { expanded: true }); }} aria-label="展开收集面板" title={error || state.message || (state.shortcutStatus !== '快捷键已注册' ? state.shortcutStatus : '点击展开 · 按住拖动 · 拖入收集')}><span>GP</span><b>{state.entries.length}</b></button>
+    <button className="orb" data-drag-click onClick={event => { if (event.detail === 0 || !drag.wasDragged()) run('set_expanded', { expanded: true }); }} aria-label="展开收集面板" title={error || state.message || (state.shortcutStatus !== '快捷键已注册' ? state.shortcutStatus : '点击展开 · 按住拖动 · 拖入收集')}><Icon name="box" /><b>{state.entries.length}</b></button>
     <small role="status" title={error || state.message}>{error || (state.message ? state.message.split('\n')[0] : '拖入收集')}</small>
   </div>;
-  return <main onDragOver={e => e.preventDefault()} onDrop={preventWebDrop}>
-    <header onMouseDown={e => drag.down(e, true)} title="按住标题栏空白区域拖动"><span className="logo">GP</span><div className="brand"><h1>GatherPack</h1><p>把分散的文件收集到一起，一次打包带走。</p></div>
-      <button aria-label="设置" onClick={() => setSettings({ ...state.settings })}>设置</button>
-      <button aria-label="收起面板" onClick={() => run('set_expanded', { expanded: false })}>收起</button>
-      <div className="menu-wrap"><button aria-label="应用菜单" aria-expanded={menu} onClick={() => setMenu(!menu)}>···</button>{menu && <div className="menu"><button disabled={!state.trayAvailable} onClick={() => { setMenu(false); run('hide_window'); }}>隐藏收集栏</button><button onClick={() => run('exit_app')}>退出 GatherPack</button></div>}</div>
+  return <main className={(dragOver ? 'drop-active ' : '') + (tab === 'graph' ? 'graph-mode' : '')} onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOver(false); }} onDrop={preventWebDrop}>
+    <header onMouseDown={e => drag.down(e, true)} title="按住标题栏空白区域拖动"><span className="grip" aria-hidden="true">⠿</span><span className="logo"><Icon name="box" /></span><div className="brand"><h1>收集清单</h1><p>{state.entries.length} 项来源 · {scanning ? '正在扫描…' : plan ? size(plan.totalBytes) : '把分散的文件，轻轻收在一起。'}</p></div>
+      <button className={'icon-button pin-button' + (pinned ? ' selected' : '')} aria-label="置顶窗口" aria-pressed={pinned} title={pinned ? '取消置顶' : '置顶窗口'} onClick={() => void pin()}><Icon name="pin" /></button>
+      <button className="icon-button" aria-label="设置" title="设置" onClick={() => setSettings({ ...state.settings })}><Icon name="settings" /></button>
+      <button className="icon-button" aria-label="收起面板" title="收起面板" onClick={() => run('set_expanded', { expanded: false })}><Icon name="collapse" /></button>
+      <div className="menu-wrap"><button className="icon-button" aria-label="应用菜单" aria-expanded={menu} onClick={() => setMenu(!menu)}>···</button>{menu && <div className="menu"><button disabled={!state.trayAvailable} onClick={() => { setMenu(false); run('hide_window'); }}>隐藏收集栏</button><button onClick={() => { setMenu(false); setTab('preview'); }}>目录与问题</button><button onClick={() => { setMenu(false); setTab('report'); }}>结果报告</button><button onClick={() => run('exit_app')}>退出 GatherPack</button></div>}</div>
     </header>
+    <div className="view-bar"><nav aria-label="内容视图"><button aria-label="收集清单" className={tab === 'collection' ? 'active' : ''} onClick={() => setTab('collection')}><Icon name="list" />清单</button><button aria-label="文件关系图" className={tab === 'graph' ? 'active' : ''} onClick={() => setTab('graph')}><Icon name="graph" />文件全景</button></nav><div className="add-menu"><div className="add-options"><button onClick={() => run('pick_entries', { directories: false })}><Icon name="plus" />添加文件</button><button onClick={() => run('pick_entries', { directories: true })}>添加文件夹</button></div></div></div>
     {!desktop && <p className="message">这是浏览器界面预览。系统拖拽、快捷键、收集和打包请在桌面程序中使用。</p>}
-    <section className="drop-area"><div className="drop-symbol">＋</div><div><h2>拖入文件或整个文件夹</h2><p>从不同目录继续收集，源文件保留原处</p></div><div className="add-actions"><button onClick={() => run('pick_entries', { directories: false })}>添加文件</button><button onClick={() => run('pick_entries', { directories: true })}>添加文件夹</button></div></section>
-    <div className="shortcut"><kbd>{state.settings.shortcut.replaceAll('Control', 'Ctrl').replaceAll('Command', '⌘')}</kbd><span>{state.shortcutStatus === '快捷键已注册' ? state.shortcutLastTriggered ? `最近触发 ${new Date(state.shortcutLastTriggered).toLocaleTimeString()} · 在文件管理器中选中后收集` : '在文件管理器中选中后直接收集' : state.shortcutStatus}</span><button className="shortcut-retry" disabled={!desktop} onClick={() => run('retry_shortcut')}>重新注册</button><span title={state.shortcutStatus} className="status-dot" data-ok={state.shortcutStatus === '快捷键已注册'} /></div>
+    {!state.entries.length && <section className="drop-area"><Icon name="plus" /><div><h2>拖入文件或整个文件夹</h2><p>跨目录持续收集，原文件保留原处</p></div></section>}
     {error && <p role="alert" className="error">{error}<button aria-label="关闭错误提示" onClick={() => setError('')}>×</button></p>}
     {state.message && <p role="status" className="message">{state.message}</p>}
-    <div className="stats"><div><strong>{state.entries.length}</strong><span>顶层项目</span></div><div><strong>{scanning ? '计算中…' : plan?.files ?? '—'}</strong><span>递归文件</span></div><div><strong>{scanning ? '计算中…' : plan ? size(plan.totalBytes) : '—'}</strong><span>可读取总大小</span></div></div>
     {task.running && <section className="task" role="status"><div><strong>{task.phase}</strong><span>{size(task.bytes)} / {size(task.totalBytes)}</span><button onClick={() => run('cancel_pack')}>取消任务</button></div><progress max={100} value={progress} /><small>公共清单可继续操作，变更用于下次任务。</small></section>}
-    <nav aria-label="内容视图">{([['collection', '收集清单'], ['graph', '文件关系图'], ['preview', '目录与问题'], ['report', '结果报告']] as const).map(([key, label]) => <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>{label}{key === 'preview' && blockers.length > 0 && <b className="count">{blockers.length}</b>}</button>)}</nav>
+    {(tab === 'preview' || tab === 'report') && <div className="detail-heading"><button onClick={() => setTab('collection')}>← 返回清单</button><strong>{tab === 'preview' ? '目录与问题' : '结果报告'}</strong></div>}
     <section className="content">
       {tab === 'graph' && (scanning || changed ? <p className="empty">正在更新文件关系图…</p> : plan && state.entries.length ? <FileGraph key={signature} plan={plan} reveal={path => run('reveal', { path })} /> : <div className="empty"><span>⌘</span><h2>先收集，再看全貌</h2><p>添加文件或文件夹后，在这里查看可展开的文件关系图。</p></div>)}
-      {tab === 'collection' && <><div className="section-heading"><p>仅记录路径，打包时读取当前内容</p><button disabled={!state.entries.length} onClick={() => run('clear_entries')}>清空清单</button></div>{!state.entries.length ? <div className="empty"><span>▤</span><h2>从第一份文件开始</h2><p>拖入，或在文件管理器中选中后按收集快捷键。</p></div> : <ul>{state.entries.map(entry => <li key={entry.path}><span className="file-icon">{entry.isDirectory ? '▣' : '▤'}</span><div className="file-info"><strong>{entry.name}</strong><span title={entry.path}>{entry.path}</span><small className={entry.status !== '可用' ? 'warning' : ''}>{entry.isDirectory ? '文件夹 · ' + (scanning ? '计算中…' : plan ? size(folderBytes(entry.path, plan)) : '待扫描') + ' · 包含隐藏内容' : entry.size === null ? '未知大小' : size(entry.size)} · {entry.status}</small></div><button onClick={() => run('reveal', { path: entry.path })}>定位</button><button aria-label={'移除 ' + entry.name} onClick={() => run('remove_entry', { path: entry.path })}>移除</button></li>)}</ul>}</>}
-      {tab === 'preview' && <><div className="section-heading"><p>只读预览 · 保留目录结构及空文件夹</p><button disabled={scanning} onClick={() => void refresh()}>{scanning ? '扫描中…' : '重新检查'}</button></div>{plan && <><p className="hint">{plan.files} 个文件 · {plan.emptyDirectories} 个空目录 · {plan.renames.length} 处改名</p>{plan.issues.length > 0 && <div className="issues"><h3>打包前问题检查</h3>{plan.issues.map((issue, i) => <div className="issue" key={i}><strong>{issue.blocking ? '需处理' : '已去重'} · {issue.message}</strong><span>{issue.source}</span><button onClick={() => run('reveal', { path: issue.source })}>定位来源</button></div>)}</div>}{plan.renames.length > 0 && <details><summary>查看重命名映射 ({plan.renames.length})</summary>{plan.renames.map((r, i) => <p className="mapping" key={i}>{r.source}<br />→ {r.destination}</p>)}</details>}<div className="tree" aria-label="压缩包目录树">{plan.entries.slice(0, visible).map(entry => <div key={entry.destination} style={{ paddingLeft: 12 + 16 * (entry.destination.split('/').length - 1) }} title={entry.source}><span>{entry.directory ? '▣' : '▤'}</span>{entry.destination.split('/').pop()}{!entry.directory && <small>{size(entry.size)}</small>}</div>)}</div>{plan.entries.length > visible && <button onClick={() => setVisible(v => v + 300)}>继续显示（剩余 {plan.entries.length - visible} 项）</button>}{!plan.entries.length && <p className="empty">没有可打包内容。</p>}</>}{!plan && <p className="empty">{scanning ? '正在扫描文件和权限…' : '请先添加文件。'}</p>}</>}
+      {tab === 'collection' && <><div className="section-heading"><p>{task.running ? '新收集的内容将用于下次打包' : '仅记录路径，打包时读取当前内容'}</p><button disabled={!state.entries.length} onClick={() => void remove()}>清空清单</button></div>{!state.entries.length ? <div className="empty"><span>▤</span><h2>从第一份文件开始</h2><p>拖入，或在文件管理器中选中后按收集快捷键。</p></div> : <ul>{state.entries.map(entry => <li key={entry.path}><span className={'file-icon ' + (entry.isDirectory ? 'folder' : /\.(png|jpg|jpeg|gif|webp)$/i.test(entry.name) ? 'image' : /\.(xls|xlsx|csv)$/i.test(entry.name) ? 'sheet' : 'document')}><Icon name={entry.isDirectory ? 'folder' : 'file'} /></span><div className="file-info"><strong>{entry.name}</strong>{plan?.renames.some(r => r.source === entry.path) && <em className="rename-badge">自动编号</em>}<span title={entry.path}>{entry.path}</span><small className={entry.status !== '可用' ? 'warning' : ''}>{entry.isDirectory ? '文件夹 · ' + (scanning ? '计算中…' : plan ? size(folderBytes(entry.path, plan)) : '待扫描') + ' · 包含隐藏内容' : entry.size === null ? '未知大小' : size(entry.size)} · {entry.status}</small></div><span className="entry-size">{entry.isDirectory ? plan ? size(folderBytes(entry.path, plan)) : '扫描中' : entry.size === null ? '—' : size(entry.size)}</span><div className="entry-actions">{entry.status !== '可用' && <button title="重新定位" aria-label={'重新定位 ' + entry.name} onClick={() => relink(entry.path)}><Icon name="undo" /></button>}<button title="定位来源" aria-label={'定位 ' + entry.name} onClick={() => run('reveal', { path: entry.path })}><Icon name="locate" /></button><button aria-label={'移除 ' + entry.name} title="移除" onClick={() => void remove(entry.path)}><Icon name="close" /></button></div></li>)}</ul>}</>}
+      {tab === 'preview' && <><div className="section-heading"><p>只读预览 · 保留目录结构及空文件夹</p><button disabled={scanning} onClick={() => void refresh()}>{scanning ? '扫描中…' : '重新检查'}</button></div>{plan && <><p className="hint">{plan.files} 个文件 · {plan.emptyDirectories} 个空目录 · {plan.renames.length} 处改名</p>{plan.issues.length > 0 && <div className="issues"><h3>打包前问题检查</h3>{plan.issues.map((issue, i) => <div className="issue" key={i}><strong>{issue.blocking ? '需处理' : '已去重'} · {issue.message}</strong><span>{issue.source}</span><button onClick={() => run('reveal', { path: issue.source })}>定位来源</button>{issue.blocking && <><button onClick={() => relink(issue.source, false)}>重新定位文件</button><button onClick={() => relink(issue.source, true)}>重新定位文件夹</button></>}</div>)}</div>}{plan.renames.length > 0 && <details><summary>查看重命名映射 ({plan.renames.length})</summary>{plan.renames.map((r, i) => <p className="mapping" key={i}>{r.source}<br />→ {r.destination}</p>)}</details>}<ArchiveTree key={signature} entries={plan.entries} />{!plan.entries.length && <p className="empty">没有可打包内容。</p>}</>}{!plan && <p className="empty">{scanning ? '正在扫描文件和权限…' : '请先添加文件。'}</p>}</>}
       {tab === 'report' && <ReportView report={task.report} reveal={path => run('reveal', { path })} />}
     </section>
-    <footer><div><strong>准备好一起带走？</strong><span>默认 {formats.find(f => f.value === state.settings.format)?.label} · 成功后保留清单</span></div><button className="primary" disabled={!desktop || !state.entries.length || task.running || starting} onClick={() => void openPack()}>检查并打包 →</button></footer>
-    {settings && <div className="overlay"><section className="dialog" role="dialog" aria-modal="true" aria-label="应用设置"><h2>应用设置</h2><label>默认压缩格式<FormatSelect value={settings.format} change={format => setSettings({ ...settings, format })} /></label><label>全局收集快捷键<input value={settings.shortcut} onChange={e => setSettings({ ...settings, shortcut: e.target.value })} /></label><p className="hint">例如 Control+Alt+Shift+E；冲突时保留原快捷键。</p><label className="checkbox"><input type="checkbox" checked={settings.autostart} onChange={e => setSettings({ ...settings, autostart: e.target.checked })} />开机启动</label><p className="hint">{state.platform} · {state.shortcutStatus}</p>{error && <p className="error">{error}</p>}<div className="dialog-actions"><button onClick={() => setSettings(null)}>取消</button><button className="primary" onClick={() => { void act('save_settings', { format: settings.format, shortcut: settings.shortcut, autostart: settings.autostart }).then(() => setSettings(null)).catch(() => {}); }}>保存设置</button></div></section></div>}
-    {packDialog && <div className="overlay"><section className="dialog" role="dialog" aria-modal="true" aria-label="确认打包"><h2>确认本次打包</h2><p>当前预览：{plan?.files ?? 0} 个文件，{size(plan?.totalBytes ?? 0)}。开始前再次检查来源。</p><label>本次格式（不修改默认设置）<FormatSelect value={format} change={value => { setFormat(value); setOutput(''); }} /></label><div className="output-field"><label htmlFor="output-path">保存到</label><div className="output"><input id="output-path" aria-label="输出路径" value={output} readOnly placeholder="选择保存位置和包名" /><button aria-label="选择保存位置" disabled={starting} onClick={() => void choose()}>选择…</button></div></div>{blockers.length > 0 && <label className="checkbox warning"><input type="checkbox" checked={skip} onChange={e => setSkip(e.target.checked)} />明确跳过目录与问题页列出的 {blockers.length} 项问题，其余内容继续打包</label>}<details><summary>本次问题明细 ({plan?.issues.length ?? 0})</summary>{plan?.issues.map((issue, i) => <p className="mapping" key={i}>{issue.source}<br />{issue.message}</p>)}</details><p className="hint">已有同名包不会被覆盖。文件夹按整项管理，普通隐藏内容一并包含。</p>{error && <p role="alert" className="error">{error}</p>}{task.running && <><p>{task.phase} · {progress}%</p><progress max={100} value={progress} /><button onClick={() => run('cancel_pack')}>取消任务</button></>}<div className="dialog-actions"><button onClick={() => setPackDialog(false)}>{task.running ? '后台运行' : '返回查看预览'}</button><button className="primary" disabled={starting || task.running || scanning || changed || !plan?.entries.length || !output || (blockers.length > 0 && !skip)} onClick={() => void start()}>{starting ? '处理中…' : '开始打包'}</button></div></section></div>}
+    <footer><div className="collection-summary"><span>{scanning ? '扫描中…' : plan ? `${plan.files} 个文件 · ${size(plan.totalBytes)}` : `${state.entries.length} 项来源`}</span><div><button aria-label="目录与问题" onClick={() => setTab('preview')}>{blockers.length ? <><Icon name="alert" />{blockers.length} 项待处理</> : '查看目录'}</button>{task.report && <button aria-label="结果报告" onClick={() => setTab('report')}>报告</button>}{undo && <button onClick={() => void restore()}><Icon name="undo" />撤销</button>}</div></div><button aria-label="检查并打包 →" className="primary pack-button" disabled={!desktop || !state.entries.length || task.running || starting} onClick={() => void openPack()}><Icon name="box" /><span>{task.running ? `正在打包 · ${progress}%` : '检查并打包'}</span><Icon name="arrow" /></button><div className="connection-strip"><button onClick={() => setConnection(true)}><span className="status-dot" data-ok={state.shortcutStatus === '快捷键已注册'} />{desktop ? '本地收集' : '浏览器预览'} · {state.shortcutStatus === '快捷键已注册' ? '快捷键已注册' : '需要连接'}</button><kbd title={state.shortcutStatus}>{state.settings.shortcut.replaceAll('Control', 'Ctrl').replaceAll('Command', '⌘').replaceAll('+', ' ')}</kbd></div></footer>
+    {notice && <div className="toast" role="status"><Icon name="check" />{notice}{undo && <button onClick={() => void restore()}>撤销</button>}</div>}
+    {connection && <Modal label="收集连接" close={() => setConnection(false)}><span className="dialog-emblem"><Icon name="settings" /></span><h2>收集连接</h2><p>快捷键注册和文件管理器连接是两个独立步骤。</p><div className="connection-card"><strong>全局快捷键</strong><p>{state.shortcutStatus}</p>{state.shortcutLastTriggered && <small>最近触发 {new Date(state.shortcutLastTriggered).toLocaleTimeString()}</small>}<button disabled={!desktop} onClick={() => run('retry_shortcut')}>重新注册</button></div><div className="connection-card"><strong>文件管理器连接</strong><p>{state.message || '请在系统文件管理器中选中文件，按收集快捷键；如需权限或依赖，具体原因会显示在这里。'}</p></div><p className="hint">{state.platform} · 拖入和手动添加始终可用。Ubuntu 使用 GNOME/X11；依赖已安装但桥接未加载时，请退出后台“文件”进程后重新打开。</p>{error && <p role="alert" className="error">{error}</p>}<div className="dialog-actions"><button className="primary" onClick={() => setConnection(false)}>完成</button></div></Modal>}
+    {settings && <Modal label="应用设置" close={() => setSettings(null)}><span className="dialog-emblem"><Icon name="settings" /></span><h2>应用设置</h2><label>默认压缩格式<FormatSelect value={settings.format} change={format => setSettings({ ...settings, format })} /></label><label>全局收集快捷键<input aria-label="全局收集快捷键" onKeyDown={e => { if (e.key === 'Tab') return; if ((e.ctrlKey || e.altKey || e.metaKey) && /^[a-z0-9]$/i.test(e.key)) { e.preventDefault(); setSettings({ ...settings, shortcut: [e.ctrlKey && 'Control', e.metaKey && 'Command', e.altKey && 'Alt', e.shiftKey && 'Shift', e.key.toUpperCase()].filter(Boolean).join('+') }); } }} value={settings.shortcut} onChange={e => setSettings({ ...settings, shortcut: e.target.value })} /></label><p className="hint">例如 Control+Alt+Shift+E；冲突时保留原快捷键。</p><label className="checkbox"><input type="checkbox" checked={settings.autostart} onChange={e => setSettings({ ...settings, autostart: e.target.checked })} />开机启动</label><p className="hint">{state.platform} · {state.shortcutStatus}</p>{error && <p className="error">{error}</p>}<div className="dialog-actions"><button onClick={() => setSettings(null)}>取消</button><button className="primary" onClick={() => { void act('save_settings', { format: settings.format, shortcut: settings.shortcut, autostart: settings.autostart }).then(() => setSettings(null)).catch(() => {}); }}>保存设置</button></div></Modal>}
+    {packDialog && <Modal label="确认打包" close={() => setPackDialog(false)}><span className="dialog-emblem"><Icon name="box" /></span><h2>确认本次打包</h2><p className="dialog-subtitle">文件名、格式和保存位置，确认好再出发。</p><p>当前预览：{plan?.files ?? 0} 个文件，{size(plan?.totalBytes ?? 0)}。开始前再次检查来源。</p><label>本次格式（不修改默认设置）<FormatSelect value={format} change={value => { setFormat(value); setOutput(''); }} /></label><div className="output-field"><label htmlFor="output-path">保存到</label><div className="output"><input id="output-path" aria-label="输出路径" value={output} onChange={e => setOutput(e.target.value)} placeholder="选择保存位置和包名" /><button aria-label="选择保存位置" disabled={starting} onClick={() => void choose()}>选择…</button></div></div>{blockers.length > 0 && <label className="checkbox warning"><input type="checkbox" checked={skip} onChange={e => setSkip(e.target.checked)} />明确跳过目录与问题页列出的 {blockers.length} 项问题，其余内容继续打包</label>}<details className="pack-tree"><summary>包内目录预览 ({plan?.entries.length ?? 0})</summary>{plan && <ArchiveTree key={signature} entries={plan.entries} />}</details><details><summary>本次问题明细 ({plan?.issues.length ?? 0})</summary>{plan?.issues.map((issue, i) => <p className="mapping" key={i}>{issue.source}<br />{issue.message}</p>)}</details><p className="hint">已有同名包不会被覆盖。文件夹按整项管理，普通隐藏内容一并包含。</p>{error && <p role="alert" className="error">{error}</p>}{task.running && <><p>{task.phase} · {progress}%</p><progress max={100} value={progress} /><button onClick={() => run('cancel_pack')}>取消任务</button></>}<div className="dialog-actions"><button onClick={() => setPackDialog(false)}>{task.running ? '后台运行' : '返回查看预览'}</button><button className="primary" disabled={starting || task.running || scanning || changed || !plan?.entries.length || !output || (blockers.length > 0 && !skip)} onClick={() => void start()}>{starting ? '处理中…' : '开始打包'}</button></div></Modal>}
   </main>;
 }
 function ReportView({ report, reveal }: { report: Report | null; reveal: (path: string) => void }) {

@@ -51,5 +51,5 @@ mounted=0
 GATHERPACK_VALIDATION_TARGET="$target" GATHERPACK_VALIDATION_COMMIT="$commit" node --input-type=module <<'JS'
 import { writeFile } from 'node:fs/promises';
 const target = process.env.GATHERPACK_VALIDATION_TARGET;
-await writeFile('artifacts/validation/macos-install-' + target + '.json', JSON.stringify({passed: true, target, commit: process.env.GATHERPACK_VALIDATION_COMMIT, checks: ['DMG SHA256 and build provenance match', 'DMG mounts read-only on matching native architecture', 'Bundled executable and license resources exist', 'Original Rust standard-library notice bytes match', 'Bundle display name and identifier match the current brand', 'Bundled executable passes 22 core and 5 restart native IPC assertions', 'DMG detaches after the application exits']}, null, 2) + '\n');
+await writeFile('artifacts/validation/macos-install-' + target + '.json', JSON.stringify({passed: true, target, commit: process.env.GATHERPACK_VALIDATION_COMMIT, checks: ['DMG SHA256 and build provenance match', 'DMG mounts read-only on matching native architecture', 'Bundled executable and license resources exist', 'Original Rust standard-library notice bytes match', 'Bundle display name and identifier match the current brand', 'Bundled executable passes core and restart native IPC assertions', 'DMG detaches after the application exits']}, null, 2) + '\n');
 JS

@@ -42,7 +42,7 @@ def wait(predicate, message, timeout=15):
         try:
             result = predicate()
             if result: return result
-        except (subprocess.CalledProcessError, IndexError, GLib.Error, RuntimeError):
+        except (subprocess.CalledProcessError, IndexError, ValueError, GLib.Error, RuntimeError):
             pass
         time.sleep(.1)
     raise AssertionError(message)
@@ -65,7 +65,11 @@ def widgets():
     queue = deque(app for app in pyatspi.Registry.getDesktop(0) if 'gatherpack' in (app.name or '').lower())
     result = []
     while queue and len(result) < 15000:
-        item = queue.popleft(); result.append(item); queue.extend(list(item))
+        item = queue.popleft()
+        result.append(item)
+        # WebKit can invalidate an accessibility node while a new view maps.
+        try: queue.extend(list(item))
+        except (ValueError, RuntimeError, GLib.Error): pass
     return result
 
 

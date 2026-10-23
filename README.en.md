@@ -36,7 +36,7 @@ Disable edge hiding in Settings if preferred; unpinning the window also pauses h
 
 <img src="docs/assets/settings-alpha12-en.png" width="360" alt="Interface language and edge hiding settings">
 
-alpha.9 fixes the rectangular background outside the rounded window and legacy user extensions shadowing the system Nautilus bridge. On Ubuntu, after upgrading, wait for file operations to finish, run `nautilus -q`, and reopen Files to load the updated extension.
+The area outside the rounded window stays transparent, and legacy user extensions shadowing the system Nautilus bridge are handled. If Ubuntu still reports a disconnected bridge after upgrading, use the checks and reconnection in Local collection. Finish file operations before confirming the extension reload.
 
 alpha.10 fixes upward window drift when switching repeatedly between the collection and file graph, preserving the current vertical position and custom window height.
 

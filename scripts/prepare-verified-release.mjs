@@ -55,7 +55,7 @@ await writeFile(join(output, 'release-notes.md'), [
   '贴边隐藏改为完整滑出、滑回动效，同时支持图标和展开清单，保留原视图与尺寸；弹窗、文件选择和打包期间暂停隐藏。新增 Linux 当前文件管理器进程诊断与经确认后的重连，可清理污染的 Python 环境、匹配 XDG 扩展目录并保护其他扩展。中英文 README 同步更新功能说明、设置截图与演示。保留中英切换、圆角和窗口位置修正。',
   '', 'Windows x64、macOS 14+ Apple Silicon / Intel、Linux x86_64。Ubuntu 22.04 / 24.04 安装验证通过。',
   '', '只需下载对应平台的 .exe / .dmg / .deb / .AppImage；Linux 对应源码和 SHA256 校验材料单独提供。升级前请退出旧版应用。',
-  '', '安装包尚未签名，macOS 尚未公证。Linux 快捷键使用 GNOME/X11/Nautilus；安装扩展后如提示桥接未加载，请退出后台“文件”进程并重新打开。',
+  '', '安装包尚未签名，macOS 尚未公证。Linux 快捷键使用 GNOME/X11/Nautilus；提示桥接未加载时，打开“本地收集连接”检查实际连接，结束复制、移动后确认重连；仍失败可复制诊断。',
   '', '源码提交：' + process.env.BUILD_COMMIT,
   '', '[构建与 Ubuntu 安装验证](https://github.com/' + process.env.GH_REPO + '/actions/runs/' + process.env.BUILD_RUN_ID + ') · [macOS DMG 安装验证](https://github.com/' + process.env.GH_REPO + '/actions/runs/' + process.env.MACOS_RUN_ID + ')',
   '', '[界面与交互更新](https://github.com/' + process.env.GH_REPO + '/blob/master/docs/ui-redesign.md)',

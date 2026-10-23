@@ -25,6 +25,10 @@
 
 [四目标构建与双 Ubuntu 兼容性检查](https://github.com/dogchenya/GatherPack/actions/runs/39914923249)、[两种 macOS DMG 挂载运行](https://github.com/dogchenya/GatherPack/actions/runs/39916456070)均已通过。
 
+[发布资源校验](https://github.com/dogchenya/GatherPack/actions/runs/39917502205)通过，18 项资源完整上传。[工件核对记录](validation/alpha12-artifact-verification.json)确认六份安装包及对应源码的 GitHub 摘要与 SHA256SUMS 一致，实际测试的 Windows、DEB 和 AppImage 与发布资源逐项一致。
+
+[v0.1.0-alpha.12 已公开发布](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.12)。标签与发布目标均为上述应用产物提交；发布页及 DEB 下载匿名访问均返回 HTTP 200。用户机器的具体桥接未加载原因仍应以新版实际诊断为准，受污染环境复现不代表所有故障来源相同。
+
 ## alpha.11 贴边隐藏与中英界面
 
 - 收起的悬浮框靠近屏幕工作区左侧或右侧，位置稳定且鼠标移开约 0.8 秒后收为 10 像素宽的窄条；悬停恢复，拖离边缘解除贴边。展开面板、打包中、取消置顶时保持显示。设置中的“贴边隐藏”默认开启，可关闭并保存。

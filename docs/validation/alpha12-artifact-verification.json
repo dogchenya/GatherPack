@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "producer": "00be17199c1494fa467bdf77ba579b645595e8bc",
+  "buildRun": 39914923249,
+  "macosRun": 39916456070,
+  "publisherRun": 39917502205,
+  "checks": [
+    "18 unique uploaded assets",
+    "six package/source SHA256 entries match GitHub asset digests",
+    "tested Windows DEB AppImage match release digests",
+    "release body identifies exact producer"
+  ],
+  "packages": [
+    {
+      "name": "gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-corresponding-source.tar",
+      "sha256": "03d27c32f9155efc5dab77c4faf38a5b6c9c0d4f34b3f2ba6c6a27aa71435dca"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.12-aarch64-apple-darwin-GatherPack_0.1.0-alpha.12_aarch64.dmg",
+      "sha256": "0e66bafd099e43074961187a51b8298997e50e5bd195295c2e0e1a0a918d5214"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.12-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.12_x64-setup.exe",
+      "sha256": "1b96abf0deaa4365881f4c415479d1df4b30ca045057e26535e38b6c57f60e73"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.12_amd64.deb",
+      "sha256": "308123242195eabadc76894114c063f21e99d1a22af95210849141ed5d8605cb"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.12_amd64.AppImage",
+      "sha256": "4746937df1fbd55002408a1d2f76593a474c0d2bc7182c8dd2e520e33feb63d9"
+    },
+    {
+      "name": "gatherpack-0.1.0-alpha.12-x86_64-apple-darwin-GatherPack_0.1.0-alpha.12_x64.dmg",
+      "sha256": "75a91ad618d82be9af12242e3375f030cd468d237c42617fdde41e82668f2a96"
+    }
+  ]
+}

@@ -52,7 +52,7 @@ for (const name of ['LICENSE','THIRD_PARTY_NOTICES.md','third-party.md','license
 await writeFile(join(output, 'SHA256SUMS.txt'), sums.sort().join('\n') + '\n');
 await writeFile(join(output, 'release-tag.txt'), 'v' + version);
 await writeFile(join(output, 'release-notes.md'), [
-  '修复反复切换收集清单和文件全景时窗口逐步上移的问题。切换只调整宽度，保留当前纵向位置和用户调整的高度；靠近屏幕右侧时仅做必要的横向避让。包含 alpha.9 的圆角及 Nautilus 桥接修复。',
+  '新增悬浮框左右贴边隐藏：移开鼠标后收为窄条，悬停恢复，展开面板保持显示；可在设置中关闭。新增简体中文 / English 界面切换，默认简体中文，保存后重启沿用。设置支持即时预览，取消恢复原语言；文件名与路径保留原样。包含此前的窗口圆角、窗口位置及 Nautilus 桥接修复。',
   '', 'Windows x64、macOS 14+ Apple Silicon / Intel、Linux x86_64。Ubuntu 22.04 / 24.04 安装验证通过。',
   '', '只需下载对应平台的 .exe / .dmg / .deb / .AppImage；Linux 对应源码和 SHA256 校验材料单独提供。升级前请退出旧版应用。',
   '', '安装包尚未签名，macOS 尚未公证。Linux 快捷键使用 GNOME/X11/Nautilus；安装扩展后如提示桥接未加载，请退出后台“文件”进程并重新打开。',

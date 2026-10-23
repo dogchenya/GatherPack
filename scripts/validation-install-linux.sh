@@ -23,6 +23,8 @@ grep -q 'NSIS installer tooling' "$notice"
 rust_notice=$(dpkg-query -L "$package" | grep '/licenses/Rust-COPYRIGHT-library.html$')
 cmp "$rust_notice" docs/installer-notices/Rust-COPYRIGHT-library.html
 /bin/bash scripts/validation-desktop-linux.sh native /usr/bin/gatherpack
+/bin/bash scripts/validation-desktop-linux.sh features /usr/bin/gatherpack
+cp artifacts/validation/edge-language-report.json artifacts/validation/linux-deb-features-report.json
 /bin/bash scripts/validation-desktop-linux.sh gnome /usr/bin/gatherpack
 cp artifacts/validation/linux-selection-report.json artifacts/validation/linux-deb-gui-report.json
 GATHERPACK_TEST_SYSTEM_UPGRADE=1 /bin/bash scripts/validation-desktop-linux.sh shortcuts /usr/bin/gatherpack

@@ -1,6 +1,8 @@
+import { useI18n } from './i18n';
 import { useEffect, useRef, type ReactNode } from 'react';
 
 export function Modal({ label, close, children }: { label: string; close: () => void; children: ReactNode }) {
+  const { t } = useI18n();
   const ref = useRef<HTMLElement>(null);
   const onClose = useRef(close); onClose.current = close;
   useEffect(() => {
@@ -19,5 +21,5 @@ export function Modal({ label, close, children }: { label: string; close: () => 
     dialog.addEventListener('keydown', handler);
     return () => { dialog.removeEventListener('keydown', handler); previous?.focus(); };
   }, []);
-  return <div className="overlay"><section ref={ref} className="dialog" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1}><button className="dialog-close icon-button" aria-label={'关闭' + label} onClick={close}>×</button>{children}</section></div>;
+  return <div className="overlay"><section ref={ref} className="dialog" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1}><button className="dialog-close icon-button" aria-label={t('关闭') + label} onClick={close}>×</button>{children}</section></div>;
 }

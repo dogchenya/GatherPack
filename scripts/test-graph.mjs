@@ -6,7 +6,7 @@ import ts from 'typescript';
 
 await mkdir('artifacts/validation', {recursive: true});
 const module = resolve('artifacts/validation/file-graph-under-test.mjs');
-await writeFile(module, ts.transpileModule(await readFile('src/FileGraph.tsx', 'utf8'), {compilerOptions: {target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx: ts.JsxEmit.ReactJSX}}).outputText);
+await writeFile(module, ts.transpileModule(await readFile('src/graphModel.ts', 'utf8'), {compilerOptions: {target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx: ts.JsxEmit.ReactJSX}}).outputText);
 const {buildGraph} = await import(pathToFileURL(module).href);
 const entries = [
   {source: '/work/项目/照片/星空.png', destination: '项目/照片/星空.png', directory: false, size: 1200},

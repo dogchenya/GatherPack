@@ -1,12 +1,10 @@
+import { buildGraph, ROOT, type GraphPlan, type GraphNode as Node } from './graphModel';
+export { buildGraph } from './graphModel';
+export type { GraphPlan } from './graphModel';
+import { useI18n } from './i18n';
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 
-export type GraphPlan = {
-  entries: { source: string; destination: string; directory: boolean; size: number }[];
-  issues: { source: string; message: string; blocking: boolean }[];
-};
-type Node = { id: string; name: string; source: string; destination: string; directory: boolean; bytes: number; issue?: string; children: Node[] };
 type Positioned = { node: Node; x: number; y: number; parent?: Positioned; more?: string };
-const ROOT = 'collection';
 const PAGE = 8;
 const MAX_NODES = 240;
 const size = (bytes: number) => bytes < 1024 ? `${bytes} B` : bytes < 1024 ** 2 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 ** 2).toFixed(1)} MB`;
@@ -16,34 +14,9 @@ function label(name: string) {
   return result;
 }
 
-export function buildGraph(plan: GraphPlan) {
-  const root: Node = { id: ROOT, name: '收集清单', source: '', destination: '', directory: true, bytes: 0, children: [] };
-  const nodes = new Map<string, Node>([['', root]]);
-  for (const entry of plan.entries) {
-    let parent = root;
-    const parts = entry.destination.split('/');
-    for (let i = 0; i < parts.length; i++) {
-      const path = parts.slice(0, i + 1).join('/');
-      let node = nodes.get(path);
-      if (!node) {
-        node = { id: `entry:${path}`, name: parts[i], source: '', destination: path, directory: true, bytes: 0, children: [] };
-        parent.children.push(node); nodes.set(path, node);
-      }
-      if (i === parts.length - 1) Object.assign(node, { source: entry.source, directory: entry.directory, bytes: entry.directory ? 0 : entry.size });
-      parent = node;
-    }
-  }
-  // Reverse depth order also handles a plan whose entries arrive child-first.
-  const depth = (node: Node) => node.destination ? node.destination.split('/').length : 0;
-  for (const node of [...nodes.values()].sort((a, b) => depth(b) - depth(a))) {
-    if (node.directory) node.bytes = node.children.reduce((sum, child) => sum + child.bytes, 0);
-  }
-  const issues = plan.issues.filter(issue => issue.blocking);
-  if (issues.length) root.children.push({ id: 'issues', name: `待处理项 (${issues.length})`, source: '', destination: '', directory: true, bytes: 0, children: issues.map((issue, i) => ({ id: `issue:${i}`, name: issue.source.split(/[\\/]/).pop() || issue.source, source: issue.source, destination: '', directory: false, bytes: 0, issue: issue.message, children: [] })) });
-  return { root, count: nodes.size - 1 + (issues.length ? issues.length + 1 : 0) };
-}
-
 export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: string) => void }) {
+  const { t } = useI18n();
+  const displayName = (node: Node) => node.id === ROOT || node.id === 'issues' || node.id.startsWith('more:') ? t(node.name) : node.name;
   const model = useMemo(() => buildGraph(plan), [plan]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [limits, setLimits] = useState<Record<string, number>>({});
@@ -125,21 +98,21 @@ export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: st
     const scale = Math.min(rect.width / viewport.width, rect.height / viewport.height);
     setView(view => ({ ...view, x: current.originX + (event.clientX - current.x) / scale, y: current.originY + (event.clientY - current.y) / scale }));
   }
-  return <section className="file-graph" aria-label="文件关系图">
-    <div className="graph-toolbar"><div><strong>把要带走的内容，一眼看全</strong><p>点击文件夹展开 · 拖动画布 · 滚轮缩放</p></div><div className="graph-controls"><button aria-label="缩小关系图" onClick={() => changeZoom(1 / 1.25)}>−</button><button onClick={fit}>适应画布</button><button aria-label="放大关系图" onClick={() => changeZoom(1.25)}>＋</button></div></div>
-    <svg ref={svg} viewBox={`0 0 ${viewport.width} ${viewport.height}`} aria-label="收集文件发散图" onPointerDown={event => { if (event.button !== 0) return; event.currentTarget.setPointerCapture(event.pointerId); gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: view.x, originY: view.y }; }} onPointerMove={pan} onPointerUp={() => { gesture.current = null; }} onPointerCancel={() => { gesture.current = null; }}>
+  return <section className="file-graph" aria-label={t("文件关系图")}>
+    <div className="graph-toolbar"><div><strong>{t("把要带走的内容，一眼看全")}</strong><p>{t("点击文件夹展开 · 拖动画布 · 滚轮缩放")}</p></div><div className="graph-controls"><button aria-label={t("缩小关系图")} onClick={() => changeZoom(1 / 1.25)}>−</button><button onClick={fit}>{t("适应画布")}</button><button aria-label={t("放大关系图")} onClick={() => changeZoom(1.25)}>＋</button></div></div>
+    <svg ref={svg} viewBox={`0 0 ${viewport.width} ${viewport.height}`} aria-label={t("收集文件发散图")} onPointerDown={event => { if (event.button !== 0) return; event.currentTarget.setPointerCapture(event.pointerId); gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: view.x, originY: view.y }; }} onPointerMove={pan} onPointerUp={() => { gesture.current = null; }} onPointerCancel={() => { gesture.current = null; }}>
       <defs><pattern id="graph-dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#d4e0d9" /></pattern></defs>
       <rect width="100%" height="100%" fill="url(#graph-dots)" />
       <g transform={`translate(${view.x} ${view.y}) scale(${view.zoom})`}>
         {layout.positions.map(point => { const side = Math.sign(point.x), startX = point.parent!.x + side * (point.parent!.node.id === ROOT ? 39 : 88), endX = point.x - side * 88, mid = (startX + endX) / 2; return <path key={'edge:' + point.node.id} d={`M${startX},${point.parent!.y} C${mid},${point.parent!.y} ${mid},${point.y} ${endX},${point.y}`} className={point.node.issue || point.node.id === 'issues' ? 'graph-edge graph-issue-edge' : 'graph-edge'} />; })}
-        <circle r="39" className="graph-root" /><text textAnchor="middle" y="-3" className="graph-root-label">收集清单</text><text textAnchor="middle" y="15" className="graph-root-count">{plan.entries.filter(entry => !entry.directory).length} 个文件</text>
-        {layout.positions.map(point => <g key={point.node.id} transform={`translate(${point.x} ${point.y})`} role="button" tabIndex={0} aria-label={(point.more ? '显示更多：' : point.node.directory ? '文件夹：' : '文件：') + point.node.name} aria-expanded={point.node.children.length ? expanded.has(point.node.id) : undefined} className={'graph-node' + (selected?.id === point.node.id ? ' selected' : '') + (point.node.issue || point.node.id === 'issues' ? ' has-issue' : '')} onPointerDown={event => event.stopPropagation()} onClick={() => select(point)} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(point); } }}>
-          <title>{point.node.source || point.node.name}{point.node.issue ? '\n' + point.node.issue : ''}</title><rect x="-88" y="-24" width="176" height="48" rx="12" /><text x="-74" y="5" className="graph-node-icon">{point.more ? '···' : point.node.issue ? '!' : point.node.directory ? '▣' : '▤'}</text><text x="-50" y="-3" className="graph-node-name">{label(point.node.name)}</text><text x="-50" y="14" className="graph-node-meta">{point.more ? '点击继续显示' : point.node.issue ? '打包前需处理' : point.node.directory ? `${point.node.children.length} 项 · ${size(point.node.bytes)}` : size(point.node.bytes)}</text>{!!point.node.children.length && <text x="72" y="5" className="graph-node-fold">{expanded.has(point.node.id) ? '−' : '+'}</text>}
+        <circle r="39" className="graph-root" /><text textAnchor="middle" y="-3" className="graph-root-label">{t("收集清单")}</text><text textAnchor="middle" y="15" className="graph-root-count">{plan.entries.filter(entry => !entry.directory).length} {t(" 个文件")}</text>
+        {layout.positions.map(point => <g key={point.node.id} transform={`translate(${point.x} ${point.y})`} role="button" tabIndex={0} aria-label={(point.more ? t('显示更多：') : point.node.directory ? t('文件夹：') : t('文件：')) + displayName(point.node)} aria-expanded={point.node.children.length ? expanded.has(point.node.id) : undefined} className={'graph-node' + (selected?.id === point.node.id ? ' selected' : '') + (point.node.issue || point.node.id === 'issues' ? ' has-issue' : '')} onPointerDown={event => event.stopPropagation()} onClick={() => select(point)} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(point); } }}>
+          <title>{point.node.source || displayName(point.node)}{point.node.issue ? '\n' + t(point.node.issue) : ''}</title><rect x="-88" y="-24" width="176" height="48" rx="12" /><text x="-74" y="5" className="graph-node-icon">{point.more ? '···' : point.node.issue ? '!' : point.node.directory ? '▣' : '▤'}</text><text x="-50" y="-3" className="graph-node-name">{label(displayName(point.node))}</text><text x="-50" y="14" className="graph-node-meta">{point.more ? t('点击继续显示') : point.node.issue ? t('打包前需处理') : point.node.directory ? t(`${point.node.children.length} 项 · ${size(point.node.bytes)}`) : size(point.node.bytes)}</text>{!!point.node.children.length && <text x="72" y="5" className="graph-node-fold">{expanded.has(point.node.id) ? '−' : '+'}</text>}
         </g>)}
       </g>
     </svg>
-    <div className="graph-caption"><span>共 {model.count} 个节点 · 当前显示 {layout.positions.length} 个</span><span>只读查看，不改变收集清单</span></div>
-    {layout.positions.length >= MAX_NODES - 2 && <p className="graph-limit">已达到单屏节点上限，请收起其他分支后继续展开。完整内容仍可在目录预览中查看。</p>}
-    {selected ? <div className="graph-detail"><div><strong>{selected.name}</strong><p>{selected.issue || (selected.directory ? '文件夹' : size(selected.bytes))}</p><p className="graph-path">{selected.source || '待处理项汇总'}</p>{selected.destination && <p className="hint">打包路径：{selected.destination}</p>}</div>{selected.source && <button onClick={() => reveal(selected.source)}>定位来源</button>}</div> : <div className="graph-detail graph-detail-empty">选择一个节点，查看完整路径、大小和打包位置。</div>}
+    <div className="graph-caption"><span>{t("共 ")}{model.count} {t(" 个节点 · 当前显示 ")}{layout.positions.length} {t(" 个")}</span><span>{t("只读查看，不改变收集清单")}</span></div>
+    {layout.positions.length >= MAX_NODES - 2 && <p className="graph-limit">{t("已达到单屏节点上限，请收起其他分支后继续展开。完整内容仍可在目录预览中查看。")}</p>}
+    {selected ? <div className="graph-detail"><div><strong>{displayName(selected)}</strong><p>{t(selected.issue || (selected.directory ? '文件夹' : size(selected.bytes)))}</p><p className="graph-path">{selected.source || t('待处理项汇总')}</p>{selected.destination && <p className="hint">{t("打包路径：")}{selected.destination}</p>}</div>{selected.source && <button onClick={() => reveal(selected.source)}>{t("定位来源")}</button>}</div> : <div className="graph-detail graph-detail-empty">{t("选择一个节点，查看完整路径、大小和打包位置。")}</div>}
   </section>;
 }

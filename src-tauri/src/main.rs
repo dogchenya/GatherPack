@@ -1,4 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+mod edge;
 #[cfg(target_os = "linux")]
 mod linux_bridge;
 mod profile;
@@ -45,6 +46,16 @@ struct Settings {
     shortcut: String,
     last_directory: Option<String>,
     autostart: bool,
+    language: Language,
+    edge_hide: bool,
+}
+#[derive(Clone, Copy, Default, Serialize, Deserialize, PartialEq)]
+enum Language {
+    #[default]
+    #[serde(rename = "zh-CN")]
+    Chinese,
+    #[serde(rename = "en")]
+    English,
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -53,6 +64,8 @@ impl Default for Settings {
             shortcut: SHORTCUT.into(),
             last_directory: None,
             autostart: false,
+            language: Language::Chinese,
+            edge_hide: true,
         }
     }
 }
@@ -73,6 +86,14 @@ struct Task {
 }
 #[derive(Default)]
 struct AppState {
+    edge: Mutex<edge::Controller>,
+    native_menu: Mutex<
+        Vec<(
+            tauri::menu::MenuItem<tauri::Wry>,
+            &'static str,
+            &'static str,
+        )>,
+    >,
     smoke_test: bool,
     collection: Mutex<Collection>,
     undo_collection: Mutex<Option<(Vec<String>, Option<String>)>>,
@@ -96,6 +117,7 @@ struct AppState {
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Snapshot {
+    dock_hidden: Option<edge::Side>,
     entries: Vec<Entry>,
     message: String,
     shortcut_status: String,
@@ -109,6 +131,7 @@ struct Snapshot {
 }
 fn read_snapshot(state: &AppState) -> Snapshot {
     Snapshot {
+        dock_hidden: state.edge.lock().unwrap().side(),
         entries: state.collection.lock().unwrap().entries(),
         message: state.last_message.lock().unwrap().clone(),
         shortcut_status: state.shortcut_status.lock().unwrap().clone(),
@@ -129,6 +152,35 @@ fn emit(app: &tauri::AppHandle) {
         "collection-changed",
         read_snapshot(&app.state::<AppState>()),
     );
+}
+fn native_text<'a>(app: &tauri::AppHandle, chinese: &'a str, english: &'a str) -> &'a str {
+    if app.state::<AppState>().settings.lock().unwrap().language == Language::English {
+        english
+    } else {
+        chinese
+    }
+}
+fn update_native_language(app: &tauri::AppHandle) {
+    let english = app.state::<AppState>().settings.lock().unwrap().language == Language::English;
+    for (item, chinese, translated) in app.state::<AppState>().native_menu.lock().unwrap().iter() {
+        let _ = item.set_text(if english { translated } else { chinese });
+    }
+    let title = if english {
+        "GatherPack · Collect and pack files"
+    } else {
+        "GatherPack · 文件收集与打包"
+    };
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.set_title(title);
+    }
+    if let Some(tray) = app.tray_by_id("main") {
+        let _ = tray.set_tooltip(Some(title));
+    }
+}
+
+#[tauri::command]
+fn reveal_dock(app: tauri::AppHandle) {
+    edge::restore(&app);
 }
 fn data_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let p = match &app.state::<AppState>().validation {
@@ -332,10 +384,11 @@ async fn relink_entry(
             let _ = window.set_always_on_top(false);
             DialogTopmostGuard(window, previous)
         });
-        let mut dialog = app
-            .dialog()
-            .file()
-            .set_title("重新定位来源（替换清单引用）");
+        let mut dialog = app.dialog().file().set_title(native_text(
+            &app,
+            "重新定位来源（替换清单引用）",
+            "Relink source (replace collection reference)",
+        ));
         if let Some(window) = app.get_webview_window("main") {
             dialog = dialog.set_parent(&window);
         }
@@ -363,9 +416,9 @@ async fn pick_entries(app: tauri::AppHandle, directories: bool) -> Result<(), St
             DialogTopmostGuard(window, previous)
         });
         let mut dialog = app.dialog().file().set_title(if directories {
-            "选择文件夹"
+            native_text(&app, "选择文件夹", "Select folders")
         } else {
-            "选择文件"
+            native_text(&app, "选择文件", "Select files")
         });
         if let Some(window) = app.get_webview_window("main") {
             dialog = dialog.set_parent(&window);
@@ -418,9 +471,12 @@ async fn choose_output(app: tauri::AppHandle, format: Format) -> Result<Option<S
         let mut dialog = app
             .dialog()
             .file()
-            .set_title("保存压缩包")
+            .set_title(native_text(&app, "保存压缩包", "Save archive"))
             .set_file_name(&name)
-            .add_filter("压缩包", &[format.extension()]);
+            .add_filter(
+                native_text(&app, "压缩包", "Archive"),
+                &[format.extension()],
+            );
         if let Some(window) = app.get_webview_window("main") {
             dialog = dialog.set_parent(&window);
         }
@@ -592,6 +648,8 @@ fn save_settings(
     format: Format,
     shortcut: String,
     autostart: bool,
+    language: Option<Language>,
+    edge_hide: Option<bool>,
 ) -> Result<(), String> {
     let state = app.state::<AppState>();
     let old = state.settings.lock().unwrap().clone();
@@ -626,6 +684,8 @@ fn save_settings(
         format,
         shortcut,
         autostart,
+        language: language.unwrap_or(old.language),
+        edge_hide: edge_hide.unwrap_or(old.edge_hide),
         ..old
     };
     if state.shortcut_available.load(Ordering::Relaxed) {
@@ -637,6 +697,8 @@ fn save_settings(
         }
     }
     persist(&app);
+    edge::restore(&app);
+    update_native_language(&app);
     emit(&app);
     Ok(())
 }
@@ -678,6 +740,7 @@ fn retry_shortcut(app: tauri::AppHandle) -> Result<(), String> {
     result
 }
 fn expand(app: &tauri::AppHandle, expanded: bool, focus: bool) {
+    edge::restore(app);
     let state = app.state::<AppState>();
     state.expanded.store(expanded, Ordering::Relaxed);
     if let Some(window) = app.get_webview_window("main") {
@@ -923,7 +986,8 @@ fn main() {
                     let quit =
                         MenuItem::with_id(app, "quit", "退出 GatherPack", true, None::<&str>)?;
                     let menu = Menu::with_items(app, &[&show, &hide, &quit])?;
-                    let mut tray = TrayIconBuilder::new()
+                    *state.native_menu.lock().unwrap() = vec![(show, "打开收集栏", "Open collection"), (hide, "隐藏收集栏", "Hide collection"), (quit, "退出 GatherPack", "Quit GatherPack")];
+                    let mut tray = TrayIconBuilder::with_id("main")
                         .menu(&menu)
                         .tooltip("GatherPack · 文件收集与打包")
                         .on_menu_event(|app, event| match event.id.as_ref() {
@@ -971,9 +1035,13 @@ fn main() {
                 message.push_str(&notice);
             }
             let window = app.get_webview_window("main").unwrap();
+            update_native_language(handle);
             window.on_window_event({
                 let h = handle.clone();
                 move |event| match event {
+                    tauri::WindowEvent::DragDrop(tauri::DragDropEvent::Enter { .. }) => {
+                        edge::restore(&h);
+                    }
                     tauri::WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) => {
                         let h = h.clone();
                         let paths = paths.clone();
@@ -989,10 +1057,12 @@ fn main() {
                     _ => {}
                 }
             });
+            if !smoke_test && state.validation.is_none() { edge::start(handle.clone()); }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            reveal_dock,
             frontend_ready,
             remove_entry,
             clear_entries,
@@ -1032,6 +1102,22 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn legacy_settings_default_to_chinese_and_new_preferences_roundtrip() {
+        let mut settings: Settings = serde_json::from_str(
+            r#"{"format":"Zip","shortcut":"Control+Alt+Shift+E","autostart":false}"#,
+        )
+        .unwrap();
+        assert!(settings.language == Language::Chinese);
+        assert!(settings.edge_hide);
+        settings.language = Language::English;
+        settings.edge_hide = false;
+        let restored: Settings =
+            serde_json::from_slice(&serde_json::to_vec(&settings).unwrap()).unwrap();
+        assert!(restored.language == Language::English);
+        assert!(!restored.edge_hide);
+        assert!(serde_json::from_str::<Settings>(r#"{"language":"invalid"}"#).is_err());
+    }
     #[test]
     fn persisted_collection_and_settings_survive_replacement_and_missing_source() {
         let dir = tempfile::tempdir().unwrap();

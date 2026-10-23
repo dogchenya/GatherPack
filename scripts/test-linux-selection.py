@@ -255,7 +255,12 @@ try:
         drag_source.write_bytes(b"native drag source remains intact")
         time.sleep(.7)
         app_window = command("xdotool", "search", "--onlyvisible", "--name", "^GatherPack").splitlines()[0]
+        # The initial edge icon may already be hidden; reveal it before moving.
+        dock = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
+        command("xdotool", "mousemove", "--sync", str(int(dock["X"]) + int(dock["WIDTH"]) // 2), str(int(dock["Y"]) + 40))
+        time.sleep(.5)
         command("xdotool", "windowmove", app_window, "1120", "50")
+        time.sleep(.5)
         app_geometry = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
         focus(second_window); sx, sy = click_content(second_window); keys("ctrl+a")
         command("xdotool", "mousemove", str(sx), str(sy), "mousedown", "1")
@@ -274,6 +279,32 @@ try:
             time.sleep(.1)
         check(str(drag_source) in json.loads(state_file.read_text())["paths"], "native Nautilus file drag is received by the Tauri window")
         check(drag_source.read_bytes() == b"native drag source remains intact", "native drag preserves source bytes")
+        # Drag the same selection onto the hidden strip: restoration alone must
+        # not consume the native drop, and existing sources must stay unique.
+        time.sleep(.5)
+        click_app_button("收起面板")
+        time.sleep(.4)
+        command("xdotool", "windowmove", app_window, "1176", "50")
+        command("xdotool", "mousemove", "600", "500")
+        for _ in range(100):
+            dock = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
+            if int(dock["WIDTH"]) == 10 and int(dock["X"]) == 1270: break
+            time.sleep(.1)
+        check(int(dock["WIDTH"]) == 10 and int(dock["X"]) == 1270, "collection icon hides before a real Nautilus drag")
+        focus(second_window); sx, sy = click_content(second_window); keys("ctrl+a")
+        command("xdotool", "mousemove", str(sx), str(sy), "mousedown", "1")
+        tx, ty = 1275, int(dock["Y"]) + 40
+        for i in range(1, 11):
+            command("xdotool", "mousemove", str(sx + (tx - sx) * i // 10), str(sy + (ty - sy) * i // 10))
+            time.sleep(.05)
+        time.sleep(.6)
+        command("xdotool", "mouseup", "1")
+        for _ in range(100):
+            current = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
+            if int(current["WIDTH"]) == 440: break
+            time.sleep(.1)
+        check(int(current["WIDTH"]) == 440, "a native drop on the hidden strip restores and opens the collection")
+        check(len(json.loads(state_file.read_text())["paths"]) == 4, "dropping existing files on the edge strip does not duplicate sources")
         time.sleep(1)
         screenshot()
         picked_source = root / "picker-only.txt"

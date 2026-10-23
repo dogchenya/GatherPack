@@ -95,6 +95,49 @@ with tempfile.TemporaryDirectory(prefix="gatherpack-corners-") as directory:
         command("xdotool", "click", "1")
         settle()
         pixels("expanded")
+
+        def geometry():
+            return {key: int(value) for key, value in (line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", window).splitlines())}
+
+        def click_button(name):
+            import pyatspi
+            from collections import deque
+            command("xdotool", "windowactivate", "--sync", window)
+            queue = deque(app for app in pyatspi.Registry.getDesktop(0) if "gatherpack" in (app.name or "").lower())
+            matches = []
+            while queue:
+                item = queue.popleft()
+                if item.name == name and item.getRoleName() in {"push button", "toggle button"}:
+                    matches.append(item)
+                queue.extend(list(item))
+            assert len(matches) == 1, (name, len(matches))
+            bounds = matches[0].queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
+            command("xdotool", "mousemove", "--sync", str(bounds.x + bounds.width // 2), str(bounds.y + bounds.height // 2))
+            time.sleep(.15)
+            command("xdotool", "click", "1")
+            settle()
+
+        transitions = []
+        position_report = {"passed": False, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "transitions": transitions}
+        for phase, x, y, cycles in [("normal", 200, 80, 12), ("right-edge", 780, 90, 4), ("moved-down", 120, 200, 4), ("resized", 200, 100, 4)]:
+            command("xdotool", "windowmove", window, str(x), str(y))
+            if phase == "resized":
+                command("xdotool", "windowsize", window, "440", "600")
+            settle()
+            baseline = geometry()
+            for cycle in range(cycles):
+                for name, width in [("文件关系图", 900), ("收集清单", 440)]:
+                    click_button(name)
+                    current = geometry()
+                    transitions.append({"phase": phase, "cycle": cycle, "view": name, "baseline": baseline, **current})
+                    Path("/work/artifacts/validation/linux-panel-position-report.json").write_text(json.dumps(position_report, indent=2))
+                    assert current["Y"] == baseline["Y"], ("view switch must not move the panel vertically", baseline, current)
+                    assert current["HEIGHT"] == baseline["HEIGHT"], ("view switch must preserve panel height", baseline, current)
+                    assert current["WIDTH"] == width, ("view width must follow the selected tab", name, current)
+                    expected_x = min(baseline["X"], 1280 - 900)
+                    assert current["X"] == expected_x, ("only initial right-edge fitting may move the panel horizontally", baseline, current)
+        position_report["passed"] = True
+        Path("/work/artifacts/validation/linux-panel-position-report.json").write_text(json.dumps(position_report, indent=2))
         Path("/work/artifacts/validation/linux-corners-report.json").write_text(json.dumps({"passed": True, "executable": executable, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "checks": checks}, indent=2))
         print(json.dumps(checks))
     finally:

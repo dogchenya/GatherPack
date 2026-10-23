@@ -260,8 +260,46 @@ fn set_panel_wide(app: tauri::AppHandle, wide: bool) {
     if state.panel_wide.swap(wide, Ordering::Relaxed) != wide
         && state.expanded.load(Ordering::Relaxed)
     {
-        expand(&app, true, false);
+        if let Some(window) = app.get_webview_window("main") {
+            // Switching views changes width only. Re-running expand() used to
+            // write the GTK frame origin back as a client position on every
+            // switch, accumulating the hidden titlebar offset vertically.
+            if let Ok(size) = window.inner_size() {
+                let scale = window.scale_factor().unwrap_or(1.0);
+                let mut width = ((if wide { 900.0 } else { 440.0 }) * scale).round() as u32;
+                let mut position = None;
+                if let Ok(Some(monitor)) = window.current_monitor() {
+                    let area = monitor.work_area();
+                    width = width.min(area.size.width.saturating_sub(24).max(80));
+                    if width > size.width {
+                        if let Ok(current) = panel_position(&window) {
+                            let x = current.x.clamp(
+                                area.position.x,
+                                (area.position.x + area.size.width as i32 - width as i32)
+                                    .max(area.position.x),
+                            );
+                            if x != current.x {
+                                position = Some(tauri::PhysicalPosition::new(x, current.y));
+                            }
+                        }
+                    }
+                }
+                let _ = window.set_size(tauri::PhysicalSize::new(width, size.height));
+                if let Some(position) = position {
+                    let _ = window.set_position(position);
+                }
+            }
+        }
     }
+}
+
+fn panel_position(window: &tauri::WebviewWindow) -> tauri::Result<tauri::PhysicalPosition<i32>> {
+    // GTK frame extents can include a hidden decoration above a frameless
+    // window. Configure-event client coordinates match gtk_window_move here.
+    #[cfg(target_os = "linux")]
+    return window.inner_position();
+    #[cfg(not(target_os = "linux"))]
+    window.outer_position()
 }
 fn replace_reference(
     app: &tauri::AppHandle,
@@ -666,7 +704,7 @@ fn expand(app: &tauri::AppHandle, expanded: bool, focus: bool) {
                 .min(area.size.width.saturating_sub(24).max(80));
             let height = ((height * monitor.scale_factor()).round() as u32)
                 .min(area.size.height.saturating_sub(24).max(80));
-            let position = window.outer_position().unwrap_or(area.position);
+            let position = panel_position(&window).unwrap_or(area.position);
             let x = position.x.clamp(
                 area.position.x,
                 (area.position.x + area.size.width as i32 - width as i32).max(area.position.x),
@@ -680,7 +718,9 @@ fn expand(app: &tauri::AppHandle, expanded: bool, focus: bool) {
                 let _ = window.set_max_size(Some(tauri::PhysicalSize::new(width, height)));
             }
             let _ = window.set_size(tauri::PhysicalSize::new(width, height));
-            let _ = window.set_position(tauri::PhysicalPosition::new(x, y));
+            if x != position.x || y != position.y {
+                let _ = window.set_position(tauri::PhysicalPosition::new(x, y));
+            }
         } else {
             if !expanded {
                 let _ = window.set_min_size(Some(tauri::LogicalSize::new(width, height)));

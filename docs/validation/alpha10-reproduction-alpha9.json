@@ -1,0 +1,23 @@
+{
+  "passed": false,
+  "baseline": {
+    "WINDOW": 8388611,
+    "X": 200,
+    "Y": 80,
+    "WIDTH": 440,
+    "HEIGHT": 760,
+    "SCREEN": 0
+  },
+  "transitions": [
+    {
+      "cycle": 0,
+      "view": "\u6587\u4ef6\u5173\u7cfb\u56fe",
+      "WINDOW": 8388611,
+      "X": 200,
+      "Y": 43,
+      "WIDTH": 900,
+      "HEIGHT": 760,
+      "SCREEN": 0
+    }
+  ]
+}

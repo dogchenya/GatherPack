@@ -50,6 +50,16 @@ export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: st
   const [selected, setSelected] = useState<Node | null>(null);
   const [view, setView] = useState({ x: 500, y: 260, zoom: 1 });
   const svg = useRef<SVGSVGElement>(null);
+  const [viewport, setViewport] = useState({ width: 1000, height: 520 });
+  useEffect(() => {
+    const element = svg.current!;
+    const observer = new ResizeObserver(() => {
+      const rect = element.getBoundingClientRect();
+      if (rect.width && rect.height) setViewport({ width: rect.width, height: rect.height });
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   const gesture = useRef<{ id: number; x: number; y: number; originX: number; originY: number } | null>(null);
   useEffect(() => { setSelected(null); setExpanded(new Set()); setLimits({}); }, [model]);
   const layout = useMemo(() => {
@@ -88,20 +98,20 @@ export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: st
     return { positions, minX: Math.min(...xs) - 105, maxX: Math.max(...xs) + 105, minY: Math.min(...ys) - 45, maxY: Math.max(...ys) + 45 };
   }, [model, expanded, limits]);
   function fit() {
-    const zoom = Math.min(1.25, 900 / (layout.maxX - layout.minX), 450 / (layout.maxY - layout.minY));
-    setView({ x: 500 - (layout.minX + layout.maxX) / 2 * zoom, y: 260 - (layout.minY + layout.maxY) / 2 * zoom, zoom });
+    const zoom = Math.min(1.25, (viewport.width - 55) / (layout.maxX - layout.minX), (viewport.height - 45) / (layout.maxY - layout.minY));
+    setView({ x: viewport.width / 2 - (layout.minX + layout.maxX) / 2 * zoom, y: viewport.height / 2 - (layout.minY + layout.maxY) / 2 * zoom, zoom });
   }
-  useEffect(fit, [layout]);
+  useEffect(fit, [layout, viewport]);
   const changeZoom = (factor: number) => setView(current => {
     const zoom = Math.max(.08, Math.min(3, current.zoom * factor)), ratio = zoom / current.zoom;
-    return { x: 500 + (current.x - 500) * ratio, y: 260 + (current.y - 260) * ratio, zoom };
+    return { x: viewport.width / 2 + (current.x - viewport.width / 2) * ratio, y: viewport.height / 2 + (current.y - viewport.height / 2) * ratio, zoom };
   });
   useEffect(() => {
     const element = svg.current;
     const wheel = (event: WheelEvent) => { event.preventDefault(); changeZoom(event.deltaY < 0 ? 1.12 : 1 / 1.12); };
     element?.addEventListener('wheel', wheel, { passive: false });
     return () => element?.removeEventListener('wheel', wheel);
-  }, []);
+  }, [viewport]);
   function toggle(node: Node) { setExpanded(current => { const next = new Set(current); next.has(node.id) ? next.delete(node.id) : next.add(node.id); return next; }); }
   function select(point: Positioned) {
     if (point.more) { setLimits(current => ({ ...current, [point.more!]: (current[point.more!] ?? PAGE) + PAGE })); return; }
@@ -112,12 +122,12 @@ export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: st
     if (!current || current.id !== event.pointerId) return;
     const rect = event.currentTarget.getBoundingClientRect();
     // meet alignment leaves horizontal or vertical gutters; use the common scale.
-    const scale = Math.min(rect.width / 1000, rect.height / 520);
+    const scale = Math.min(rect.width / viewport.width, rect.height / viewport.height);
     setView(view => ({ ...view, x: current.originX + (event.clientX - current.x) / scale, y: current.originY + (event.clientY - current.y) / scale }));
   }
   return <section className="file-graph" aria-label="文件关系图">
     <div className="graph-toolbar"><div><strong>把要带走的内容，一眼看全</strong><p>点击文件夹展开 · 拖动画布 · 滚轮缩放</p></div><div className="graph-controls"><button aria-label="缩小关系图" onClick={() => changeZoom(1 / 1.25)}>−</button><button onClick={fit}>适应画布</button><button aria-label="放大关系图" onClick={() => changeZoom(1.25)}>＋</button></div></div>
-    <svg ref={svg} viewBox="0 0 1000 520" aria-label="收集文件发散图" onPointerDown={event => { if (event.button !== 0) return; event.currentTarget.setPointerCapture(event.pointerId); gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: view.x, originY: view.y }; }} onPointerMove={pan} onPointerUp={() => { gesture.current = null; }} onPointerCancel={() => { gesture.current = null; }}>
+    <svg ref={svg} viewBox={`0 0 ${viewport.width} ${viewport.height}`} aria-label="收集文件发散图" onPointerDown={event => { if (event.button !== 0) return; event.currentTarget.setPointerCapture(event.pointerId); gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, originX: view.x, originY: view.y }; }} onPointerMove={pan} onPointerUp={() => { gesture.current = null; }} onPointerCancel={() => { gesture.current = null; }}>
       <defs><pattern id="graph-dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#d4e0d9" /></pattern></defs>
       <rect width="100%" height="100%" fill="url(#graph-dots)" />
       <g transform={`translate(${view.x} ${view.y}) scale(${view.zoom})`}>

@@ -30,6 +30,7 @@ jobs:
       - run: node scripts/test-i18n.mjs
       - run: node scripts/test-collect-artifacts.mjs
       - run: python3 scripts/test-linux-bridge-diagnostics.py
+      - run: python3 scripts/test-connection-diagnostics.py
       - run: pnpm exec playwright install --with-deps chromium
       - run: node scripts/test-ui.mjs
       - run: cargo fmt --all --check

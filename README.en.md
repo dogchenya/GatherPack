@@ -15,9 +15,26 @@ GatherPack is a desktop file collection and archiving tool for Windows, macOS, a
 
 On first launch, GatherPack imports the collection, settings, and reports from an existing easy_pack profile while keeping the original data. If you use launch at login, re-enable it in Settings after migration. On macOS, grant Finder Automation permission when prompted.
 
-<img src="docs/assets/shelf-alpha8.png" width="440" alt="GatherPack collection shelf">
+## Latest features and how to use them
 
-*Production frontend with sample files. The app supports Simplified Chinese and English. Simplified Chinese is the default; switch languages in Settings.*
+| Feature | How it works |
+| --- | --- |
+| Sliding edge hide | Move either the compact icon or expanded panel to a left/right screen edge. It slides out when the pointer leaves, keeping only a wake-up tab. Hover to slide back to the same view and dimensions. Dialogs, file choosers and packing pause hiding. |
+| Chinese / English | Choose Interface language in Settings for an immediate preview. Save to keep it after restarting, or cancel to restore the previous language. Simplified Chinese is the default. |
+| Linux connection diagnostics | Open Local collection → Check file manager connection to inspect the resident Nautilus process, Python loader and desktop session. Checking closes no windows. |
+| Linux reconnection | Finish copying or moving files, then choose Reconnect file manager and confirm. The app restarts the file manager with a clean Python environment and reloads its bridge. Other extensions are protected. Copy diagnostics if it still fails. |
+
+Disable edge hiding in Settings if preferred; unpinning the window also pauses hiding. A registered shortcut and a connected Nautilus extension are separate states. When the bridge is disconnected, use connection diagnostics instead of repeatedly installing dependencies that are already present.
+
+<img src="docs/assets/edge-slide-alpha12.gif" width="156" alt="Native floating widget sliding out and back in">
+
+*Native GNOME/X11 recording with an empty collection. The expanded panel also supports sliding edge hide.*
+
+<img src="docs/assets/shelf-alpha12.png" width="440" alt="GatherPack collection shelf">
+
+*alpha.12 production frontend with sample files. The app supports Simplified Chinese and English. Simplified Chinese is the default; switch languages in Settings.*
+
+<img src="docs/assets/settings-alpha12-en.png" width="360" alt="Interface language and edge hiding settings">
 
 alpha.9 fixes the rectangular background outside the rounded window and legacy user extensions shadowing the system Nautilus bridge. On Ubuntu, after upgrading, wait for file operations to finish, run `nautilus -q`, and reopen Files to load the updated extension.
 
@@ -25,12 +42,12 @@ alpha.10 fixes upward window drift when switching repeatedly between the collect
 
 The redesigned shelf adds undo, source relinking, window pinning, and continued collection during packing. See [UI and interaction notes](docs/ui-redesign.md).
 
-alpha.11 adds edge auto-hide for the floating widget and a saved Chinese/English interface preference.
+alpha.12 adds sliding edge animations for both the icon and expanded panel, resident Linux process diagnostics and confirmed reconnection, while retaining alpha.11's Chinese/English preference.
 
 ## Features
 
 - **Collect across folders**: drag in files or entire folders, or capture the file manager's selection with a keyboard shortcut.
-- **Floating collection bar**: drag the whole compact icon or the expanded panel header. At either screen edge, the compact icon hides automatically and returns on hover; disable this in Settings if preferred.
+- **Floating collection bar**: drag the whole compact icon or expanded panel header. Both support sliding edge hide and return on hover; disable this in Settings if preferred.
 - **Chinese and English**: Simplified Chinese by default; choose English in Settings and save it for future launches.
 - **Three archive formats**: ZIP, 7z, and tar.gz, with a saved default and an override for individual tasks.
 - **Preview before packing**: review the archive structure, renamed entries, and unavailable sources before starting.
@@ -42,19 +59,19 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 ## Download and install
 
-Current version: **0.1.0-alpha.11**. This is an Alpha release candidate, with installers distributed through GitHub Releases. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
+Current version: **0.1.0-alpha.12**. This is an Alpha release candidate, with installers distributed through GitHub Releases. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
 
-Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.11), choose your platform under **Assets**, and install the package. No GitHub sign-in is required. Separate platform artifacts remain available in GitHub Actions.
+Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.12), choose your platform under **Assets**, and install the package. No GitHub sign-in is required. Separate platform artifacts remain available in GitHub Actions.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
-| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.11/gatherpack-0.1.0-alpha.11-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.11_x64-setup.exe) | Run the `.exe` installer |
-| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.11/gatherpack-0.1.0-alpha.11-aarch64-apple-darwin-GatherPack_0.1.0-alpha.11_aarch64.dmg) | Open the `.dmg` and drag the app into Applications |
-| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.11/gatherpack-0.1.0-alpha.11-x86_64-apple-darwin-GatherPack_0.1.0-alpha.11_x64.dmg) | Open the `.dmg` and drag the app into Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.11/gatherpack-0.1.0-alpha.11-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.11_amd64.deb) | Install the `.deb` |
-| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.11/gatherpack-0.1.0-alpha.11-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.11_amd64.AppImage) | Make the `.AppImage` executable and run it |
+| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.12_x64-setup.exe) | Run the `.exe` installer |
+| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-aarch64-apple-darwin-GatherPack_0.1.0-alpha.12_aarch64.dmg) | Open the `.dmg` and drag the app into Applications |
+| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-apple-darwin-GatherPack_0.1.0-alpha.12_x64.dmg) | Open the `.dmg` and drag the app into Applications |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.12_amd64.deb) | Install the `.deb` |
+| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.12_amd64.AppImage) | Make the `.AppImage` executable and run it |
 
-Quit the previous GatherPack version before upgrading the app on Ubuntu. For an unloaded bridge or a `python3-nautilus` message, follow [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english) to install dependencies and restart the background Files process. Alpha.7 distinguishes missing dependencies from an installed but unloaded bridge.
+Quit the previous GatherPack version before upgrading on Ubuntu. For a disconnected bridge, use the in-app connection diagnostics and confirmed reconnection. If it still fails, copy diagnostics and see [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english). The app never automatically interrupts file-manager operations and distinguishes missing dependencies from an installed but unloaded bridge.
 
 Linux installers, corresponding source, and verification materials are separate downloads. For normal installation, choose either the `.deb` or AppImage. `x64`, `x86_64`, and `amd64` all mean 64-bit Intel/AMD; 32-bit x86 builds are currently unavailable.
 
@@ -76,7 +93,7 @@ See [UI and validation notes](docs/ui-redesign.md) for this release. Ubuntu GNOM
 | Windows / Linux: `Ctrl + Alt + Shift + E` | Collect the foreground file manager's selected items |
 | macOS: `Command + Option + Shift + E` | Collect the selected items in Finder |
 
-Use “设置” (Settings) to change the shortcut, default archive format, or launch-at-login option. Shortcut collection does not require copying files and does not read the clipboard.
+Settings controls the interface language, edge hiding, shortcut, default archive format and launch at login. Shortcut collection does not require copying files and does not read the clipboard. Diagnostic text is written to the clipboard only when you explicitly choose Copy diagnostics.
 
 ## Run from source
 

@@ -17,6 +17,27 @@ executable = os.environ["GATHERPACK_TEST_EXECUTABLE"]
 environment = {**os.environ, "XDG_DATA_HOME": str(root), "XDG_CONFIG_HOME": str(root / "config")}
 state_file = root / "io.github.dogchenya.gatherpack/state.json"
 checks, processes, logs = [], [], []
+capture_directory = None
+capture_frames = []
+if os.environ.get('GATHERPACK_CAPTURE_EDGE') == '1':
+    import gi
+    gi.require_version('Gdk', '3.0')
+    from gi.repository import Gdk
+    Gdk.init([])
+    subprocess.run(['gsettings','set','org.gnome.desktop.interface','enable-animations','true'],check=True)
+    capture_directory = Path(tempfile.mkdtemp(prefix='edge-motion-', dir=evidence))
+
+
+def capture_for(seconds):
+    if capture_directory is None: return
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        root_window = Gdk.get_default_root_window()
+        frame = Gdk.pixbuf_get_from_window(root_window,0,160,104,112)
+        name = capture_directory / f'{len(capture_frames):04d}.png'
+        frame.savev(str(name),'png',[],[])
+        capture_frames.append(str(name))
+        time.sleep(.03)
 
 
 def command(*args):
@@ -115,14 +136,21 @@ try:
     process, window = launch()
     check("展开收集面板" in text(), "fresh profile starts in Simplified Chinese")
     command("xdotool", "windowmove", window, "0", "160")
-    command("xdotool", "mousemove", "--sync", "50", "190")
+    command("xdotool", "mousemove", "--sync", "7", "165")
     time.sleep(1.5)
     check(geometry()["WIDTH"] == 104, "pointer inside the edge icon prevents hiding")
+    capture_for(.3)
     command("xdotool", "mousemove", "--sync", "600", "500")
+    capture_for(1.5)
     wait(lambda: geometry()["WIDTH"] == 10, "left edge must become a 10px handle")
     hidden = geometry()
     check(hidden["X"] == 0 and hidden["HEIGHT"] == 112, "left handle stays fully on screen")
+    motion_reveal_start = len(capture_frames)
     command("xdotool", "mousemove", "--sync", "5", str(hidden["Y"] + 40))
+    capture_for(.35)
+    if capture_directory is not None:
+        command("xdotool", "mousemove", "7", "165")
+    capture_for(.3)
     wait(lambda: geometry()["WIDTH"] == 104, "hover must restore compact icon")
     check(geometry()["X"] == 0, "left edge reveal preserves its anchor")
     command("xdotool", "windowmove", window, "300", "160")
@@ -140,9 +168,17 @@ try:
     wait(lambda: geometry()["WIDTH"] == 440, "compact icon must open normally after reveal")
     command("xdotool", "windowmove", window, "0", "80")
     command("xdotool", "mousemove", "--sync", "700", "500")
-    time.sleep(2)
-    check(geometry()["WIDTH"] == 440, "expanded collection never auto-hides")
+    wait(lambda: geometry()["WIDTH"] == 10, "expanded collection must slide out at the edge")
+    hidden = geometry()
+    check(hidden["HEIGHT"] == 112, "expanded panel leaves only a compact edge wake-up target")
+    command("xdotool", "mousemove", "--sync", "5", str(hidden["Y"] + 40))
+    wait(lambda: geometry()["WIDTH"] == 440 and geometry()["HEIGHT"] == 760, "hover must restore expanded panel dimensions")
+    check(geometry()["Y"] == 80, "expanded reveal preserves the original panel position")
+    time.sleep(.4)
     click("设置")
+    command("xdotool", "mousemove", "700", "500")
+    time.sleep(1.5)
+    check(geometry()["WIDTH"] == 440, "settings suspend edge hiding while the pointer is outside")
     choose_language("界面语言", "End")
     wait(lambda: "Save settings" in text(), "language change must preview immediately")
     check("App settings" in text() and "Auto-hide at screen edges" in text(), "settings controls preview in English")
@@ -171,7 +207,7 @@ try:
     command("xdotool", "mousemove", "--sync", "600", "500")
     time.sleep(2)
     check(geometry()["WIDTH"] == 104, "disabling auto-hide keeps the edge icon visible")
-    report = {"passed": True, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "checks": checks}
+    report = {"passed": True, "executableSHA256": hashlib.sha256(Path(executable).read_bytes()).hexdigest(), "packageSHA256": os.environ.get("GATHERPACK_TEST_PACKAGE_SHA256"), "checks": checks, "motionFrames":str(capture_directory) if capture_directory else None, "motionRevealStart":motion_reveal_start}
 except Exception as error:
     report = {"passed": False, "error": str(error), "checks": checks}
     try:

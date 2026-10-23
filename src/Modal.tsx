@@ -8,7 +8,7 @@ export function Modal({ label, close, children }: { label: string; close: () => 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const dialog = ref.current!;
-    const focusable = () => [...dialog.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, [tabindex="0"]')].filter(el => el.getClientRects().length);
+    const focusable = () => [...dialog.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex="0"]')].filter(el => el.getClientRects().length);
     (focusable()[0] || dialog).focus();
     const handler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); onClose.current(); }

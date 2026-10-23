@@ -48,6 +48,10 @@ try {
           case 'plugin:window|start_dragging': window.__dragCount = (window.__dragCount ?? 0) + 1; return;
           case 'retry_shortcut': window.__shortcutRetries = (window.__shortcutRetries ?? 0) + 1; state.shortcutStatus = '快捷键已注册'; break;
           case 'reveal_dock': state.dockHidden = null; break;
+          case 'linux_connection_diagnostics': {
+            window.__connectionCalls = [...(window.__connectionCalls ?? []), args.restartConfirmed];
+            return {summary: args.restartConfirmed ? '文件管理器桥接已连接，请切回文件管理器选中文件后重试。' : '文件管理器扩展尚未连接。可在文件操作结束后点击“重新连接文件管理器”，以干净的系统 Python 环境重新加载扩展。', details:'{"uid":1000,"bridgeOwnerPID":null}', connected: args.restartConfirmed, canRestart:true};
+          }
           case 'reveal': window.__revealedPath = args.path; return;
           case 'choose_output': return 'C:/out/archive.' + ({ Zip: 'zip', SevenZip: '7z', TarGz: 'tar.gz' })[args.format];
           case 'start_pack':
@@ -238,6 +242,24 @@ try {
   await page.getByRole('button', {name:'Open collection panel'}).click();
   await page.evaluate(data => { Object.assign(window.__testState,data.state); window.__previewPlan=data.plan; window.__emitTestState(); },fixtureBeforeLanguage);
   await page.getByRole('button', {name:'设置',exact:true}).waitFor();
+  await page.evaluate(() => { window.__testState.platform='linux'; window.__emitTestState(); });
+  await page.locator('.connection-strip button').click();
+  await page.getByRole('button', {name:'检查文件管理器连接',exact:true}).click();
+  assert.deepEqual(await page.evaluate(() => window.__connectionCalls),[false],'diagnostics must not restart the file manager');
+  await page.getByRole('button', {name:'重新连接文件管理器',exact:true}).click();
+  assert.deepEqual(await page.evaluate(() => window.__connectionCalls),[false],'opening the consent prompt must not restart anything');
+  await page.getByRole('button', {name:'已结束文件操作，继续重连',exact:true}).click();
+  await page.getByRole('status').filter({hasText:'文件管理器桥接已连接'}).waitFor();
+  assert.deepEqual(await page.evaluate(() => window.__connectionCalls),[false,true]);
+  await page.getByRole('button', {name:'完成',exact:true}).click();
+  await page.evaluate(() => { window.__testState.expanded=false; window.__testState.dockMotion={side:'right',revealing:false}; window.__emitTestState(); });
+  await page.locator('.compact.edge-hiding.edge-right').waitFor();
+  await page.waitForTimeout(450);
+  assert.ok(await page.locator('.compact').evaluate(e=>e.getBoundingClientRect().x > 95),'the icon slides completely outside its original viewport');
+  await page.evaluate(() => { window.__testState.dockMotion={side:'right',revealing:true}; window.__emitTestState(); });
+  await page.waitForTimeout(450);
+  assert.ok(await page.locator('.compact').evaluate(e=>Math.abs(e.getBoundingClientRect().x-5)<1),'the reveal animation returns the icon to its original position');
+  await page.evaluate(data => { Object.assign(window.__testState,data.state); window.__testState.dockMotion=null; window.__previewPlan=data.plan; window.__emitTestState(); },fixtureBeforeLanguage);
   if (process.env.CAPTURE_UI === '1') {
     await page.setViewportSize({ width: 440, height: 760 });
     await page.getByRole('button', { name: '收集清单', exact: true }).click();
@@ -258,12 +280,18 @@ try {
     await page.locator('.collection-summary').getByText('7 个文件', { exact: false }).waitFor();
     await page.locator('.toast').waitFor({ state: 'hidden' });
     await mkdir('docs/assets', { recursive: true });
-    await page.screenshot({ path: 'docs/assets/shelf-alpha8.png' });
+    await page.screenshot({ path: 'docs/assets/shelf-alpha12.png' });
+    await page.getByRole('button', {name:'设置',exact:true}).click();
+    await page.screenshot({path:'docs/assets/settings-alpha12-zh.png'});
+    await page.getByRole('combobox', {name:'界面语言'}).selectOption('en');
+    await page.getByRole('heading', {name:'App settings'}).waitFor();
+    await page.screenshot({path:'docs/assets/settings-alpha12-en.png'});
+    await page.getByRole('button', {name:'Cancel',exact:true}).click();
     await page.setViewportSize({ width: 900, height: 760 });
     await page.getByRole('button', { name: '文件关系图', exact: true }).click();
     await page.getByRole('button', { name: '文件夹：设计素材', exact: true }).click();
     await page.getByRole('button', { name: '适应画布', exact: true }).click();
-    await page.screenshot({ path: 'docs/assets/graph-alpha8.png' });
+    await page.screenshot({ path: 'docs/assets/graph-alpha12.png' });
   }
   console.log('UI integration passed (including 440px shelf/modal bounds, undo, native pin, graph width, keyboard capture/focus trap/Escape): collect, graph selection/issues/zoom/reveal, shortcut retry, full-header and compact-icon drag/click separation, preview, packing isolation and report; no page errors.');
 } finally { await browser.close(); server.close(); }

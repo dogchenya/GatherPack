@@ -55,6 +55,11 @@ fn install_files(directory: &std::path::Path, system: &std::path::Path) -> Resul
     // Nautilus loads the user's module before the system module of the same
     // name. A previous AppImage can otherwise shadow every subsequent deb fix.
     let existing = fs::read_to_string(&target);
+    // A confirmed reconnect can install a current user copy for a host whose
+    // XDG search path excludes the system extension directory. Keep that copy.
+    if existing.as_deref().ok() == Some(CONTENT) {
+        return Ok(());
+    }
     if fs::read_to_string(system).ok().as_deref() == Some(CONTENT) {
         match &existing {
             Ok(text) if text.starts_with("# gatherpack managed Nautilus selection bridge") => {

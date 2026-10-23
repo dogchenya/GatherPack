@@ -1,5 +1,13 @@
 # Ubuntu / GNOME X11 快捷键收集
 
+## alpha.12 应用内连接检查与重连
+
+先打开底部“本地收集”→“检查文件管理器连接”。检查读取当前用户实际运行的 Nautilus 进程、扩展加载器、Python 库、XDG 扩展位置及桌面会话，不关闭窗口。导出内容包含应用版本与系统版本；主动点击“复制诊断信息”才会写入剪贴板。
+
+确认文件复制、移动已经结束后，可点击“重新连接文件管理器”，再确认继续。应用会核对桌面会话和扩展归属，匹配文件管理器的 XDG 数据目录，安装当前版本的托管桥接，并以清理过的系统 Python 环境退出、重开 Nautilus。不会强制终止未退出的进程，不覆盖其他扩展，不删除原文件。
+
+如果应用与 Nautilus 不在同一桌面会话，或以 root 启动，重连会被禁止。请从桌面应用菜单正常启动 GatherPack。若重连后仍不通，请复制诊断信息；不能仅凭“系统 Python 可以导入扩展”判断实际 Nautilus 已正常加载。
+
 快捷键已触发但提示 `python3-nautilus` 时，通常是 Nautilus 扩展尚未加载，不能仅凭这条提示判断依赖缺失。
 
 alpha.9 会清理本应用遗留在用户目录中的同名托管扩展，避免它覆盖 deb 安装的新版桥接；不会覆盖用户自行编写的扩展。加载时优先匹配 Nautilus 进程已经加载的 GI/GTK 版本。系统扩展仍需在 Nautilus 新进程中加载，升级不会自动关闭文件管理器。
@@ -49,6 +57,8 @@ AppImage 不会自动安装系统的 Nautilus 扩展加载器。deb 的依赖由
 Linux 桌面结果适用于隔离 GNOME/X11 会话；Wayland，以及 Windows Explorer / macOS Finder 的完整桌面交互范围仍见 [兼容性记录](prototype-validation.md)。
 
 ## English
+
+In alpha.12, open **Local collection → Check file manager connection** to inspect the resident Nautilus process, Python loader, XDG extension location and desktop session. This check closes no windows. Once copying or moving files has finished, choose **Reconnect file manager** and confirm. The app protects independent extensions, matches the resident file manager's XDG location, and restarts Nautilus using a clean system Python environment. It never force-kills a process that has not exited. Different desktop sessions and root launches cannot reconnect. Copy diagnostics if reconnection still fails; the report includes the app and OS version. Copying diagnostics is explicit and separate from shortcut collection.
 
 A message mentioning `python3-nautilus` can mean that the Nautilus bridge has not loaded, even when the package is installed. On Ubuntu 22.04 / 24.04, install `python3-nautilus` and `python3-gi` using the commands above. Wait for file operations to finish, run `nautilus -q`, then reopen Files and retry the collection shortcut with files selected. Closing the window alone may leave Nautilus running in the background.
 

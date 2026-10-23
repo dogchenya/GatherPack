@@ -9,6 +9,18 @@ html[data-docked] #root{border-radius:0}
 .edge-handle{display:flex;width:100%;height:100dvh;padding:0;border:0;border-radius:0;background:transparent;align-items:center;justify-content:center;cursor:pointer}
 .edge-handle:hover,.edge-handle:focus-visible{background:transparent;outline:none}
 .edge-handle span{width:6px;height:72px;border-radius:4px;background:linear-gradient(#7da58b,#28684f);box-shadow:0 0 0 1px #ffffff90;pointer-events:none}
+.compact,main{transition:transform 360ms cubic-bezier(.4,0,.2,1);will-change:transform}
+.edge-hiding.edge-left{transform:translateX(-110%);pointer-events:none;animation:edge-hide-left 360ms cubic-bezier(.4,0,.2,1) both}
+.edge-hiding.edge-right{transform:translateX(110%);pointer-events:none;animation:edge-hide-right 360ms cubic-bezier(.4,0,.2,1) both}
+@keyframes edge-hide-left{from{transform:translateX(0)}to{transform:translateX(-110%)}}
+@keyframes edge-hide-right{from{transform:translateX(0)}to{transform:translateX(110%)}}
+.edge-revealing.edge-left{animation:edge-reveal-left 360ms cubic-bezier(.4,0,.2,1) both}
+.edge-revealing.edge-right{animation:edge-reveal-right 360ms cubic-bezier(.4,0,.2,1) both}
+@keyframes edge-reveal-left{from{transform:translateX(-110%)}to{transform:translateX(0)}}
+@keyframes edge-reveal-right{from{transform:translateX(110%)}to{transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.compact,main{transition-duration:1ms}.edge-hiding,.edge-revealing{animation-duration:1ms}}
+.linux-connection button{margin:4px 6px 4px 0}
+.linux-connection textarea{box-sizing:border-box;width:100%;min-height:150px;font:10px/1.5 monospace;white-space:pre;resize:vertical}
 .edge-handle:focus-visible span{box-shadow:0 0 0 2px #fff;background:#24634e}
 html[lang=en] .view-bar nav button{padding-inline:7px}
 html[lang=en] .add-options button{font-size:9px}
@@ -20,3 +32,5 @@ html,body,#root{height:100%;overflow:hidden}
 body:has(.compact) #root{border-radius:0}
 
 .graph-mode .content{display:flex;flex-direction:column}.graph-mode .file-graph{flex:1;min-height:0;display:flex;flex-direction:column}.graph-mode .file-graph svg{flex:1;height:0;min-height:100px}.graph-mode .graph-toolbar,.graph-mode .graph-caption,.graph-mode .graph-detail,.graph-mode .graph-limit{flex-shrink:0}
+
+html[data-docked] body{min-width:0!important}html[data-docked] #root{width:100%}

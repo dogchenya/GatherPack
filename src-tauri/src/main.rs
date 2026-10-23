@@ -118,6 +118,7 @@ struct AppState {
 #[serde(rename_all = "camelCase")]
 struct Snapshot {
     dock_hidden: Option<edge::Side>,
+    dock_motion: Option<edge::Motion>,
     entries: Vec<Entry>,
     message: String,
     shortcut_status: String,
@@ -130,8 +131,13 @@ struct Snapshot {
     validation: Option<validation::ValidationContext>,
 }
 fn read_snapshot(state: &AppState) -> Snapshot {
+    let (dock_hidden, dock_motion) = {
+        let edge = state.edge.lock().unwrap();
+        (edge.side(), edge.motion())
+    };
     Snapshot {
-        dock_hidden: state.edge.lock().unwrap().side(),
+        dock_hidden,
+        dock_motion,
         entries: state.collection.lock().unwrap().entries(),
         message: state.last_message.lock().unwrap().clone(),
         shortcut_status: state.shortcut_status.lock().unwrap().clone(),
@@ -181,6 +187,10 @@ fn update_native_language(app: &tauri::AppHandle) {
 #[tauri::command]
 fn reveal_dock(app: tauri::AppHandle) {
     edge::restore(&app);
+}
+#[tauri::command]
+fn set_edge_blocked(app: tauri::AppHandle, blocked: bool) {
+    edge::set_blocked(&app, blocked);
 }
 fn data_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let p = match &app.state::<AppState>().validation {
@@ -378,6 +388,7 @@ async fn relink_entry(
     directory: bool,
 ) -> Result<bool, String> {
     tauri::async_runtime::spawn_blocking(move || {
+        let _edge_hold = edge::hold(&app);
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
             let previous = app.state::<AppState>().pinned.load(Ordering::Relaxed);
@@ -409,6 +420,7 @@ async fn relink_entry(
 #[tauri::command]
 async fn pick_entries(app: tauri::AppHandle, directories: bool) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || {
+        let _edge_hold = edge::hold(&app);
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
             let previous = app.state::<AppState>().pinned.load(Ordering::Relaxed);
@@ -456,6 +468,7 @@ async fn prepare(app: tauri::AppHandle) -> Result<Plan, String> {
 #[tauri::command]
 async fn choose_output(app: tauri::AppHandle, format: Format) -> Result<Option<String>, String> {
     tauri::async_runtime::spawn_blocking(move || {
+        let _edge_hold = edge::hold(&app);
         #[cfg(target_os = "linux")]
         let _topmost = app.get_webview_window("main").map(|window| {
             let previous = app.state::<AppState>().pinned.load(Ordering::Relaxed);
@@ -738,6 +751,32 @@ fn retry_shortcut(app: tauri::AppHandle) -> Result<(), String> {
     }
     emit(&app);
     result
+}
+#[tauri::command]
+async fn linux_connection_diagnostics(
+    app: tauri::AppHandle,
+    restart_confirmed: bool,
+) -> Result<serde_json::Value, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let result = tauri::async_runtime::spawn_blocking(move || {
+            selection::connection_diagnostics(restart_confirmed)
+        })
+        .await
+        .map_err(|e| e.to_string())??;
+        if restart_confirmed {
+            if let Some(message) = result.get("summary").and_then(|v| v.as_str()) {
+                *app.state::<AppState>().last_message.lock().unwrap() = message.into();
+            }
+            emit(&app);
+        }
+        return Ok(result);
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = (app, restart_confirmed);
+        Err("此连接检查仅适用于 Linux".into())
+    }
 }
 fn expand(app: &tauri::AppHandle, expanded: bool, focus: bool) {
     edge::restore(app);
@@ -1063,6 +1102,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             snapshot,
             reveal_dock,
+            set_edge_blocked,
             frontend_ready,
             remove_entry,
             clear_entries,
@@ -1077,6 +1117,7 @@ fn main() {
             cancel_pack,
             save_settings,
             retry_shortcut,
+            linux_connection_diagnostics,
             set_expanded,
             hide_window,
             exit_app,

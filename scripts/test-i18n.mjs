@@ -9,7 +9,7 @@ const target=resolve('artifacts/validation/i18n-under-test.mjs');
 await writeFile(target,ts.transpileModule(await readFile('src/i18n.tsx','utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText);
 const {catalog,translate}=await import(pathToFileURL(target).href);
 const missing=[];
-for(const file of ['src/main.tsx','src/FileGraph.tsx','src/ArchiveTree.tsx','src/Modal.tsx']){
+for(const file of ['src/main.tsx','src/FileGraph.tsx','src/ArchiveTree.tsx','src/Modal.tsx','src/LinuxConnection.tsx']){
  const tree=ts.createSourceFile(file,await readFile(file,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  function visit(node){
   if(ts.isCallExpression(node)&&node.expression.getText(tree)==='t'){

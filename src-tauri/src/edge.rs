@@ -21,6 +21,13 @@ struct Hidden {
     side: Side,
     full: Rect,
     strip: Rect,
+    hiding: bool,
+}
+
+#[derive(Clone, Copy, serde::Serialize)]
+pub struct Motion {
+    side: Side,
+    revealing: bool,
 }
 
 #[derive(Default)]
@@ -29,11 +36,48 @@ pub struct Controller {
     last: Option<Rect>,
     changed: Option<Instant>,
     outside: Option<Instant>,
+    reveal: Option<(Side, Instant)>,
+    blocked: bool,
+    holds: usize,
+}
+
+pub struct Hold(tauri::AppHandle);
+impl Drop for Hold {
+    fn drop(&mut self) {
+        let state = self.0.state::<crate::AppState>();
+        let mut controller = state.edge.lock().unwrap();
+        controller.holds = controller.holds.saturating_sub(1);
+    }
+}
+pub fn hold(app: &tauri::AppHandle) -> Hold {
+    app.state::<crate::AppState>().edge.lock().unwrap().holds += 1;
+    restore(app);
+    Hold(app.clone())
+}
+pub fn set_blocked(app: &tauri::AppHandle, blocked: bool) {
+    app.state::<crate::AppState>().edge.lock().unwrap().blocked = blocked;
+    if blocked {
+        restore(app);
+    }
 }
 
 impl Controller {
     pub fn side(&self) -> Option<Side> {
-        self.hidden.map(|h| h.side)
+        self.hidden.filter(|h| !h.hiding).map(|h| h.side)
+    }
+    pub fn motion(&self) -> Option<Motion> {
+        self.hidden
+            .filter(|h| h.hiding)
+            .map(|h| Motion {
+                side: h.side,
+                revealing: false,
+            })
+            .or_else(|| {
+                self.reveal.map(|(side, _)| Motion {
+                    side,
+                    revealing: true,
+                })
+            })
     }
 }
 
@@ -70,6 +114,9 @@ pub fn restore(app: &tauri::AppHandle) {
         let state = app.state::<crate::AppState>();
         let mut controller = state.edge.lock().unwrap();
         let hidden = controller.hidden.take();
+        controller.reveal = hidden
+            .filter(|h| !h.hiding)
+            .map(|h| (h.side, Instant::now()));
         controller.last = hidden.map(|h| h.full);
         controller.changed = Some(Instant::now());
         controller.outside = None;
@@ -108,12 +155,17 @@ fn tick(app: &tauri::AppHandle) {
     if window.is_minimized().unwrap_or(false) {
         return;
     }
-    if state.expanded.load(std::sync::atomic::Ordering::Relaxed)
+    let blocked = {
+        let controller = state.edge.lock().unwrap();
+        controller.blocked || controller.holds > 0
+    };
+    if blocked
         || !state.settings.lock().unwrap().edge_hide
         || !state.pinned.load(std::sync::atomic::Ordering::Relaxed)
         || state.running.load(std::sync::atomic::Ordering::Relaxed)
         || !window.is_visible().unwrap_or(false)
     {
+        state.edge.lock().unwrap().reveal = None;
         restore(app);
         return;
     }
@@ -140,7 +192,34 @@ fn tick(app: &tauri::AppHandle) {
     };
     let now = Instant::now();
     let mut controller = state.edge.lock().unwrap();
+    if let Some((_, started)) = controller.reveal {
+        if now.duration_since(started) >= Duration::from_millis(420) {
+            controller.reveal = None;
+            drop(controller);
+            crate::emit(app);
+        }
+        return;
+    }
     if let Some(hidden) = controller.hidden {
+        if hidden.hiding {
+            if contains(rect, pointer) || rect != hidden.full {
+                drop(controller);
+                restore(app);
+            } else if controller
+                .changed
+                .is_some_and(|started| now.duration_since(started) >= Duration::from_millis(420))
+            {
+                controller.hidden = Some(Hidden {
+                    hiding: false,
+                    ..hidden
+                });
+                controller.changed = Some(now);
+                drop(controller);
+                apply(&window, hidden.strip);
+                crate::emit(app);
+            }
+            return;
+        }
         // GTK applies resize asynchronously. Positioning the narrow strip before
         // that configure event is constrained using the old, wider window size.
         // Place it again once the requested size has actually arrived.
@@ -212,18 +291,27 @@ fn tick(app: &tauri::AppHandle) {
             area.x + area.width as i32 - width as i32
         },
         width,
+        height: (112.0 * scale).round() as u32,
+        y: full.y + (full.height as i32 - (112.0 * scale).round() as i32).max(0) / 2,
         ..full
     };
-    controller.hidden = Some(Hidden { side, full, strip });
+    controller.hidden = Some(Hidden {
+        side,
+        full,
+        strip,
+        hiding: true,
+    });
     controller.changed = Some(now);
     drop(controller);
-    apply(&window, strip);
+    if rect != full {
+        let _ = window.set_position(tauri::PhysicalPosition::new(full.x, full.y));
+    }
     crate::emit(app);
 }
 
 pub fn start(app: tauri::AppHandle) {
     std::thread::spawn(move || loop {
-        std::thread::sleep(Duration::from_millis(150));
+        std::thread::sleep(Duration::from_millis(50));
         let handle = app.clone();
         if app.run_on_main_thread(move || tick(&handle)).is_err() {
             break;

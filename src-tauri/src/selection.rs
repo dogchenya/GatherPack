@@ -130,6 +130,11 @@ fn capture_impl() -> Result<Selection, String> {
 
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
 fn linux_helper() -> std::process::Command {
+    linux_command(include_str!("../scripts/selection-linux.py"))
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+fn linux_command(script: &str) -> std::process::Command {
     let mut command = std::process::Command::new("/usr/bin/python3");
     command
         // AppImage/Conda paths must not redirect the system Python/GI
@@ -141,8 +146,27 @@ fn linux_helper() -> std::process::Command {
         .env_remove("GTK_PATH")
         .env_remove("GIO_EXTRA_MODULES")
         .env_remove("GIO_MODULE_DIR")
-        .args(["-I", "-c", include_str!("../scripts/selection-linux.py")]);
+        .args(["-I", "-c", script]);
     command
+}
+
+#[cfg(target_os = "linux")]
+pub fn connection_diagnostics(restart: bool) -> Result<serde_json::Value, String> {
+    let mut command = linux_command(include_str!("../scripts/connection-linux.py"));
+    command.env("GATHERPACK_VERSION", env!("CARGO_PKG_VERSION"));
+    if restart {
+        command.arg("--restart-confirmed").env(
+            "GATHERPACK_BRIDGE_CONTENT",
+            include_str!("../scripts/gatherpack_selection.py"),
+        );
+    }
+    let output = run_helper(&mut command)?;
+    let result: serde_json::Value =
+        serde_json::from_slice(&output.stdout).map_err(|e| e.to_string())?;
+    if let Some(error) = result.get("error").and_then(|e| e.as_str()) {
+        return Err(error.to_string());
+    }
+    Ok(result)
 }
 
 #[cfg(target_os = "linux")]

@@ -288,7 +288,24 @@ Nautilus 不是前台活动窗口|Nautilus is not the active foreground window
 配置目录无效|Invalid configuration folder
 旧版清单不是普通文件，未导入|The previous collection is not a regular file and was not imported
 新版本报告目录不是普通目录，未导入|The new report folder is not a regular folder. Import cancelled.
-文件不存在|File does not exist`;
+文件不存在|File does not exist
+Linux 连接修复|Linux connection repair
+图标和展开清单贴近左右边缘后滑出隐藏，悬停恢复；弹窗与打包时暂停。|Both the icon and expanded panel slide out at either screen edge and return on hover. Auto-hide pauses during dialogs and packing.
+检查当前文件管理器进程、扩展加载器和桌面会话。检查不会关闭窗口。|Inspect the running file manager, extension loader and desktop session. Checking does not close any windows.
+检查中…|Checking…
+检查文件管理器连接|Check file manager connection
+重新连接文件管理器|Reconnect file manager
+复制诊断信息|Copy diagnostics
+诊断详情|Diagnostic details
+确认重连|Confirm reconnection
+将关闭并重新打开文件管理器窗口，请先完成复制、移动等操作。不会删除原文件。|This closes and reopens file manager windows. Finish copying or moving files first. Your original files will not be deleted.
+已结束文件操作，继续重连|File operations finished — reconnect
+请选中下方诊断内容手动复制。|Select the diagnostic text below and copy it manually.
+文件管理器桥接已连接，请切回文件管理器选中文件后重试。|The file manager bridge is connected. Return to the file manager, select files and try again.
+应用与文件管理器不在同一桌面会话，请退出 GatherPack 后从桌面应用菜单重新启动，勿使用 sudo。|The app and file manager use different desktop sessions. Quit GatherPack and reopen it from the desktop app menu without sudo.
+正在运行的文件管理器没有加载 Python 扩展加载器。可在文件操作结束后点击“重新连接文件管理器”；仍失败时请导出诊断信息。|The running file manager has not loaded its Python extension loader. Finish file operations, then choose Reconnect file manager. Export diagnostics if the problem continues.
+文件管理器扩展尚未连接。可在文件操作结束后点击“重新连接文件管理器”，以干净的系统 Python 环境重新加载扩展。|The file manager extension is disconnected. Finish file operations, then reconnect the file manager to reload extensions using a clean system Python environment.
+重连后桥接仍未加载，请复制诊断信息用于排查；拖入和手动添加仍可使用。|The bridge is still disconnected after reconnecting. Copy diagnostics for troubleshooting. Dragging files and manual adding remain available.`;
 
 export const catalog = new Map(rows.split('\n').map(row => {
   const index = row.indexOf('|');

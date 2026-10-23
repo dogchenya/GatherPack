@@ -631,8 +631,9 @@ fn retry_shortcut(app: tauri::AppHandle) -> Result<(), String> {
         *state.last_message.lock().unwrap() =
             "快捷键已重新注册。请切回文件管理器，选中文件后按收集快捷键。".into();
         #[cfg(target_os = "linux")]
-        if let Ok(Some(message)) = linux_bridge::install(&app) {
-            *state.last_message.lock().unwrap() = message;
+        match linux_bridge::install(&app) {
+            Ok(Some(message)) | Err(message) => *state.last_message.lock().unwrap() = message,
+            Ok(None) => {}
         }
     }
     emit(&app);

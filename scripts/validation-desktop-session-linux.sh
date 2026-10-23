@@ -38,5 +38,6 @@ elif [ "${1:-selection}" = shortcuts ]; then
 elif [ "${1:-selection}" = drag ]; then
   python3 /work/scripts/test-window-drag-linux.py
 else
+  if [ "${1:-selection}" = gnome ]; then python3 /work/scripts/test-window-corners-linux.py; fi
   python3 /work/scripts/test-linux-selection.py
 fi

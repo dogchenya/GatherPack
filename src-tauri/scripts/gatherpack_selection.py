@@ -8,12 +8,24 @@ import json
 import os
 import gi
 
-try:
-    gi.require_version("Nautilus", "4.0")
-    GTK_VERSION = "4.0"
-except ValueError:
-    gi.require_version("Nautilus", "3.0")
-    GTK_VERSION = "3.0"
+def require_host_versions():
+    # Nautilus/Python can have both typelibs installed. Match the namespace
+    # already loaded by the host, rather than picking the newest installed one.
+    version = gi.get_required_version("Nautilus")
+    gtk = gi.get_required_version("Gtk")
+    if version is None and gtk is not None:
+        version = "4.0" if gtk == "4.0" else "3.0"
+    if version is None:
+        try:
+            gi.require_version("Nautilus", "4.0")
+            version = "4.0"
+        except ValueError:
+            version = "3.0"
+    gi.require_version("Nautilus", version)
+    return "3.0" if version == "3.0" else "4.0"
+
+
+GTK_VERSION = require_host_versions()
 gi.require_version("Gtk", GTK_VERSION)
 gi.require_version("GdkX11", GTK_VERSION)
 from gi.repository import Gio, GLib, GObject, Gtk, GdkX11, Nautilus

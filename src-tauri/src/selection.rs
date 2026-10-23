@@ -141,7 +141,7 @@ fn linux_helper() -> std::process::Command {
         .env_remove("GTK_PATH")
         .env_remove("GIO_EXTRA_MODULES")
         .env_remove("GIO_MODULE_DIR")
-        .args(["-c", include_str!("../scripts/selection-linux.py")]);
+        .args(["-I", "-c", include_str!("../scripts/selection-linux.py")]);
     command
 }
 

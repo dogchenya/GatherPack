@@ -35,17 +35,17 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 ## 下载与安装
 
-当前版本：**0.1.0-alpha.8**，处于 Alpha 阶段，安装包在 GitHub Releases 提供。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
+当前版本：**0.1.0-alpha.9**，处于 Alpha 阶段，安装包在 GitHub Releases 提供。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
 
-打开 [发布与下载](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.8)，在 **Assets** 中下载对应系统的安装包；无需登录 GitHub。GitHub Actions 仍保留按系统与架构分开的构建产物。
+打开 [发布与下载](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.9)，在 **Assets** 中下载对应系统的安装包；无需登录 GitHub。GitHub Actions 仍保留按系统与架构分开的构建产物。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
-| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.8_x64-setup.exe) | 运行 `.exe` 安装程序 |
-| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-aarch64-apple-darwin-GatherPack_0.1.0-alpha.8_aarch64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
-| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-apple-darwin-GatherPack_0.1.0-alpha.8_x64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.8_amd64.deb) | 安装 `.deb` |
-| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.8_amd64.AppImage) | 赋予 `.AppImage` 执行权限后运行 |
+| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.9/gatherpack-0.1.0-alpha.9-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.9_x64-setup.exe) | 运行 `.exe` 安装程序 |
+| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.9/gatherpack-0.1.0-alpha.9-aarch64-apple-darwin-GatherPack_0.1.0-alpha.9_aarch64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
+| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.9/gatherpack-0.1.0-alpha.9-x86_64-apple-darwin-GatherPack_0.1.0-alpha.9_x64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.9/gatherpack-0.1.0-alpha.9-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.9_amd64.deb) | 安装 `.deb` |
+| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.9/gatherpack-0.1.0-alpha.9-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.9_amd64.AppImage) | 赋予 `.AppImage` 执行权限后运行 |
 
 在 Ubuntu 上升级 GatherPack 前，请先退出旧版应用。若快捷键提示桥接未加载或需要 `python3-nautilus`，请按 [Nautilus 快捷键排查](docs/nautilus-shortcut.md) 安装依赖并退出后台进程后重新打开“文件”。alpha.7 会区分缺少依赖与已安装但尚未加载，不再统一提示重复安装。
 

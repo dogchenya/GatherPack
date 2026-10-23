@@ -2,6 +2,12 @@
 
 快捷键已触发但提示 `python3-nautilus` 时，通常是 Nautilus 扩展尚未加载，不能仅凭这条提示判断依赖缺失。
 
+alpha.9 会清理本应用遗留在用户目录中的同名托管扩展，避免它覆盖 deb 安装的新版桥接；不会覆盖用户自行编写的扩展。加载时优先匹配 Nautilus 进程已经加载的 GI/GTK 版本。系统扩展仍需在 Nautilus 新进程中加载，升级不会自动关闭文件管理器。
+
+连接失败时，程序会以系统 Python 隔离模式尝试导入实际安装的桥接文件。若缺少 typelib 或导入报错，界面显示具体异常与文件位置；包已安装、模块可以导入但服务尚未出现时，才显示退出后台进程并重新打开的提示。该导入检查不能证明运行中的 Nautilus 已加载扩展。
+
+用户目录优先于系统目录的加载顺序见 [GNOME 官方扩展文档](https://gnome.pages.gitlab.gnome.org/nautilus-python/nautilus-python-overview.html)。
+
 Ubuntu 22.04 / 24.04 可以执行：
 
 ```bash

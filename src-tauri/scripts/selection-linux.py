@@ -6,6 +6,36 @@ import subprocess
 import sys
 from collections import deque
 from urllib.parse import urlparse, unquote
+from pathlib import Path
+
+
+def bridge_load_error():
+    """Probe the installed module, without starting a second selection service."""
+    data = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share")
+    candidates = [data / "nautilus-python/extensions/gatherpack_selection.py"]
+    candidates.extend(Path(root) / "nautilus-python/extensions/gatherpack_selection.py"
+                      for root in os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":"))
+    extension = next((path for path in candidates if path.is_file()), None)
+    if extension is None:
+        return "未找到 Nautilus 桥接文件，请在 GatherPack 的连接检查中点击重新注册以修复安装。"
+    # Import against the actual Nautilus generation, even with both GIRs present.
+    probe = """import gi, importlib.util, re, subprocess, sys
+version = subprocess.check_output(['/usr/bin/nautilus', '--version'], text=True, timeout=2)
+major = int(re.search(r'\\b(\\d+)\\.', version).group(1))
+gi.require_version('Nautilus', '4.0' if major >= 43 else '3.0')
+spec = importlib.util.spec_from_file_location('gatherpack_selection_probe', sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+"""
+    try:
+        result = subprocess.run(["/usr/bin/python3", "-I", "-c", probe, str(extension)],
+                                capture_output=True, text=True, timeout=4)
+        if result.returncode:
+            detail = next((line for line in reversed(result.stderr.splitlines()) if line.strip()), "未知导入错误")
+            return f"Nautilus 扩展加载失败：{detail[:500]}。扩展：{extension}。请执行 sudo apt install --reinstall python3-nautilus python3-gi，再等待文件操作结束后执行 nautilus -q。"
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return f"无法验证 Nautilus 扩展：{error}。扩展：{extension}"
+    return None
 
 
 def bridge_unavailable_reason():
@@ -17,6 +47,9 @@ def bridge_unavailable_reason():
         )
         status = package.stdout.split()
         if package.returncode == 0 and len(status) == 3 and status[1:] == ["ok", "installed"]:
+            load_error = bridge_load_error()
+            if load_error:
+                return load_error
             return (
                 "Nautilus 桥接尚未加载，python3-nautilus 已安装，无需重复安装。"
                 "请先等待文件复制、移动等操作结束，再执行 nautilus -q，重新打开“文件”后重试。"

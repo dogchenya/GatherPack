@@ -19,7 +19,7 @@ On first launch, GatherPack imports the collection, settings, and reports from a
 
 | Feature | How it works |
 | --- | --- |
-| Sliding edge hide | Move either the compact icon or expanded panel to a left/right screen edge. It slides out when the pointer leaves, keeping only a wake-up tab. Hover to slide back to the same view and dimensions. Dialogs, file choosers and packing pause hiding. |
+| Sliding edge hide | Move either the compact icon or expanded panel to a left/right screen edge. It slides out when the pointer leaves, keeping only a wake-up tab. Hover to slide back to the same view and dimensions; the expanded window remains resizable. Dialogs, file choosers and packing pause hiding. |
 | Chinese / English | Choose Interface language in Settings for an immediate preview. Save to keep it after restarting, or cancel to restore the previous language. Simplified Chinese is the default. |
 | Linux connection diagnostics | Open Local collection → Check file manager connection to inspect the resident Nautilus process, Python loader and desktop session. Checking closes no windows. |
 | Linux reconnection | Finish copying or moving files, then choose Reconnect file manager and confirm. The app restarts the file manager with a clean Python environment and reloads its bridge. Other extensions are protected. Copy diagnostics if it still fails. |

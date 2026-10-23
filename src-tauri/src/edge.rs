@@ -98,15 +98,19 @@ fn side(rect: Rect, area: Rect, threshold: i32) -> Option<Side> {
     }
 }
 
-fn apply(window: &tauri::WebviewWindow, rect: Rect) {
+fn apply(window: &tauri::WebviewWindow, rect: Rect, fixed: bool) {
     let _ = window.set_resizable(true);
     let _ = window.set_max_size(None::<tauri::PhysicalSize<u32>>);
-    let _ = window.set_min_size(Some(tauri::PhysicalSize::new(rect.width, rect.height)));
-    let _ = window.set_max_size(Some(tauri::PhysicalSize::new(rect.width, rect.height)));
+    if fixed {
+        let _ = window.set_min_size(Some(tauri::PhysicalSize::new(rect.width, rect.height)));
+        let _ = window.set_max_size(Some(tauri::PhysicalSize::new(rect.width, rect.height)));
+    } else {
+        let _ = window.set_min_size(Some(tauri::LogicalSize::new(80.0, 80.0)));
+    }
     let _ = window.set_size(tauri::PhysicalSize::new(rect.width, rect.height));
     let _ = window.set_position(tauri::PhysicalPosition::new(rect.x, rect.y));
     #[cfg(not(target_os = "linux"))]
-    let _ = window.set_resizable(false);
+    let _ = window.set_resizable(!fixed);
 }
 
 pub fn restore(app: &tauri::AppHandle) {
@@ -141,7 +145,13 @@ pub fn restore(app: &tauri::AppHandle) {
                         .max(work.position.y),
                 );
             }
-            apply(&window, full);
+            apply(
+                &window,
+                full,
+                !app.state::<crate::AppState>()
+                    .expanded
+                    .load(std::sync::atomic::Ordering::Relaxed),
+            );
         }
         crate::emit(app);
     }
@@ -215,7 +225,7 @@ fn tick(app: &tauri::AppHandle) {
                 });
                 controller.changed = Some(now);
                 drop(controller);
-                apply(&window, hidden.strip);
+                apply(&window, hidden.strip, true);
                 crate::emit(app);
             }
             return;

@@ -17,6 +17,15 @@ const out = resolve('artifacts', target);
 await mkdir(out, { recursive: true });
 const checksums = [];
 const version = JSON.parse(await readFile('package.json', 'utf8')).version;
+const product = JSON.parse(await readFile('src-tauri/tauri.conf.json', 'utf8')).productName;
+const expected = {
+  'x86_64-pc-windows-msvc': [`${product}_${version}_x64-setup.exe`],
+  'aarch64-apple-darwin': [`${product}_${version}_aarch64.dmg`],
+  'x86_64-apple-darwin': [`${product}_${version}_x64.dmg`],
+  'x86_64-unknown-linux-gnu': [`${product}_${version}_amd64.deb`, `${product}_${version}_amd64.AppImage`],
+}[target];
+if (!expected) throw new Error(`Unsupported installer target: ${target}`);
+const collected = new Set();
 let commit = process.env.GITHUB_SHA ?? null;
 let dirty = false;
 if (!process.env.GITHUB_SHA) {
@@ -32,7 +41,11 @@ async function walk(directory) {
     const path = join(directory, item.name);
     if (item.isDirectory()) await walk(path);
     else if (/\.(exe|dmg|deb|AppImage)$/.test(item.name)) {
-      if (!item.name.includes(version)) continue;
+      // A retried DMG build can leave a versioned rw.* temporary disk image.
+      // Only the final filenames for this exact version and architecture ship.
+      if (!expected.includes(item.name)) continue;
+      if (collected.has(item.name)) throw new Error(`Duplicate final installer: ${item.name}`);
+      collected.add(item.name);
       const artifactName = `gatherpack-${version}-${target}-${item.name}`;
       await copyFile(path, join(out, artifactName));
       const checksum = await hashFile(path);
@@ -41,7 +54,7 @@ async function walk(directory) {
   }
 }
 await walk(root);
-if (!checksums.length) throw new Error(`No installers under ${root}`);
+if (expected.some(name => !collected.has(name))) throw new Error(`Missing final installers under ${root}: ${expected.filter(name => !collected.has(name)).join(', ')}`);
 const installers = checksums.length;
 for (const item of await readdir(out)) {
   if (item.includes(version) && item.endsWith('-corresponding-source.tar')) {

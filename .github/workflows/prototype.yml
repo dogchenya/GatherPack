@@ -28,6 +28,7 @@ jobs:
       - run: pnpm build
       - run: node scripts/test-graph.mjs
       - run: node scripts/test-i18n.mjs
+      - run: node scripts/test-collect-artifacts.mjs
       - run: python3 scripts/test-linux-bridge-diagnostics.py
       - run: pnpm exec playwright install --with-deps chromium
       - run: node scripts/test-ui.mjs

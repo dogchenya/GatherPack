@@ -1,0 +1,69 @@
+name: Prepare verified GitHub release
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful installer and Ubuntu compatibility run
+        required: true
+      build_commit:
+        description: Full installer source commit
+        required: true
+      macos_run_id:
+        description: Successful delivered DMG validation run
+        required: true
+permissions:
+  contents: write
+  actions: read
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BUILD_RUN_ID: ${{ inputs.build_run_id }}
+      BUILD_COMMIT: ${{ inputs.build_commit }}
+      MACOS_RUN_ID: ${{ inputs.macos_run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify completed validation runs
+        run: |
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$MACOS_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$BUILD_COMMIT" =~ ^[a-f0-9]{40}$ ]]
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN_ID" > build.json
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN_ID/jobs?per_page=100" > jobs.json
+          gh api "repos/$GH_REPO/actions/runs/$MACOS_RUN_ID" > macos.json
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const read = name => JSON.parse(readFileSync(name));
+          const build = read('build.json'), mac = read('macos.json'), jobs = read('jobs.json').jobs;
+          assert.equal(build.head_sha, process.env.BUILD_COMMIT);
+          assert.equal(build.path, '.github/workflows/prototype.yml');
+          assert.equal(build.conclusion, 'success');
+          assert.equal(jobs.find(job => job.name === 'check')?.conclusion, 'success');
+          for (const [prefix, count] of [['installers (', 4], ['linux-package-compatibility (', 2]]) {
+            const selected = jobs.filter(job => job.name.startsWith(prefix));
+            assert.equal(selected.length, count);
+            assert.ok(selected.every(job => job.conclusion === 'success'));
+          }
+          assert.equal(mac.path, '.github/workflows/macos-package-validation.yml');
+          assert.equal(mac.conclusion, 'success');
+          JS
+      - uses: actions/download-artifact@v4
+        with:
+          path: downloaded/build
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: downloaded/macos
+          run-id: ${{ inputs.macos_run_id }}
+          github-token: ${{ github.token }}
+      - name: Verify source, installer checksums and mounted DMG evidence
+        run: node scripts/prepare-verified-release.mjs downloaded release-assets
+      - name: Prepare reviewable prerelease
+        run: |
+          tag=$(cat release-assets/release-tag.txt)
+          gh release create "$tag" --draft --prerelease --target "$BUILD_COMMIT" --title "GatherPack $tag" --notes-file release-assets/release-notes.md
+          find release-assets -maxdepth 1 -type f ! -name release-tag.txt ! -name release-notes.md -print0 | xargs -0 -r gh release upload "$tag"

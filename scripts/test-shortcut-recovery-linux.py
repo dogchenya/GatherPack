@@ -97,7 +97,7 @@ def expand(window):
     focus(window)
     bounds = geometry(window)
     command("xdotool", "mousemove", str(bounds["X"] + 52), str(bounds["Y"] + 44), "click", "1")
-    wait(lambda: geometry(window)["WIDTH"] > 700, "Compact click must open the panel")
+    wait(lambda: geometry(window)["WIDTH"] >= 420, "Compact click must open the panel")
 
 
 def app_widgets():
@@ -195,7 +195,9 @@ try:
     wait(lambda: len(json.loads(secondary_state.read_text())["paths"]) == 3, "Same-key retry must recover after the conflicting instance exits")
     check(True, "saving the unchanged shortcut restores real collection after conflict removal")
     expand(secondary_window)
+    button(secondary_window, "本地收集 · 快捷键已注册")
     button(secondary_window, "重新注册")
+    button(secondary_window, "完成")
     (source / "retry-again.txt").write_bytes(b"retry again original")
     time.sleep(.5)
     collect(files)

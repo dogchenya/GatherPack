@@ -84,7 +84,7 @@ def click_app_button(name):
     while queue and len(trace) < 10000:
         widget = queue.popleft()
         trace.append([widget.getRoleName(), widget.name])
-        if widget.name == name and widget.getRoleName() == "push button": matches.append(widget)
+        if widget.name == name and widget.getRoleName() in {"push button", "toggle button"}: matches.append(widget)
         queue.extend(list(widget))
     (evidence / "linux-app-accessibility.json").write_text(json.dumps(trace, ensure_ascii=False))
     check(len(matches) == 1, "native WebView exposes one accessible " + name + " button")
@@ -303,6 +303,9 @@ try:
             if "_NET_WM_STATE_ABOVE" in command("xprop", "-id", app_window, "_NET_WM_STATE"): break
             time.sleep(.1)
         check("_NET_WM_STATE_ABOVE" in command("xprop", "-id", app_window, "_NET_WM_STATE"), "floating window returns to always-on-top after picker closes")
+        click_app_button("置顶窗口")
+        time.sleep(.4)
+        check("_NET_WM_STATE_ABOVE" not in command("xprop", "-id", app_window, "_NET_WM_STATE"), "pin button disables the actual native always-on-top state")
         picked_folder = root / "selected-folder"
         picked_folder.mkdir(); (picked_folder / "child.txt").write_bytes(b"picked folder child")
         (picked_folder / ".hidden").write_bytes(b"hidden child"); (picked_folder / "empty").mkdir()
@@ -314,6 +317,9 @@ try:
             if str(picked_folder) in json.loads(state_file.read_text())["paths"]: break
             time.sleep(.1)
         check(str(picked_folder) in json.loads(state_file.read_text())["paths"], "native folder chooser adds the whole folder")
+        time.sleep(.4)
+        check("_NET_WM_STATE_ABOVE" not in command("xprop", "-id", app_window, "_NET_WM_STATE"), "closing a native chooser preserves the user's unpinned preference")
+        click_app_button("置顶窗口")
         time.sleep(.5)
         before_graph = state_file.read_bytes()
         click_app_button("文件关系图")
@@ -344,6 +350,25 @@ try:
             check(all(archive.read(name) == content for name, content in expected.items()) and "selected-folder/empty/" in archive.namelist(), "UI-created ZIP restores all selected content, hidden files and empty folder")
         check(len(report["written"]) == 7 and not report["failed"] and not report["skipped"], "native UI result report matches the seven archived files")
         check(len(json.loads(state_file.read_text())["paths"]) == 6, "native UI packing retains the six public collection entries")
+        relocated = root / "relocated-picker-only.txt"
+        picked_source.rename(relocated)
+        click_app_button("目录与问题")
+        click_app_button("重新检查")
+        time.sleep(.5)
+        click_app_button("重新定位文件")
+        relink_dialog = wait_native_dialog("重新定位来源（替换清单引用）")
+        enter_native_path(relink_dialog, relocated)
+        for _ in range(100):
+            if str(relocated) in json.loads(state_file.read_text())["paths"]: break
+            time.sleep(.1)
+        paths = json.loads(state_file.read_text())["paths"]
+        check(str(relocated) in paths and str(picked_source) not in paths and len(paths) == 6, "native relink picker replaces the stale reference without duplicating collection entries")
+        check(relocated.read_bytes() == b"native picker source", "relink preserves the chosen source bytes")
+        click_app_button("撤销")
+        time.sleep(.4)
+        paths = json.loads(state_file.read_text())["paths"]
+        check(str(picked_source) in paths and str(relocated) not in paths and len(paths) == 6, "UI undo restores the original reference and removes the relink replacement")
+        relocated.rename(picked_source)
         for enabled in (True, False):
             click_app_button("设置"); time.sleep(.3)
             toggle_autostart(); click_app_button("保存设置")

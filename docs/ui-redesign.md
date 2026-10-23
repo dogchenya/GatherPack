@@ -20,6 +20,22 @@
 
 原生验证另调用实际 Rust 命令并核对磁盘，覆盖三种压缩格式、引用替换及撤销、撤销后新增内容保留、顺序、清单持久化、输出保护与取消清理。安装包与各系统验证结果随发布记录补充；历史版本的证据不代替本次验证。
 
+应用源码提交：`d40899154bc76259316f5be04e41c6cd2cf8cc48`。后续文档及测试脚本提交不改变该构建的应用代码。
+
+| 实际环境 | 本轮结果 |
+| --- | --- |
+| Windows x64 / WebView2 | 最终 release 程序：28 项真实核心 IPC 和 5 项重启恢复通过 |
+| Ubuntu 24.04 / GNOME / X11 / Nautilus | 源码构建：115 项真实桌面检查通过，覆盖拖入、选中项快捷键、原生文件/文件夹/保存/重新定位选择器、取消置顶、撤销、图谱、打包与解压校验、开机启动和窗口移动 |
+| Ubuntu 24.04 快捷键恢复 | 22 项通过：首次加载桥接、实际热键读取、双实例冲突、原组合键恢复、重新注册和 Caps Lock |
+
+桌面检查在独立的 WSL2 Ubuntu rootfs、Xvfb 和非 root 测试账户中运行。可追溯报告：[桌面 115 项](validation/alpha8-gnome-source.json)、[快捷键恢复 22 项](validation/alpha8-shortcut-source.json)。这两份报告验证源码构建程序，最终安装包另做校验。
+
+## GitHub 发布
+
+安装包通过公开的 `Checks and desktop installers` 工作流构建，Linux 包继续基于 Ubuntu 22.04 构建并检查 GLIBC 2.35 基线。macOS 两种架构另通过 `Validate delivered macOS packages` 挂载实际 DMG 验证。
+
+`Prepare verified GitHub release` 接受构建运行编号、源码提交和 macOS 安装验证编号。只有四目标构建、双 Ubuntu 安装以及双 DMG 验证成功，并且来源、版本和 SHA256 一致时，才整理发布草稿。安装包、AppImage 对应源码、校验和及授权说明分别提供。
+
 ## 原型与研究参考
 
 设计原型在 [prototypes/gatherpack-v2](../prototypes/gatherpack-v2/README.md)。原型里的文件与系统动作是演示；正式应用不包含模拟桌面、示例文件、自动演示或虚拟打包。

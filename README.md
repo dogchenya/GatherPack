@@ -41,21 +41,21 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
-| Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | 运行 `.exe` 安装程序 |
-| macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
-| macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | 打开 `.dmg`，将应用拖入 Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | 安装 `.deb` |
-| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | 赋予 `.AppImage` 执行权限后运行 |
+| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.8_x64-setup.exe) | 运行 `.exe` 安装程序 |
+| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-aarch64-apple-darwin-GatherPack_0.1.0-alpha.8_aarch64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
+| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-apple-darwin-GatherPack_0.1.0-alpha.8_x64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.8_amd64.deb) | 安装 `.deb` |
+| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.8_amd64.AppImage) | 赋予 `.AppImage` 执行权限后运行 |
 
 在 Ubuntu 上升级 GatherPack 前，请先退出旧版应用。若快捷键提示桥接未加载或需要 `python3-nautilus`，请按 [Nautilus 快捷键排查](docs/nautilus-shortcut.md) 安装依赖并退出后台进程后重新打开“文件”。alpha.7 会区分缺少依赖与已安装但尚未加载，不再统一提示重复安装。
 
 Linux 安装包、对应源码和校验材料分别下载，普通安装只需选择 `.deb` 或 AppImage 其中一种。`x64`、`x86_64`、`amd64` 均指 Intel/AMD 64 位架构，目前没有 32 位 x86 包。
 
-对应源码单独放在 `gatherpack-linux-x64-corresponding-source`（其中的 `.tar` 约 545.8 MiB）；SHA256 校验和、构建来源及授权说明放在 `gatherpack-linux-x64-checksums-and-licenses`。再分发 AppImage 时，须同时提供**同一轮下载**中的 `corresponding-source.tar`。
+对应源码为发布页中独立的 `corresponding-source.tar`，普通安装无需下载。校验和位于 `SHA256SUMS.txt`，构建来源及授权说明分别提供；Actions 中也保留分开的下载项。再分发 AppImage 时，须同时提供**同一版本、同一构建**的对应源码。
 
 安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。
 
-安装包已通过四目标原生 IPC 与安装验证；同一批 Linux 包已在 Ubuntu 22.04 / 24.04 的 GNOME/X11 环境完成桌面与快捷键回归。见 [本次验证记录](docs/nautilus-shortcut.md#alpha7-validation) 与 [悬浮窗、关系图说明](docs/desktop-interaction.md)。Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证，详见 [兼容性与验证记录](docs/prototype-validation.md)。
+本轮验证记录见 [界面与交互更新](docs/ui-redesign.md)。Ubuntu GNOME/X11 已覆盖真实拖入、全局快捷键、文件选择、关系图、打包及窗口拖动；Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证。历史证据分别保存在 [快捷键排查](docs/nautilus-shortcut.md#alpha7-validation) 与 [兼容性记录](docs/prototype-validation.md)。
 
 ## 快速上手
 

@@ -41,21 +41,21 @@ Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/t
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
-| Windows x64 | `gatherpack-x86_64-pc-windows-msvc` | Run the `.exe` installer |
-| macOS 14+ · Apple Silicon | `gatherpack-aarch64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
-| macOS 14+ · Intel | `gatherpack-x86_64-apple-darwin` | Open the `.dmg` and drag the app into Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | `gatherpack-linux-x64-deb` | Install the `.deb` |
-| Linux x86_64 · AppImage | `gatherpack-linux-x64-appimage` | Make the `.AppImage` executable and run it |
+| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.8_x64-setup.exe) | Run the `.exe` installer |
+| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-aarch64-apple-darwin-GatherPack_0.1.0-alpha.8_aarch64.dmg) | Open the `.dmg` and drag the app into Applications |
+| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-apple-darwin-GatherPack_0.1.0-alpha.8_x64.dmg) | Open the `.dmg` and drag the app into Applications |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.8_amd64.deb) | Install the `.deb` |
+| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.8/gatherpack-0.1.0-alpha.8-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.8_amd64.AppImage) | Make the `.AppImage` executable and run it |
 
 Quit the previous GatherPack version before upgrading the app on Ubuntu. For an unloaded bridge or a `python3-nautilus` message, follow [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english) to install dependencies and restart the background Files process. Alpha.7 distinguishes missing dependencies from an installed but unloaded bridge.
 
 Linux installers, corresponding source, and verification materials are separate downloads. For normal installation, choose either the `.deb` or AppImage. `x64`, `x86_64`, and `amd64` all mean 64-bit Intel/AMD; 32-bit x86 builds are currently unavailable.
 
-Corresponding source is under `gatherpack-linux-x64-corresponding-source` (the `.tar` is about 545.8 MiB). SHA256 checksums, build provenance, and license notices are under `gatherpack-linux-x64-checksums-and-licenses`. When redistributing the AppImage, include `corresponding-source.tar` from the **same download run**.
+The release includes a separate `corresponding-source.tar`; ordinary installation does not require it. Checksums are in `SHA256SUMS.txt`, with provenance and license notices provided separately. When redistributing an AppImage, also provide the corresponding source from the **same version and build**.
 
 Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup.
 
-Installers passed native IPC and installation checks on all four targets; the same Linux packages passed desktop and shortcut regression on Ubuntu 22.04 / 24.04 GNOME/X11. See the [latest validation record](docs/nautilus-shortcut.md#alpha7-validation-en) and [floating window and graph notes](docs/desktop-interaction.md) (Chinese). Full file manager interaction on Windows/macOS, Wayland, and other Linux file managers still needs validation. See the [compatibility and validation record](docs/prototype-validation.md) (Chinese).
+See [UI and validation notes](docs/ui-redesign.md) for this release. Ubuntu GNOME/X11 covers actual drag/drop, collection shortcuts, native choosers, graph exploration, packing, and window movement. Full Windows/macOS file-manager interaction, Wayland, and other Linux file managers still need validation. Older evidence remains in the compatibility documentation.
 
 ## Getting started
 

@@ -123,10 +123,19 @@ def app_text():
 
 
 def button(window, name):
-    focus(window)
+    # The new dialogs correctly close on Escape; activation must preserve them.
+    command("xdotool", "windowactivate", "--sync", window)
+    time.sleep(.3)
     matches = [item for item in app_widgets() if item.name == name and item.getRoleName() == "push button"]
     check(len(matches) == 1, "Recovery UI exposes one " + name + " button")
-    matches[0].queryAction().doAction(0)
+    import pyatspi
+    component = matches[0].queryComponent()
+    component.scrollTo(pyatspi.SCROLL_ANYWHERE)
+    component.grabFocus()
+    bounds = component.getExtents(pyatspi.DESKTOP_COORDS)
+    command("xdotool", "mousemove", "--sync", str(bounds.x + bounds.width // 2), str(bounds.y + bounds.height // 2))
+    time.sleep(.15)
+    command("xdotool", "click", "1")
     time.sleep(.4)
 
 
@@ -184,6 +193,7 @@ try:
     secondary_window = wait(lambda: app_window(secondary), "Conflicting second instance must start")
     expand(secondary_window)
     button(secondary_window, "设置")
+    wait(lambda: "保存设置" in app_text(), "Settings dialog must mount before conflict recovery")
     wait(lambda: "快捷键注册失败" in app_text(), "A second app shortcut conflict must be reported")
     check(True, "shortcut conflict with another running instance is visible")
     stop(primary)

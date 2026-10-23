@@ -1,0 +1,1 @@
+{"passed":true,"checks":["deb dependencies installed","desktop launcher uses the GatherPack name and executable","system Nautilus bridge matches source","installed licenses complete","installed binary native IPC and restart passed","package removal removes binary and bridge"]}

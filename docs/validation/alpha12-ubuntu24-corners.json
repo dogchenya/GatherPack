@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "executable": "/usr/bin/gatherpack",
+  "executableSHA256": "d850b3564485623f9cbaa803e731d7f803b46a50a631190e1b2d6cedb0d0f791",
+  "packageSHA256": "308123242195eabadc76894114c063f21e99d1a22af95210849141ed5d8605cb",
+  "checks": [
+    {
+      "managedUserShadowRemoved": true
+    },
+    {
+      "mode": "compact",
+      "corners": [
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ]
+      ],
+      "width": 104,
+      "height": 112
+    },
+    {
+      "mode": "expanded",
+      "corners": [
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ]
+      ],
+      "width": 440,
+      "height": 760
+    }
+  ]
+}

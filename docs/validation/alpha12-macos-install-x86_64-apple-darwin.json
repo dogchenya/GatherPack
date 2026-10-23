@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "target": "x86_64-apple-darwin",
+  "commit": "00be17199c1494fa467bdf77ba579b645595e8bc",
+  "checks": [
+    "DMG SHA256 and build provenance match",
+    "DMG mounts read-only on matching native architecture",
+    "Bundled executable and license resources exist",
+    "Original Rust standard-library notice bytes match",
+    "Bundle display name and identifier match the current brand",
+    "Bundled executable passes core and restart native IPC assertions",
+    "DMG detaches after the application exits"
+  ]
+}

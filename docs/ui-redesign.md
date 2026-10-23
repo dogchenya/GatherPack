@@ -13,6 +13,17 @@
 
 开发构建预验证：[17 项贴边与语言检查](validation/alpha12-source-edge-language.json)、[受污染的真实 Nautilus 重连检查](validation/alpha12-source-connection.json)、[124 项完整桌面交互](validation/alpha12-source-desktop.json)、[48 次清单/全景位置切换](validation/alpha12-source-position.json)通过；各报告记录实际运行的开发构建程序 SHA256。源码构建的核心 IPC 与重启恢复也通过。录屏逐帧确认滑出和滑回均存在多个中间位置，未将直接缩窄当作动效。
 
+### alpha.12 安装包验证
+
+应用产物源码提交：`00be17199c1494fa467bdf77ba579b645595e8bc`。后续文档和验证脚本改进不改变应用产物。
+
+- 同一 DEB 在 Ubuntu 22.04 / Nautilus 42、Ubuntu 24.04 / Nautilus 46 隔离 GNOME/X11 桌面安装，分别通过 17 项贴边与语言检查、124 项完整交互、48 次视图位置切换、24 项快捷键恢复检查，以及核心 IPC 和重启恢复。两系统均实际复现受污染的 Nautilus，应用内确认重连后通过真实全局快捷键收集原文件；检查诊断和打开确认界面不重启宿主，独立扩展受到保护。测试完成后卸载并核对系统程序及桥接已移除。
+- [22.04 新功能](validation/alpha12-ubuntu22-features.json)、[24.04 新功能](validation/alpha12-ubuntu24-features.json)、[22.04 重连](validation/alpha12-ubuntu22-connection.json)、[24.04 重连](validation/alpha12-ubuntu24-connection.json)、[22.04 桌面](validation/alpha12-ubuntu22-desktop.json)、[24.04 桌面](validation/alpha12-ubuntu24-desktop.json)、[22.04 快捷键](validation/alpha12-ubuntu22-shortcuts.json)、[24.04 快捷键](validation/alpha12-ubuntu24-shortcuts.json)。DEB SHA256 均为 `308123242195eabadc76894114c063f21e99d1a22af95210849141ed5d8605cb`，程序 SHA256 均为 `d850b3564485623f9cbaa803e731d7f803b46a50a631190e1b2d6cedb0d0f791`。
+- [Windows 实际安装器](validation/alpha12-windows-installer.json)通过安装、资源授权文本、28 项核心 IPC、5 项重启恢复与卸载。两架构 macOS 实际 DMG 通过只读挂载、校验来源与 SHA256、程序运行及卸载镜像：[Apple Silicon](validation/alpha12-macos-install-aarch64-apple-darwin.json)、[Intel](validation/alpha12-macos-install-x86_64-apple-darwin.json)。
+- Ubuntu 22.04 WebKit 在视图初始化期间可能使辅助功能树节点失效，测试等待跳过此瞬态节点后继续读取真实界面；修正仅涉及测试脚本。之前已通过的贴边与 IPC 检查保留，继续运行重连与桌面检查。
+
+[四目标构建与双 Ubuntu 兼容性检查](https://github.com/dogchenya/GatherPack/actions/runs/39914923249)、[两种 macOS DMG 挂载运行](https://github.com/dogchenya/GatherPack/actions/runs/39916456070)均已通过。
+
 ## alpha.11 贴边隐藏与中英界面
 
 - 收起的悬浮框靠近屏幕工作区左侧或右侧，位置稳定且鼠标移开约 0.8 秒后收为 10 像素宽的窄条；悬停恢复，拖离边缘解除贴边。展开面板、打包中、取消置顶时保持显示。设置中的“贴边隐藏”默认开启，可关闭并保存。

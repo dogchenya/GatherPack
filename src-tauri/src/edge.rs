@@ -6,6 +6,8 @@ use tauri::Manager;
 pub enum Side {
     Left,
     Right,
+    Top,
+    Bottom,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -32,6 +34,7 @@ pub struct Motion {
 
 #[derive(Default)]
 pub struct Controller {
+    ticks: u64,
     hidden: Option<Hidden>,
     last: Option<Rect>,
     changed: Option<Instant>,
@@ -62,6 +65,9 @@ pub fn set_blocked(app: &tauri::AppHandle, blocked: bool) {
 }
 
 impl Controller {
+    pub fn diagnostics(&self) -> serde_json::Value {
+        serde_json::json!({"ticks":self.ticks,"blocked":self.blocked,"holds":self.holds,"hidden":self.side(),"motion":self.motion(),"last":format!("{:?}",self.last),"stableMs":self.changed.map(|t|t.elapsed().as_millis()),"outsideMs":self.outside.map(|t|t.elapsed().as_millis())})
+    }
     pub fn side(&self) -> Option<Side> {
         self.hidden.filter(|h| !h.hiding).map(|h| h.side)
     }
@@ -89,13 +95,58 @@ fn contains(rect: Rect, point: tauri::PhysicalPosition<f64>) -> bool {
 }
 
 fn side(rect: Rect, area: Rect, threshold: i32) -> Option<Side> {
-    if (rect.x - area.x).abs() <= threshold {
-        Some(Side::Left)
-    } else if (rect.x + rect.width as i32 - area.x - area.width as i32).abs() <= threshold {
-        Some(Side::Right)
-    } else {
-        None
+    // A large panel can be close to opposite edges at once. Select the closest
+    // (or most crossed) edge rather than always preferring left/top.
+    [
+        (Side::Left, rect.x - area.x),
+        (
+            Side::Right,
+            area.x + area.width as i32 - rect.x - rect.width as i32,
+        ),
+        (Side::Top, rect.y - area.y),
+        (
+            Side::Bottom,
+            area.y + area.height as i32 - rect.y - rect.height as i32,
+        ),
+    ]
+    .into_iter()
+    .filter(|(_, distance)| *distance <= threshold)
+    .min_by_key(|(_, distance)| *distance)
+    .map(|(side, _)| side)
+}
+
+fn anchor(mut full: Rect, area: Rect, side: Side) -> Rect {
+    full.x = full.x.clamp(
+        area.x,
+        (area.x + area.width as i32 - full.width as i32).max(area.x),
+    );
+    full.y = full.y.clamp(
+        area.y,
+        (area.y + area.height as i32 - full.height as i32).max(area.y),
+    );
+    match side {
+        Side::Left => full.x = area.x,
+        Side::Right => full.x = area.x + area.width as i32 - full.width as i32,
+        Side::Top => full.y = area.y,
+        Side::Bottom => full.y = area.y + area.height as i32 - full.height as i32,
     }
+    full
+}
+
+fn wake_rect(full: Rect, area: Rect, side: Side, scale: f64) -> Rect {
+    let vertical = matches!(side, Side::Left | Side::Right);
+    let thin = (10.0 * scale).round().max(6.0) as u32;
+    let long = (112.0 * scale).round() as u32;
+    let width = if vertical { thin } else { long }.min(area.width);
+    let height = if vertical { long } else { thin }.min(area.height);
+    let mut strip = Rect {
+        x: full.x + (full.width as i32 - width as i32) / 2,
+        y: full.y + (full.height as i32 - height as i32) / 2,
+        width,
+        height,
+    };
+    strip = anchor(strip, area, side);
+    strip
 }
 
 fn apply(window: &tauri::WebviewWindow, rect: Rect, fixed: bool) {
@@ -134,15 +185,15 @@ pub fn restore(app: &tauri::AppHandle) {
                 .or_else(|_| window.primary_monitor())
             {
                 let work = monitor.work_area();
-                full.x = if hidden.side == Side::Left {
-                    work.position.x
-                } else {
-                    work.position.x + work.size.width as i32 - full.width as i32
-                };
-                full.y = full.y.clamp(
-                    work.position.y,
-                    (work.position.y + work.size.height as i32 - full.height as i32)
-                        .max(work.position.y),
+                full = anchor(
+                    full,
+                    Rect {
+                        x: work.position.x,
+                        y: work.position.y,
+                        width: work.size.width,
+                        height: work.size.height,
+                    },
+                    hidden.side,
                 );
             }
             apply(
@@ -159,6 +210,7 @@ pub fn restore(app: &tauri::AppHandle) {
 
 fn tick(app: &tauri::AppHandle) {
     let state = app.state::<crate::AppState>();
+    state.edge.lock().unwrap().ticks += 1;
     let Some(window) = app.get_webview_window("main") else {
         return;
     };
@@ -252,6 +304,8 @@ fn tick(app: &tauri::AppHandle) {
                     .is_none_or(|changed| now.duration_since(changed) > Duration::from_millis(500)))
             || hidden.strip.x < area.x
             || hidden.strip.x + hidden.strip.width as i32 > area.x + area.width as i32
+            || hidden.strip.y < area.y
+            || hidden.strip.y + hidden.strip.height as i32 > area.y + area.height as i32
         {
             drop(controller);
             restore(app);
@@ -287,30 +341,7 @@ fn tick(app: &tauri::AppHandle) {
     let Some(side) = side(rect, area, threshold).or_else(|| side(rect, screen, threshold)) else {
         return;
     };
-    let full = Rect {
-        x: if side == Side::Left {
-            area.x
-        } else {
-            area.x + area.width as i32 - rect.width as i32
-        },
-        y: rect.y.clamp(
-            area.y,
-            (area.y + area.height as i32 - rect.height as i32).max(area.y),
-        ),
-        ..rect
-    };
-    let width = (10.0 * scale).round().max(6.0) as u32;
-    let strip = Rect {
-        x: if side == Side::Left {
-            area.x
-        } else {
-            area.x + area.width as i32 - width as i32
-        },
-        width,
-        height: (112.0 * scale).round() as u32,
-        y: full.y + (full.height as i32 - (112.0 * scale).round() as i32).max(0) / 2,
-        ..full
-    };
+    let strip = wake_rect(anchor(rect, area, side), area, side, scale);
     controller.hidden = Some(Hidden {
         side,
         // Keep the observed geometry until the animation finishes. GTK applies
@@ -337,6 +368,118 @@ pub fn start(app: tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn near_full_height_panels_choose_the_closest_edge() {
+        let area = Rect {
+            x: 0,
+            y: 0,
+            width: 1024,
+            height: 728,
+        };
+        let panel = Rect {
+            x: 64,
+            y: 8,
+            width: 440,
+            height: 704,
+        };
+        assert_eq!(side(panel, area, 32), Some(Side::Top));
+        assert_eq!(side(Rect { y: 16, ..panel }, area, 32), Some(Side::Bottom));
+        assert_eq!(
+            side(
+                Rect {
+                    x: 4,
+                    y: 12,
+                    ..panel
+                },
+                area,
+                32
+            ),
+            Some(Side::Left)
+        );
+        assert_eq!(
+            side(
+                Rect {
+                    x: 580,
+                    y: 12,
+                    ..panel
+                },
+                area,
+                32
+            ),
+            Some(Side::Right)
+        );
+    }
+    #[test]
+    fn crossing_an_edge_still_docks_instead_of_missing_the_proximity_band() {
+        let area = Rect {
+            x: 0,
+            y: 0,
+            width: 2560,
+            height: 1528,
+        };
+        let icon = Rect {
+            x: 1064,
+            y: 1542,
+            width: 156,
+            height: 168,
+        };
+        assert_eq!(side(icon, area, 48), Some(Side::Bottom));
+        assert_eq!(
+            side(
+                Rect {
+                    x: -120,
+                    y: 200,
+                    ..icon
+                },
+                area,
+                48
+            ),
+            Some(Side::Left)
+        );
+        assert_eq!(
+            side(
+                Rect {
+                    x: 2524,
+                    y: 200,
+                    ..icon
+                },
+                area,
+                48
+            ),
+            Some(Side::Right)
+        );
+        assert_eq!(side(Rect { y: -120, ..icon }, area, 48), Some(Side::Top));
+    }
+    #[test]
+    fn all_four_edges_anchor_and_keep_wake_targets_inside_scaled_work_area() {
+        let area = Rect {
+            x: -1600,
+            y: 40,
+            width: 1600,
+            height: 960,
+        };
+        let panel = Rect {
+            x: -1000,
+            y: 200,
+            width: 660,
+            height: 760,
+        };
+        for edge in [Side::Left, Side::Right, Side::Top, Side::Bottom] {
+            let full = anchor(panel, area, edge);
+            assert_eq!(side(full, area, 0), Some(edge));
+            let strip = wake_rect(full, area, edge, 1.5);
+            assert!(strip.x >= area.x && strip.y >= area.y);
+            assert!(strip.x + strip.width as i32 <= area.x + area.width as i32);
+            assert!(strip.y + strip.height as i32 <= area.y + area.height as i32);
+            if matches!(edge, Side::Top | Side::Bottom) {
+                assert_eq!((strip.width, strip.height), (168, 15));
+                assert_eq!(full.x, panel.x);
+            } else {
+                assert_eq!((strip.width, strip.height), (15, 168));
+                assert_eq!(full.y, panel.y);
+            }
+        }
+    }
     #[test]
     fn edges_use_work_area_and_physical_coordinates() {
         let area = Rect {

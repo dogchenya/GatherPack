@@ -31,7 +31,7 @@ pub fn arguments() -> Result<Option<ValidationContext>, String> {
         .iter()
         .find_map(|s| s.strip_prefix("--validation-scenario="))
         .unwrap_or("core");
-    if !["core", "restore"].contains(&scenario) {
+    if !["core", "restore", "desktop"].contains(&scenario) {
         return Err("unknown validation scenario".into());
     }
     Ok(Some(ValidationContext {
@@ -55,7 +55,7 @@ fn checked_path(state: &AppState, path: &str) -> Result<PathBuf, String> {
     Ok(path)
 }
 pub fn seed(context: &ValidationContext) -> Result<(), String> {
-    if context.scenario == "restore" {
+    if context.scenario == "restore" || context.scenario == "desktop" {
         return Ok(());
     }
     let root = Path::new(&context.root);
@@ -94,6 +94,155 @@ pub fn seed(context: &ValidationContext) -> Result<(), String> {
         .set_len(128 * 1024 * 1024)
         .map_err(|e| e.to_string())?;
     Ok(())
+}
+
+#[tauri::command]
+pub fn validation_desktop_action(
+    app: tauri::AppHandle,
+    action: String,
+) -> Result<serde_json::Value, String> {
+    let state = app.state::<AppState>();
+    let context = state
+        .validation
+        .as_ref()
+        .filter(|c| c.scenario == "desktop")
+        .ok_or("desktop validation is disabled")?;
+    let window = app.get_webview_window("main").ok_or("window unavailable")?;
+    window
+        .set_title("GatherPack · 本地窗口验证")
+        .map_err(|e| e.to_string())?;
+    if action == "fit-panel" {
+        let monitor = window
+            .current_monitor()
+            .map_err(|e| e.to_string())?
+            .ok_or("monitor unavailable")?;
+        let size = window.inner_size().map_err(|e| e.to_string())?;
+        window
+            .set_size(tauri::PhysicalSize::new(
+                size.width.min(monitor.work_area().size.width / 2 - 2),
+                size.height.min(monitor.work_area().size.height / 2 - 2),
+            ))
+            .map_err(|e| e.to_string())?;
+    }
+    if action.starts_with("place-") {
+        crate::edge::restore(&app);
+        let monitor = window
+            .current_monitor()
+            .map_err(|e| e.to_string())?
+            .ok_or("monitor unavailable")?;
+        let work = monitor.work_area();
+        let size = window.inner_size().map_err(|e| e.to_string())?;
+        let mut gap = (if action.ends_with("-over") {
+            -80.0
+        } else {
+            24.0
+        } * monitor.scale_factor())
+        .round() as i32;
+        let edge_action = action.trim_end_matches("-over");
+        if gap > 0 {
+            let room = if matches!(edge_action, "place-top" | "place-bottom") {
+                work.size.height.saturating_sub(size.height)
+            } else {
+                work.size.width.saturating_sub(size.width)
+            };
+            gap = gap.min((room / 3) as i32);
+            let other_room = if matches!(edge_action, "place-top" | "place-bottom") {
+                work.size.width.saturating_sub(size.width)
+            } else {
+                work.size.height.saturating_sub(size.height)
+            };
+            gap = gap.min((other_room / 6) as i32);
+            if state.expanded.load(std::sync::atomic::Ordering::Relaxed) {
+                gap = 0;
+            }
+            if matches!(edge_action, "place-left" | "place-right") {
+                let margin = ((work.size.height / 2).saturating_sub(size.height) / 2)
+                    .min((64.0 * monitor.scale_factor()) as u32)
+                    .max(1);
+                gap = gap.min((margin / 2) as i32);
+            }
+        }
+        let x = match edge_action {
+            "place-left" => work.position.x + gap,
+            "place-right" => work.position.x + work.size.width as i32 - size.width as i32 - gap,
+            "place-top" | "place-bottom" => {
+                // Test hiding with the pointer outside the window, without moving
+                // the user's mouse. A wide panel otherwise covers a centered pointer.
+                let margin = if state.expanded.load(std::sync::atomic::Ordering::Relaxed) {
+                    1
+                } else {
+                    (64.0 * monitor.scale_factor()).round() as i32
+                };
+                if app
+                    .cursor_position()
+                    .map(|p| p.x < (work.position.x + work.size.width as i32 / 2) as f64)
+                    .unwrap_or(true)
+                {
+                    work.position.x + work.size.width as i32 - size.width as i32 - margin
+                } else {
+                    work.position.x + margin
+                }
+            }
+            _ => work.position.x + (work.size.width as i32 - size.width as i32) / 2,
+        };
+        let y = match edge_action {
+            "place-top" => work.position.y + gap,
+            "place-bottom" => work.position.y + work.size.height as i32 - size.height as i32 - gap,
+            "place-left" | "place-right" => {
+                let room = work.size.height.saturating_sub(size.height) as i32;
+                let margin = ((work.size.height / 2).saturating_sub(size.height) / 2)
+                    .min((64.0 * monitor.scale_factor()) as u32)
+                    .max(1) as i32;
+                if app
+                    .cursor_position()
+                    .map(|p| p.y < (work.position.y + work.size.height as i32 / 2) as f64)
+                    .unwrap_or(true)
+                {
+                    work.position.y + room - margin
+                } else {
+                    work.position.y + margin
+                }
+            }
+            _ => work.position.y + (work.size.height.saturating_sub(size.height) / 2) as i32,
+        };
+        window
+            .set_position(tauri::PhysicalPosition::new(x, y))
+            .map_err(|e| e.to_string())?;
+        window.show().map_err(|e| e.to_string())?;
+    }
+    let edge = state.edge.lock().unwrap().diagnostics();
+    let result = serde_json::json!({
+        "outerPosition": format!("{:?}", window.outer_position()),
+        "innerPosition": format!("{:?}", window.inner_position()),
+        "outerOrigin": window.outer_position().ok(), "innerOrigin": window.inner_position().ok(),
+        "outerSize": window.outer_size().ok(), "innerSize": window.inner_size().ok(),
+        "scale": window.scale_factor().ok(), "cursor": app.cursor_position().ok(),
+        "monitor": window.current_monitor().ok().flatten().map(|m| serde_json::json!({"position":m.position(),"size":m.size(),"workPosition":m.work_area().position,"workSize":m.work_area().size})),
+        "edge": edge,
+        "snapshot": crate::read_snapshot(&state),
+    });
+    save_json(
+        &Path::new(&context.root).join("desktop-latest.json"),
+        &result,
+    )?;
+    Ok(result)
+}
+
+#[tauri::command]
+pub fn validation_desktop_report(
+    app: tauri::AppHandle,
+    result: serde_json::Value,
+) -> Result<(), String> {
+    let state = app.state::<AppState>();
+    let context = state
+        .validation
+        .as_ref()
+        .filter(|c| c.scenario == "desktop")
+        .ok_or("desktop validation is disabled")?;
+    save_json(
+        &Path::new(&context.root).join("desktop-report.json"),
+        &result,
+    )
 }
 #[tauri::command]
 pub fn validation_add(app: tauri::AppHandle, paths: Vec<String>) -> Result<(), String> {

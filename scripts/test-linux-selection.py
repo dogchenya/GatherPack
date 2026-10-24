@@ -257,9 +257,9 @@ try:
         app_window = command("xdotool", "search", "--onlyvisible", "--name", "^GatherPack").splitlines()[0]
         # The initial edge icon may already be hidden; reveal it before moving.
         dock = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
-        command("xdotool", "mousemove", "--sync", str(int(dock["X"]) + int(dock["WIDTH"]) // 2), str(int(dock["Y"]) + 40))
+        command("xdotool", "mousemove", "--sync", str(int(dock["X"]) + int(dock["WIDTH"]) // 2), str(int(dock["Y"]) + int(dock["HEIGHT"]) // 2))
         time.sleep(.5)
-        command("xdotool", "windowmove", app_window, "1120", "50")
+        command("xdotool", "windowmove", app_window, "1120", "160")
         time.sleep(.5)
         app_geometry = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
         focus(second_window); sx, sy = click_content(second_window); keys("ctrl+a")
@@ -284,7 +284,7 @@ try:
         time.sleep(.5)
         click_app_button("收起面板")
         time.sleep(.4)
-        command("xdotool", "windowmove", app_window, "1176", "50")
+        command("xdotool", "windowmove", app_window, "1176", "160")
         command("xdotool", "mousemove", "600", "500")
         for _ in range(100):
             dock = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())

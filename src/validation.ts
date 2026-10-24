@@ -7,6 +7,7 @@ type Snapshot = { entries: { path: string; status: string }[]; settings: { forma
 
 /** Explicit CLI-only validation profile. Calls the real Rust IPC implementation. */
 export async function runNativeValidation(context: Context) {
+  if (context.scenario === 'desktop') { const { runDesktopValidation } = await import('./desktopValidation'); await runDesktopValidation(); return; }
   const checks: { name: string; passed: boolean }[] = [];
   const check = (condition: unknown, name: string) => { checks.push({ name, passed: !!condition }); if (!condition) throw new Error(name); };
   const separator = context.root.includes(String.fromCharCode(92)) ? String.fromCharCode(92) : '/';

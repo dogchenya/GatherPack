@@ -955,6 +955,12 @@ fn main() {
         std::process::exit(4);
     });
     let mut context = tauri::generate_context!();
+    // DWM's undecorated shadow adds a white non-client frame and hidden offsets.
+    // The rounded shelf paints its own shadow; native and web bounds must agree.
+    #[cfg(target_os = "windows")]
+    for window in &mut context.config_mut().app.windows {
+        window.shadow = false;
+    }
     #[cfg(target_os = "linux")]
     for window in &mut context.config_mut().app.windows {
         window.transparent = true;
@@ -966,7 +972,8 @@ fn main() {
         for w in &mut context.config_mut().app.windows {
             // WebKitGTK defers page initialization for an unmapped window.
             // Linux validation runs in its own disposable desktop session.
-            w.visible = cfg!(target_os = "linux") && validation.is_some();
+            w.visible = (cfg!(target_os = "linux") && validation.is_some())
+                || validation.as_ref().is_some_and(|c| c.scenario == "desktop");
         }
     }
     tauri::Builder::default()
@@ -1136,7 +1143,12 @@ fn main() {
                     _ => {}
                 }
             });
-            if !smoke_test && state.validation.is_none() { edge::start(handle.clone()); }
+            if !smoke_test && (state.validation.is_none() || state.validation.as_ref().is_some_and(|c| c.scenario == "desktop")) {
+                // Normalize client bounds after Windows' initial DPI/non-client negotiation.
+                #[cfg(target_os = "windows")]
+                expand(handle, false, false);
+                edge::start(handle.clone());
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -1166,7 +1178,9 @@ fn main() {
             validation::validation_add,
             validation::validation_relink,
             validation::validation_remove_source,
-            validation::validation_done
+            validation::validation_done,
+            validation::validation_desktop_action,
+            validation::validation_desktop_report
         ])
         .build(context)
         .expect("启动 GatherPack 失败")

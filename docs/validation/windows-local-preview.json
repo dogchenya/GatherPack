@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "released": false,
+  "platform": "Windows; local desktop; 150% scale",
+  "executableSHA256": "66993ba9267036e539c36b323749f60743305753328f14e3043dc2b8bbffe86d",
+  "checks": [
+    {
+      "name": "compact viewport is exactly 104 logical pixels",
+      "passed": true
+    },
+    {
+      "name": "native frame and client dimensions match",
+      "passed": true
+    },
+    {
+      "name": "left becomes a 10 logical pixel wake tab",
+      "passed": true
+    },
+    {
+      "name": "left wake tab stays fully inside the work area",
+      "passed": true
+    },
+    {
+      "name": "left restores compact width without growth",
+      "passed": true
+    },
+    {
+      "name": "left still hides after crossing the screen edge",
+      "passed": true
+    },
+    {
+      "name": "right becomes a 10 logical pixel wake tab",
+      "passed": true
+    },
+    {
+      "name": "right wake tab stays fully inside the work area",
+      "passed": true
+    },
+    {
+      "name": "right restores compact width without growth",
+      "passed": true
+    },
+    {
+      "name": "right still hides after crossing the screen edge",
+      "passed": true
+    },
+    {
+      "name": "top becomes a 10 logical pixel wake tab",
+      "passed": true
+    },
+    {
+      "name": "top wake tab stays fully inside the work area",
+      "passed": true
+    },
+    {
+      "name": "top restores compact width without growth",
+      "passed": true
+    },
+    {
+      "name": "top still hides after crossing the screen edge",
+      "passed": true
+    },
+    {
+      "name": "bottom becomes a 10 logical pixel wake tab",
+      "passed": true
+    },
+    {
+      "name": "bottom wake tab stays fully inside the work area",
+      "passed": true
+    },
+    {
+      "name": "bottom restores compact width without growth",
+      "passed": true
+    },
+    {
+      "name": "bottom still hides after crossing the screen edge",
+      "passed": true
+    },
+    {
+      "name": "visible dialog pauses native edge hiding",
+      "passed": true
+    },
+    {
+      "name": "collapsed dialog releases native edge hiding",
+      "passed": true
+    },
+    {
+      "name": "expanded panel hides at left",
+      "passed": true
+    },
+    {
+      "name": "expanded left preserves size",
+      "passed": true
+    },
+    {
+      "name": "expanded panel hides at top",
+      "passed": true
+    },
+    {
+      "name": "expanded top preserves size",
+      "passed": true
+    },
+    {
+      "name": "expanded panel hides at bottom",
+      "passed": true
+    },
+    {
+      "name": "expanded bottom preserves size",
+      "passed": true
+    }
+  ],
+  "compact": {
+    "inner": {
+      "height": 168,
+      "width": 156
+    },
+    "outer": {
+      "height": 168,
+      "width": 156
+    },
+    "scale": 1.5
+  },
+  "evidence": "artifacts/validation/windows-desktop-9ed8d017b6d444889f0251e66646e322/verified.json",
+  "additional": [
+    "native IPC core 31 passed",
+    "native restart restore 5 passed",
+    "four edge animations and collapsed dialog browser regression passed",
+    "native screenshot: 104x112 local preview window"
+  ],
+  "screenshot": "docs/assets/windows-local-compact.png"
+}

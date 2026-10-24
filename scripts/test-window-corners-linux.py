@@ -43,6 +43,11 @@ checks = []
 executable = os.environ.get("GATHERPACK_TEST_EXECUTABLE", "/var/cache/easy-pack/target/release/gatherpack")
 with tempfile.TemporaryDirectory(prefix="gatherpack-corners-") as directory:
     env = {**os.environ, "XDG_DATA_HOME": directory, "XDG_CONFIG_HOME": directory, "XDG_CACHE_HOME": directory}
+    # Position/corner checks intentionally move a tall panel past screen edges.
+    # Isolate that geometry regression from separately tested auto-hide behavior.
+    profile = Path(directory) / 'io.github.dogchenya.gatherpack'
+    profile.mkdir()
+    (profile / 'state.json').write_text(json.dumps({'paths':[], 'settings':{'edgeHide':False}}))
     system = Path("/usr/share/nautilus-python/extensions/gatherpack_selection.py")
     shadow = Path(directory) / "nautilus-python/extensions/gatherpack_selection.py"
     if system.exists():

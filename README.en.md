@@ -19,7 +19,7 @@ On first launch, GatherPack imports the collection, settings, and reports from a
 
 | Feature | How it works |
 | --- | --- |
-| Sliding edge hide | Move either the compact icon or expanded panel within about 32 pixels of a left/right screen edge. It slides out about 0.8 seconds after the pointer leaves, keeping only a wake-up tab. Hover to slide back to the same view and dimensions; the expanded window remains resizable. Dialogs, file choosers and packing pause hiding. |
+| Sliding edge hide | Move either the compact icon or expanded panel within about 32 pixels of any of the four screen edges. It slides out about 0.8 seconds after the pointer leaves, keeping only a wake-up tab (horizontal at top/bottom, vertical at left/right). Hover to slide back to the same view and dimensions; the expanded window remains resizable. Dialogs, file choosers and packing pause hiding. |
 | Remove in the canvas | Select a file or folder in File graph and choose Remove from this archive, including nested items. Removing a folder excludes its subtree. Undo restores inclusion; original files stay in place. Exclusions are saved with the collection. Add the source again to restore inclusion. |
 | Chinese / English | Choose Interface language in Settings for an immediate preview. Save to keep it after restarting, or cancel to restore the previous language. Simplified Chinese is the default. |
 | Linux connection diagnostics | Open Local collection → Check file manager connection to inspect the resident Nautilus process, Python loader and desktop session. Checking closes no windows. |
@@ -27,27 +27,27 @@ On first launch, GatherPack imports the collection, settings, and reports from a
 
 Disable edge hiding in Settings if preferred; edge hiding works independently of keeping the window on top. A registered shortcut and a connected Nautilus extension are separate states. When the bridge is disconnected, use connection diagnostics instead of repeatedly installing dependencies that are already present.
 
-<img src="docs/assets/edge-slide-alpha13.gif" width="156" alt="Native floating widget sliding out and back in">
+<img src="docs/assets/edge-slide-v1.0.0.gif" width="156" alt="Native floating widget sliding out and back in">
 
 *Native GNOME/X11 recording with an empty collection. The expanded panel also supports sliding edge hide. System reduced-motion preferences simplify animations.*
 
-<img src="docs/assets/shelf-alpha13.png" width="440" alt="GatherPack collection shelf">
+<img src="docs/assets/shelf-v1.0.0.png" width="440" alt="GatherPack collection shelf">
 
-*alpha.13 production frontend with sample files. The app supports Simplified Chinese and English. Simplified Chinese is the default; switch languages in Settings.*
+*1.0.0 production frontend with sample files. The app supports Simplified Chinese and English. Simplified Chinese is the default; switch languages in Settings.*
 
-<img src="docs/assets/settings-alpha13-en.png" width="360" alt="Interface language and edge hiding settings">
+<img src="docs/assets/settings-v1.0.0-en.png" width="360" alt="Interface language and edge hiding settings">
 
-The area outside the rounded window stays transparent, and legacy user extensions shadowing the system Nautilus bridge are handled. If Ubuntu still reports a disconnected bridge after upgrading, use the checks and reconnection in Local collection. Finish file operations before confirming the extension reload.
+Windows no longer adds an extra native white frame. The area outside the rounded window stays transparent, and legacy user extensions shadowing the system Nautilus bridge are handled. If Ubuntu still reports a disconnected bridge after upgrading, use the checks and reconnection in Local collection. Finish file operations before confirming the extension reload.
 
 Switching repeatedly between the collection and file graph preserves the current vertical position and custom window height.
 
 The redesigned shelf adds undo, source relinking, window pinning, and continued collection during packing. See [UI and interaction notes](docs/ui-redesign.md).
 
-Both the icon and expanded panel slide out at screen edges and return on hover, independently of keeping the window on top. Linux provides resident process diagnostics and confirmed reconnection.
+Both the icon and expanded panel slide out at all four edges, including when partly dragged off-screen, and return on hover, independently of keeping the window on top. Linux provides resident process diagnostics and confirmed reconnection.
 
-<img src="docs/assets/graph-alpha13.png" width="900" alt="Remove a selected file or folder from the archive">
+<img src="docs/assets/graph-v1.0.0.png" width="900" alt="Remove a selected file or folder from the archive">
 
-*alpha.13 production UI with sample files showing canvas removal.*
+*1.0.0 production UI with sample files showing canvas removal.*
 
 ## Features
 
@@ -64,17 +64,20 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 ## Download and install
 
-Current version: **0.1.0-alpha.13**. This is an Alpha release candidate, with installers distributed through GitHub Releases. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
+Stable versions use `vMAJOR.MINOR.PATCH` tags. Historical Alpha versions remain prereleases; prefer the stable release marked Latest. See [release and branch policy](docs/releasing.md).
 
-Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.13), choose your platform under **Assets**, and install the package. No GitHub sign-in is required. Separate platform artifacts remain available in GitHub Actions.
+
+Current version: **1.0.0**. This is the first stable release, with installers distributed through GitHub Releases. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
+
+Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/tag/v1.0.0), choose your platform under **Assets**, and install the package. No GitHub sign-in is required. Separate platform artifacts remain available in GitHub Actions.
 
 | Platform | Artifact | Installation |
 | --- | --- | --- |
-| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.13_x64-setup.exe) | Run the `.exe` installer |
-| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-aarch64-apple-darwin-GatherPack_0.1.0-alpha.13_aarch64.dmg) | Open the `.dmg` and drag the app into Applications |
-| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-apple-darwin-GatherPack_0.1.0-alpha.13_x64.dmg) | Open the `.dmg` and drag the app into Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.13_amd64.deb) | Install the `.deb` |
-| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.13_amd64.AppImage) | Make the `.AppImage` executable and run it |
+| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-pc-windows-msvc-GatherPack_1.0.0_x64-setup.exe) | Run the `.exe` installer |
+| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-aarch64-apple-darwin-GatherPack_1.0.0_aarch64.dmg) | Open the `.dmg` and drag the app into Applications |
+| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-apple-darwin-GatherPack_1.0.0_x64.dmg) | Open the `.dmg` and drag the app into Applications |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-unknown-linux-gnu-GatherPack_1.0.0_amd64.deb) | Install the `.deb` |
+| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-unknown-linux-gnu-GatherPack_1.0.0_amd64.AppImage) | Make the `.AppImage` executable and run it |
 
 Quit the previous GatherPack version before upgrading on Ubuntu. For a disconnected bridge, use the in-app connection diagnostics and confirmed reconnection. If it still fails, copy diagnostics and see [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english). The app never automatically interrupts file-manager operations and distinguishes missing dependencies from an installed but unloaded bridge.
 

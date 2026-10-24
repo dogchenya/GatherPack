@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import signal
 import subprocess
@@ -134,6 +135,8 @@ def choose_language(label, key):
 
 try:
     process, window = launch()
+    work_area = [int(n) for n in re.findall(r'-?\d+', command('xprop','-root','_NET_WORKAREA').split('=',1)[1])][:4]
+    work_top, work_bottom = work_area[1], work_area[1]+work_area[3]
     check("展开收集面板" in text(), "fresh profile starts in Simplified Chinese")
     command("xdotool", "windowmove", window, "24", "160")
     command("xdotool", "mousemove", "--sync", "31", "165")
@@ -164,6 +167,17 @@ try:
     command("xdotool", "mousemove", "--sync", "1275", str(hidden["Y"] + 40))
     wait(lambda: geometry()["WIDTH"] == 104 and geometry()["X"] == 1176, "right hover must restore")
     check(geometry()["X"] == 1176, "right edge reveal preserves its anchor")
+    for edge, top, wake_y in [('top', work_top, work_top+5), ('bottom', work_bottom-112, work_bottom-5)]:
+        command("xdotool", "windowmove", window, "300", str(top))
+        command("xdotool", "mousemove", "--sync", "900", "450")
+        wait(lambda: geometry()["HEIGHT"] == 10, edge + " edge must become a horizontal wake tab")
+        hidden = geometry()
+        check(hidden['WIDTH'] == 112 and hidden['Y'] == (work_top if edge == 'top' else work_bottom-10), edge + ' horizontal tab stays in the work area')
+        command('xdotool','mousemove','--sync',str(hidden['X']+56),str(wake_y))
+        wait(lambda: geometry()['WIDTH'] == 104 and geometry()['HEIGHT'] == 112, edge + ' hover restores compact dimensions')
+        check(geometry()['X'] == 300, edge + ' reveal preserves the horizontal anchor')
+    command('xdotool','windowmove',window,'300','160')
+    command('xdotool','mousemove','--sync','350','200')
     click("展开收集面板")
     wait(lambda: geometry()["WIDTH"] == 440, "compact icon must open normally after reveal")
     click("置顶窗口")
@@ -176,6 +190,14 @@ try:
     command("xdotool", "mousemove", "--sync", "5", str(hidden["Y"] + 40))
     wait(lambda: geometry()["WIDTH"] == 440 and geometry()["HEIGHT"] == 760, "hover must restore expanded panel dimensions")
     check(geometry()["Y"] == 80, "expanded reveal preserves the original panel position")
+    for edge, top in [('top',work_top),('bottom',work_bottom-760)]:
+        command('xdotool','windowmove',window,'200',str(top))
+        command('xdotool','mousemove','--sync','1100','450')
+        wait(lambda: geometry()['HEIGHT'] == 10, 'expanded ' + edge + ' hides')
+        hidden=geometry()
+        command('xdotool','mousemove','--sync',str(hidden['X']+56),str(hidden['Y']+5))
+        wait(lambda: geometry()['WIDTH'] == 440 and geometry()['HEIGHT'] == 760, 'expanded ' + edge + ' restores size')
+        check(geometry()['X'] == 200 and geometry()['Y'] == top, 'expanded ' + edge + ' restores its anchor')
     command("xdotool", "windowmove", window, "200", "80")
     command("xdotool", "windowsize", window, "440", "600")
     wait(lambda: geometry()["HEIGHT"] == 600, "a restored expanded panel must remain resizable")

@@ -3,7 +3,8 @@ import { createContext, useContext, useEffect, type ReactNode } from 'react';
 export type Language = 'zh-CN' | 'en';
 // Chinese source keys keep persisted diagnostics readable across app versions.
 // Only UI/diagnostic text is translated. File names and paths are never keys.
-const rows = String.raw`从本次打包移除|Remove from this archive
+const rows = String.raw`本地预览|Local preview
+从本次打包移除|Remove from this archive
 移除仅影响打包，源文件保留原处|Removal affects this archive only. Originals stay in place.
 已从本次打包移除，源文件保留原处|Removed from this archive. Originals stay in place.
 请使用桌面程序连接系统能力|Use the desktop app to connect to system features

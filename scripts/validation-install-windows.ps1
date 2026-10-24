@@ -25,6 +25,11 @@ $checks.Add('Installed Rust standard-library copyright text matches the original
 & node (Join-Path $PSScriptRoot 'test-native.mjs') $executable
 if ($LASTEXITCODE -ne 0) { throw 'Installed executable failed native IPC validation' }
 $checks.Add('Installed executable passes core and restart native IPC scenarios')
+$desktopPath = Join-Path $workspace 'artifacts/validation/windows-installed-desktop-report.json'
+& (Join-Path $PSScriptRoot 'test-desktop-windows.ps1') -Executable $executable -ReportPath $desktopPath
+$desktop = Get-Content -LiteralPath $desktopPath -Raw | ConvertFrom-Json
+if (-not $desktop.passed) { throw 'Installed executable failed native desktop checks' }
+$checks.Add('Installed executable passes 26 four-edge, crossed-edge and dialog native desktop checks')
 $uninstaller = @(Get-ChildItem -LiteralPath $installPath -Filter '*uninstall*.exe')
 if ($uninstaller.Count -ne 1) { throw 'Expected exactly one test uninstaller' }
 $process = Start-Process -FilePath $uninstaller[0].FullName -ArgumentList '/S' -WindowStyle Hidden -Wait -PassThru
@@ -34,7 +39,7 @@ if (Test-Path -LiteralPath $executable) { throw 'Uninstall left the application 
 $remaining = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue | Where-Object { $_.InstallLocation -eq $installPath }
 if ($remaining) { throw 'Uninstall left its registration behind' }
 $checks.Add('Silent uninstall removes the executable and installation registration')
-$report = @{ passed=$true; installer=$installerPath; installerSHA256=(Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant(); installation=$installPath; checks=$checks }
+$report = @{ passed=$true; installer=$installerPath; installerSHA256=(Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant(); installation=$installPath; checks=$checks; desktopValidation=@{passed=$desktop.passed;commit=$desktop.commit;executableSHA256=$desktop.executableSHA256;checks=$desktop.report.checks} }
 if (-not $ReportPath) { $ReportPath = Join-Path $workspace 'artifacts\validation\windows-install-report.json' }
-$report | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $ReportPath -Encoding utf8
-$report | ConvertTo-Json -Depth 5
+$report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $ReportPath -Encoding utf8
+$report | ConvertTo-Json -Depth 10

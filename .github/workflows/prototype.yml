@@ -29,6 +29,7 @@ jobs:
       - run: node scripts/test-graph.mjs
       - run: node scripts/test-i18n.mjs
       - run: node scripts/test-collect-artifacts.mjs
+      - run: node scripts/test-release-preparation.mjs
       - run: python3 scripts/test-linux-bridge-diagnostics.py
       - run: python3 scripts/test-connection-diagnostics.py
       - run: pnpm exec playwright install --with-deps chromium
@@ -138,6 +139,12 @@ jobs:
             node scripts/test-native.mjs "target/$REQUESTED_TARGET/release/gatherpack"
           fi
       - run: node scripts/collect-artifacts.mjs ${{ matrix.target }}
+      - name: Validate delivered Windows installer and four-edge desktop behavior
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $installer = (Get-ChildItem "artifacts/${{ matrix.target }}" -Filter *.exe).FullName
+          ./scripts/validation-install-windows.ps1 -Installer $installer -ReportPath artifacts/validation/windows-installer-report.json
       - name: Upload native validation evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -146,6 +153,7 @@ jobs:
           path: |
             artifacts/validation/**/native-*.json
             artifacts/validation/glibc-*.json
+            artifacts/validation/windows-installer-report.json
           if-no-files-found: warn
       - uses: ./.github/actions/upload-installers
         with:
@@ -192,26 +200,4 @@ jobs:
             artifacts/validation/**/native-*.json
             artifacts/validation/profile-migration-report.json
           if-no-files-found: error
-
-  draft-release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [installers, linux-package-compatibility]
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: release-assets
-      - name: Create draft release only
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.ref_name }}
-        run: |
-          gh release create "$RELEASE_TAG" --draft --verify-tag --title "GatherPack $RELEASE_TAG" --notes "File collection and archive alpha. Review docs/prototype-validation.md for desktop compatibility and remaining verification."
-          find release-assets -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.deb' -o -name '*.AppImage' -o -name '*-corresponding-source.tar' -o -name '*-provenance.json' \) -print0 | xargs -0 -r gh release upload "$RELEASE_TAG"
-          gh release upload "$RELEASE_TAG" "$(find release-assets -name THIRD_PARTY_NOTICES.md -print -quit)" "$(find release-assets -name LICENSE -print -quit)" "$(find release-assets -name third-party.md -print -quit)" "$(find release-assets -name license-audit.json -print -quit)"
-          find release-assets -name SHA256SUMS.txt -exec cat {} + > SHA256SUMS.txt
-          gh release upload "$RELEASE_TAG" SHA256SUMS.txt
 

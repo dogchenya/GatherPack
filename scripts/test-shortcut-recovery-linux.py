@@ -100,7 +100,7 @@ def expand(window):
     command("xdotool", "mousemove", str(bounds["X"] + bounds["WIDTH"] // 2), str(bounds["Y"] + min(44, bounds["HEIGHT"] // 2)))
     wait(lambda: geometry(window)["WIDTH"] >= 80, "Hover must reveal the tested instance")
     time.sleep(.5)
-    command("xdotool", "windowmove", window, "100", "40")
+    command("xdotool", "windowmove", window, "100", "100")
     focus(window)
     bounds = geometry(window)
     command("xdotool", "mousemove", str(bounds["X"] + 52), str(bounds["Y"] + 44), "click", "1")

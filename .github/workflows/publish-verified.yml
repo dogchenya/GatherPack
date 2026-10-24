@@ -62,13 +62,14 @@ jobs:
           github-token: ${{ github.token }}
       - name: Verify source, installer checksums and mounted DMG evidence
         run: node scripts/prepare-verified-release.mjs downloaded release-assets
-      - name: Prepare reviewable prerelease
+      - name: Prepare reviewable release
         run: |
           tag=$(cat release-assets/release-tag.txt)
+          prerelease=$(cat release-assets/release-prerelease.txt)
           if gh api "repos/$GH_REPO/git/ref/tags/$tag" --jq '.object.sha' > release-tag-sha.txt; then
             test "$(cat release-tag-sha.txt)" = "$BUILD_COMMIT"
-            gh release create "$tag" --verify-tag --draft --prerelease --title "GatherPack $tag" --notes-file release-assets/release-notes.md
+            gh release create "$tag" --verify-tag --draft --prerelease="$prerelease" --latest=false --title "GatherPack $tag" --notes-file release-assets/release-notes.md
           else
-            gh release create "$tag" --draft --prerelease --target "$BUILD_COMMIT" --title "GatherPack $tag" --notes-file release-assets/release-notes.md
+            gh release create "$tag" --draft --prerelease="$prerelease" --latest=false --target "$BUILD_COMMIT" --title "GatherPack $tag" --notes-file release-assets/release-notes.md
           fi
-          find release-assets -maxdepth 1 -type f ! -name release-tag.txt ! -name release-notes.md -print0 | xargs -0 -r gh release upload "$tag"
+          find release-assets -maxdepth 1 -type f ! -name release-tag.txt ! -name release-notes.md ! -name release-prerelease.txt -print0 | xargs -0 -r gh release upload "$tag"

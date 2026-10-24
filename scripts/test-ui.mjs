@@ -50,6 +50,7 @@ try {
           case 'clear_entries': window.__undoEntries = structuredClone(state.entries); state.entries = []; break;
           case 'undo_collection': state.entries = [...window.__undoEntries, ...state.entries.filter(e => !window.__undoEntries.some(old => old.path === e.path))]; if (window.__canvasUndo) { window.__previewPlan = window.__canvasUndo; delete window.__canvasUndo; state.excluded = []; } break;
           case 'set_pinned': window.__pinned = args.pinned; return;
+          case 'set_edge_blocked': window.__edgeBlocked = args.blocked; return;
           case 'set_panel_wide': window.__wide = args.wide; return;
           case 'prepare': return state.entries.length ? structuredClone(window.__previewPlan ?? plan) : { ...plan, sources: [], entries: [], issues: [], renames: [], files: 0, totalBytes: 0 };
           case 'plugin:window|start_dragging': window.__dragCount = (window.__dragCount ?? 0) + 1; return;
@@ -269,6 +270,14 @@ try {
   await page.getByRole('button', {name:'已结束文件操作，继续重连',exact:true}).click();
   await page.getByRole('status').filter({hasText:'文件管理器桥接已连接'}).waitFor();
   assert.deepEqual(await page.evaluate(() => window.__connectionCalls),[false,true]);
+  assert.equal(await page.evaluate(() => window.__edgeBlocked),true,'a visible connection dialog pauses edge hiding');
+  await page.evaluate(() => { window.__testState.expanded=false; window.__emitTestState(); });
+  await page.locator('.compact').waitFor();
+  await page.waitForTimeout(50);
+  assert.equal(await page.evaluate(() => window.__edgeBlocked),false,'a collapsed dialog must not leave compact edge hiding blocked');
+  await page.getByRole('button', {name:'展开收集面板',exact:true}).click();
+  await page.getByRole('button', {name:'完成',exact:true}).waitFor();
+  assert.equal(await page.evaluate(() => window.__edgeBlocked),true,'reopened visible dialog pauses hiding again');
   await page.getByRole('button', {name:'完成',exact:true}).click();
   await page.evaluate(() => { window.__testState.expanded=false; window.__testState.dockMotion={side:'right',revealing:false}; window.__emitTestState(); });
   await page.locator('.compact.edge-hiding.edge-right').waitFor();
@@ -277,6 +286,16 @@ try {
   await page.evaluate(() => { window.__testState.dockMotion={side:'right',revealing:true}; window.__emitTestState(); });
   await page.waitForTimeout(450);
   assert.ok(await page.locator('.compact').evaluate(e=>Math.abs(e.getBoundingClientRect().x-5)<1),'the reveal animation returns the icon to its original position');
+  for (const side of ['top','bottom']) {
+    await page.evaluate(side => { window.__testState.dockMotion={side,revealing:false}; window.__emitTestState(); },side);
+    await page.locator(`.compact.edge-hiding.edge-${side}`).waitFor();
+    await page.waitForTimeout(450);
+    const y = await page.locator('.compact').evaluate(e=>e.getBoundingClientRect().y);
+    assert.ok(side === 'top' ? y < -95 : y > 105, `${side} slides vertically outside the viewport`);
+    await page.evaluate(side => { window.__testState.dockMotion={side,revealing:true}; window.__emitTestState(); },side);
+    await page.waitForTimeout(450);
+    assert.ok(await page.locator('.compact').evaluate(e=>Math.abs(e.getBoundingClientRect().y-5)<1),`${side} returns to the compact anchor`);
+  }
   await page.evaluate(data => { Object.assign(window.__testState,data.state); window.__testState.dockMotion=null; window.__previewPlan=data.plan; window.__emitTestState(); },fixtureBeforeLanguage);
   if (process.env.CAPTURE_UI === '1') {
     await page.setViewportSize({ width: 440, height: 760 });
@@ -298,18 +317,18 @@ try {
     await page.locator('.collection-summary').getByText('7 个文件', { exact: false }).waitFor();
     await page.locator('.toast').waitFor({ state: 'hidden' });
     await mkdir('docs/assets', { recursive: true });
-    await page.screenshot({ path: 'docs/assets/shelf-alpha13.png' });
+    await page.screenshot({ path: 'docs/assets/shelf-v1.0.0.png' });
     await page.getByRole('button', {name:'设置',exact:true}).click();
-    await page.screenshot({path:'docs/assets/settings-alpha13-zh.png'});
+    await page.screenshot({path:'docs/assets/settings-v1.0.0-zh.png'});
     await page.getByRole('combobox', {name:'界面语言'}).selectOption('en');
     await page.getByRole('heading', {name:'App settings'}).waitFor();
-    await page.screenshot({path:'docs/assets/settings-alpha13-en.png'});
+    await page.screenshot({path:'docs/assets/settings-v1.0.0-en.png'});
     await page.getByRole('button', {name:'Cancel',exact:true}).click();
     await page.setViewportSize({ width: 900, height: 760 });
     await page.getByRole('button', { name: '文件关系图', exact: true }).click();
     await page.getByRole('button', { name: '文件夹：设计素材', exact: true }).click();
     await page.getByRole('button', { name: '适应画布', exact: true }).click();
-    await page.screenshot({ path: 'docs/assets/graph-alpha13.png' });
+    await page.screenshot({ path: 'docs/assets/graph-v1.0.0.png' });
   }
   console.log('UI integration passed (including 440px shelf/modal bounds, undo, native pin, graph width, keyboard capture/focus trap/Escape): collect, graph selection/issues/zoom/reveal, shortcut retry, full-header and compact-icon drag/click separation, preview, packing isolation and report; no page errors.');
 } finally { await browser.close(); server.close(); }

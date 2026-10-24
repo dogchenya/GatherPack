@@ -24,6 +24,12 @@
 
 [四平台构建与双 Ubuntu 兼容性检查](https://github.com/dogchenya/GatherPack/actions/runs/40052750295)、[两种 Mac 实际 DMG 检查](https://github.com/dogchenya/GatherPack/actions/runs/40053533779)均已通过。
 
+实际 AppImage 通过[18 项贴边与语言检查](validation/alpha13-appimage-features.json)、[受污染宿主的确认重连](validation/alpha13-appimage-connection.json)、[22 项快捷键恢复](validation/alpha13-appimage-shortcuts.json)、31 项原生核心 IPC 和 5 项重启恢复。使用 Ubuntu 24.04 独立 GNOME/X11 桌面的解压运行方式，报告绑定实际包 SHA256：`12057e7648d2a88595a8577e447ffb6f6c5ba741a230f373008b106f06e11539`。
+
+[发布资源检查](https://github.com/dogchenya/GatherPack/actions/runs/40053903398)通过，18 项资源完整上传。[工件核验](validation/alpha13-artifact-verification.json)确认六份安装包及对应源码的 GitHub 摘要与 SHA256SUMS 一致，实际下载测试的 Windows、DEB 和 AppImage 与发布资源逐项一致。
+
+[v0.1.0-alpha.13 已公开发布](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.13)。标签与发布目标均为上述应用产物提交；发布页与 DEB 下载匿名访问均返回 HTTP 200。
+
 ## alpha.12 滑动隐藏与实际文件管理器重连
 
 - 置顶状态下，收起图标和展开清单均支持左右贴边滑出；悬停滑回，并恢复原视图、宽度、高度和纵向位置。保留 10×112 的屏内唤回条。动画为 360ms，原生窗口在动画结束后才缩为唤回条，避免内容被提前裁掉；尊重减少动态效果偏好。

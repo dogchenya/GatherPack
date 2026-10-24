@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "executableSHA256": "12057e7648d2a88595a8577e447ffb6f6c5ba741a230f373008b106f06e11539",
+  "packageSHA256": "12057e7648d2a88595a8577e447ffb6f6c5ba741a230f373008b106f06e11539",
+  "checks": [
+    "reproduced an alive Nautilus whose Python environment prevents bridge loading",
+    "read-only diagnostics do not close the file manager",
+    "restart waits for explicit file-operation consent",
+    "foreign extensions are protected and a refused repair does not restart Nautilus",
+    "confirmed in-app repair replaces the poisoned host and connects the live bridge",
+    "repaired global collection preserves the clipboard",
+    "reconnection and collection preserve original source bytes"
+  ]
+}

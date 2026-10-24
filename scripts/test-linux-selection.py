@@ -440,6 +440,9 @@ try:
             time.sleep(.1)
         check(str(retry_source) in json.loads(state_file.read_text())["paths"], "re-register button restores actual foreground collection hotkey")
         click_app_button("展开收集面板")
+        # The earlier native-drop setup can leave the tall panel at the bottom
+        # work-area limit. Give this independent down/right drag room to move.
+        command("xdotool", "windowmove", app_window, "200", "80")
         focus(app_window)
         expanded_before = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
         ex, ey = int(expanded_before["X"]), int(expanded_before["Y"])
@@ -448,6 +451,7 @@ try:
             command("xdotool", "mousemove", str(ex + 180 + i * 9), str(ey + 25 + i * 5)); time.sleep(.05)
         command("xdotool", "mouseup", "1"); time.sleep(.3)
         expanded_after = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())
+        (evidence / "linux-header-drag-geometry.json").write_text(json.dumps({"before":expanded_before,"after":expanded_after},indent=2))
         check(int(expanded_after["X"]) > ex + 20 and int(expanded_after["Y"]) > ey + 10, "expanded panel moves from its broad sticky header")
         click_app_button("收起面板"); time.sleep(.4)
         compact = dict(line.split("=", 1) for line in command("xdotool", "getwindowgeometry", "--shell", app_window).splitlines())

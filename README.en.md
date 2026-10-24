@@ -39,11 +39,11 @@ Disable edge hiding in Settings if preferred; edge hiding works independently of
 
 The area outside the rounded window stays transparent, and legacy user extensions shadowing the system Nautilus bridge are handled. If Ubuntu still reports a disconnected bridge after upgrading, use the checks and reconnection in Local collection. Finish file operations before confirming the extension reload.
 
-alpha.10 fixes upward window drift when switching repeatedly between the collection and file graph, preserving the current vertical position and custom window height.
+Switching repeatedly between the collection and file graph preserves the current vertical position and custom window height.
 
 The redesigned shelf adds undo, source relinking, window pinning, and continued collection during packing. See [UI and interaction notes](docs/ui-redesign.md).
 
-alpha.12 adds sliding edge animations for both the icon and expanded panel, resident Linux process diagnostics and confirmed reconnection, while retaining alpha.11's Chinese/English preference.
+Both the icon and expanded panel slide out at screen edges and return on hover, independently of keeping the window on top. Linux provides resident process diagnostics and confirmed reconnection.
 
 <img src="docs/assets/graph-alpha13.png" width="900" alt="Remove a selected file or folder from the archive">
 
@@ -56,7 +56,7 @@ alpha.12 adds sliding edge animations for both the icon and expanded panel, resi
 - **Chinese and English**: Simplified Chinese by default; choose English in Settings and save it for future launches.
 - **Three archive formats**: ZIP, 7z, and tar.gz, with a saved default and an override for individual tasks.
 - **Preview before packing**: review the archive structure, renamed entries, and unavailable sources before starting.
-- **File relationship graph**: explore folders and files as expanding branches, zoom or pan the canvas, and reveal original locations.
+- **File relationship graph**: expand folders, zoom or pan, reveal original locations, or remove selected nodes from the archive with undo support.
 - **Preserve your originals**: collection stores paths; removing entries, clearing the list, or cancelling never deletes or moves source files.
 - **Keep organizing**: background packing, progress and cancellation, result reports, and a collection that survives restarts.
 

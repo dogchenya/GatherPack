@@ -170,11 +170,14 @@ try:
     for edge, top, wake_y in [('top', work_top, work_top+5), ('bottom', work_bottom-112, work_bottom-5)]:
         command("xdotool", "windowmove", window, "300", str(top))
         command("xdotool", "mousemove", "--sync", "900", "450")
-        wait(lambda: geometry()["HEIGHT"] == 10, edge + " edge must become a horizontal wake tab")
+        expected_y = work_top if edge == 'top' else work_bottom-10
+        # GTK reports resize and move separately. Wait for the complete native
+        # geometry, so the assertion cannot sample the old position mid-update.
+        wait(lambda: geometry()["HEIGHT"] == 10 and geometry()["WIDTH"] == 112 and geometry()["Y"] == expected_y, edge + " edge must become an anchored horizontal wake tab")
         hidden = geometry()
         check(hidden['WIDTH'] == 112 and hidden['Y'] == (work_top if edge == 'top' else work_bottom-10), edge + ' horizontal tab stays in the work area')
         command('xdotool','mousemove','--sync',str(hidden['X']+56),str(wake_y))
-        wait(lambda: geometry()['WIDTH'] == 104 and geometry()['HEIGHT'] == 112, edge + ' hover restores compact dimensions')
+        wait(lambda: geometry()['WIDTH'] == 104 and geometry()['HEIGHT'] == 112 and geometry()['X'] == 300, edge + ' hover restores compact dimensions and anchor')
         check(geometry()['X'] == 300, edge + ' reveal preserves the horizontal anchor')
     command('xdotool','windowmove',window,'300','160')
     command('xdotool','mousemove','--sync','350','200')

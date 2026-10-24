@@ -1,0 +1,22 @@
+{
+  "reproduced": true,
+  "version": "0.1.0-alpha.12",
+  "packageSHA256": "308123242195eabadc76894114c063f21e99d1a22af95210849141ed5d8605cb",
+  "description": "Original delivered DEB remains 104px wide at x=24 after the pointer leaves; the candidate passes this same case.",
+  "expectedFailingBaseline": {
+    "passed": false,
+    "error": "left edge must become a 10px handle",
+    "checks": [
+      "fresh profile starts in Simplified Chinese",
+      "pointer inside the edge icon prevents hiding"
+    ],
+    "geometry": {
+      "WINDOW": 8388611,
+      "X": 24,
+      "Y": 160,
+      "WIDTH": 104,
+      "HEIGHT": 112,
+      "SCREEN": 0
+    }
+  }
+}

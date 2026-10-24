@@ -180,5 +180,23 @@
       "name": "all original sample files remain unchanged",
       "passed": true
     }
-  ]
+  ],
+  "packageSHA256": "71ff2b4a1670f1ab8d7b82270017bc5cbc75cb04ae371ad670da7a2d3dae2a6e",
+  "media": [
+    {
+      "path": "docs\\assets\\product-demo-v1.0.0.gif",
+      "bytes": 2591221,
+      "sha256": "39a7e5a4f10dbaeba05375f676a61a1d38dc5a69e2d80afc5292ebdea00c3251",
+      "width": 1120,
+      "height": 803,
+      "frames": 345,
+      "durationSeconds": 43.13
+    },
+    {
+      "path": "docs\\assets\\product-demo-v1.0.0.mp4",
+      "bytes": 567969,
+      "sha256": "b625fb9d6ce673a54a11bdc3f71a2898aa15cbeba515734be72854534c026081"
+    }
+  ],
+  "visualReview": "Chapter frames checked: collection, graph, exclusion, native save chooser and successful result; captions have a separate top bar and no hover tooltips obscure the UI."
 }

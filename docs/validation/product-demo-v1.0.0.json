@@ -1,0 +1,184 @@
+{
+  "passed": true,
+  "version": "1.0.0",
+  "environment": "Ubuntu 24.04 / GNOME X11",
+  "sampleFiles": true,
+  "executableSHA256": "a8b76a909fa9fa050db79e600ea2ff0a004ca96706f2dc4b6fa803476e8bc4e4",
+  "duration": 45.11,
+  "chapters": [
+    {
+      "at": 0.0,
+      "label": "Collect / 收集示例文件"
+    },
+    {
+      "at": 12.68,
+      "label": "Explore / 文件画布"
+    },
+    {
+      "at": 23.61,
+      "label": "Organize / 移除与撤销"
+    },
+    {
+      "at": 31.99,
+      "label": "Pack / 检查并打包"
+    },
+    {
+      "at": 40.92,
+      "label": "Done / 打包完成"
+    }
+  ],
+  "checks": [
+    {
+      "name": "native accessible 添加文件 action",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 清空清单 action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 添加文件夹 action",
+      "passed": true
+    },
+    {
+      "name": "folder chooser exposes its visible filesystem Home location",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 添加文件 action",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "real native choosers collect the two sample sources",
+      "passed": true
+    },
+    {
+      "name": "native accessible 文件关系图 action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 文件夹：project-assets action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 文件夹：design action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 文件：interface.txt action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 适应画布 action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 文件：draft.txt action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 从本次打包移除 action",
+      "passed": true
+    },
+    {
+      "name": "canvas removal persists exclusion",
+      "passed": true
+    },
+    {
+      "name": "native accessible 撤销 action",
+      "passed": true
+    },
+    {
+      "name": "undo restores sample file inclusion",
+      "passed": true
+    },
+    {
+      "name": "native accessible 收集清单 action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 检查并打包 → action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 选择保存位置 action",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native accessible 开始打包 action",
+      "passed": true
+    },
+    {
+      "name": "real Rust backend produces the demonstrated archive",
+      "passed": true
+    },
+    {
+      "name": "archive content matches sample meeting-notes.txt",
+      "passed": true
+    },
+    {
+      "name": "archive content matches sample project-assets/draft.txt",
+      "passed": true
+    },
+    {
+      "name": "archive content matches sample project-assets/budget.csv",
+      "passed": true
+    },
+    {
+      "name": "archive content matches sample project-assets/design/interface.txt",
+      "passed": true
+    },
+    {
+      "name": "all original sample files remain unchanged",
+      "passed": true
+    }
+  ]
+}

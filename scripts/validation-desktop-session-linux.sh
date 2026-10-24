@@ -2,7 +2,7 @@
 set -euo pipefail
 export DISPLAY=:88 XDG_SESSION_TYPE=x11 GDK_BACKEND=x11 LC_ALL=C.UTF-8 LANG=C.UTF-8
 if [ "${1:-selection}" = native ]; then export DISPLAY=:89; fi
-if [[ "${1:-selection}" = gnome || "${1:-selection}" = shortcuts || "${1:-selection}" = drag || "${1:-selection}" = layout || "${1:-selection}" = features || "${1:-selection}" = connection ]]; then export DISPLAY=:90 XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome GNOME_SHELL_SESSION_MODE=user; fi
+if [[ "${1:-selection}" = gnome || "${1:-selection}" = shortcuts || "${1:-selection}" = drag || "${1:-selection}" = layout || "${1:-selection}" = demo || "${1:-selection}" = features || "${1:-selection}" = connection ]]; then export DISPLAY=:90 XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome GNOME_SHELL_SESSION_MODE=user; fi
 export XDG_RUNTIME_DIR=/tmp/gatherpack-runtime-2000
 export GTK_A11Y=atspi NO_AT_BRIDGE=0 WEBKIT_DISABLE_DMABUF_RENDERER=1
 export GIO_USE_VFS=local GIO_USE_VOLUME_MONITOR=unix
@@ -17,7 +17,7 @@ Xvfb "$DISPLAY" -screen 0 1280x900x24 -nolisten tcp >/work/artifacts/validation/
 xvfb_pid=$!
 trap 'kill "$xvfb_pid" 2>/dev/null || true' EXIT
 for i in $(seq 1 50); do if xdpyinfo >/dev/null 2>&1; then break; fi; sleep .1; done
-if [[ "${1:-selection}" = gnome || "${1:-selection}" = shortcuts || "${1:-selection}" = drag || "${1:-selection}" = layout || "${1:-selection}" = features || "${1:-selection}" = connection ]]; then
+if [[ "${1:-selection}" = gnome || "${1:-selection}" = shortcuts || "${1:-selection}" = drag || "${1:-selection}" = layout || "${1:-selection}" = demo || "${1:-selection}" = features || "${1:-selection}" = connection ]]; then
   gsettings set org.gnome.desktop.interface enable-animations false
   gnome-shell --x11 --replace >/work/artifacts/validation/gnome-shell.log 2>&1 &
   shell_pid=$!
@@ -29,6 +29,7 @@ fi
 case "${1:-selection}" in
   migration) cd /work; node scripts/test-profile-migration.mjs "${2:-/var/cache/easy-pack/target/release/gatherpack}" ;;
   native) cd /work; node scripts/test-native.mjs "${2:-/var/cache/easy-pack/target/release/gatherpack}" ;;
+  demo) python3 /work/scripts/record-product-demo-linux.py ;;
   features) python3 /work/scripts/test-edge-language-linux.py ;;
   connection) python3 /work/scripts/test-connection-repair-linux.py ;;
   layout) python3 /work/scripts/test-window-corners-linux.py ;;

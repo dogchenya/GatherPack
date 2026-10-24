@@ -13,9 +13,7 @@
 
 GatherPack is a desktop file collection and archiving tool for Windows, macOS, and Linux. Drop files and folders from different locations into a floating collection bar, organize the list, and export a ZIP, 7z, or tar.gz archive. Everything runs locally, without an account or network connection.
 
-On first launch, GatherPack imports the collection, settings, and reports from an existing easy_pack profile while keeping the original data. If you use launch at login, re-enable it in Settings after migration. On macOS, grant Finder Automation permission when prompted.
-
-## Latest features and how to use them
+## Features and how to use them
 
 | Feature | How it works |
 | --- | --- |
@@ -37,11 +35,11 @@ Disable edge hiding in Settings if preferred; edge hiding works independently of
 
 <img src="docs/assets/settings-v1.0.0-en.png" width="360" alt="Interface language and edge hiding settings">
 
-Windows no longer adds an extra native white frame. The area outside the rounded window stays transparent, and legacy user extensions shadowing the system Nautilus bridge are handled. If Ubuntu still reports a disconnected bridge after upgrading, use the checks and reconnection in Local collection. Finish file operations before confirming the extension reload.
+The area outside the rounded window stays transparent. If Ubuntu reports a disconnected bridge, use the checks and reconnection in Local collection. Finish file operations before confirming the extension reload.
 
 Switching repeatedly between the collection and file graph preserves the current vertical position and custom window height.
 
-The redesigned shelf adds undo, source relinking, window pinning, and continued collection during packing. See [UI and interaction notes](docs/ui-redesign.md).
+The shelf supports undo, source relinking, window pinning, and continued collection during packing.
 
 Both the icon and expanded panel slide out at all four edges, including when partly dragged off-screen, and return on hover, independently of keeping the window on top. Linux provides resident process diagnostics and confirmed reconnection.
 
@@ -64,10 +62,7 @@ Folders retain their structure, hidden contents, and empty directories. Duplicat
 
 ## Download and install
 
-Stable versions use `vMAJOR.MINOR.PATCH` tags. Historical Alpha versions remain prereleases; prefer the stable release marked Latest. See [release and branch policy](docs/releasing.md).
-
-
-Current version: **1.0.0**. This is the first stable release, with installers distributed through GitHub Releases. Use this version on Ubuntu 22.04; the alpha.4 Linux packages require GLIBC 2.39 and do not support 22.04.
+Current stable version: **1.0.0**. Installers are available through GitHub Releases. The Linux DEB supports Ubuntu 22.04 and 24.04.
 
 Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/tag/v1.0.0), choose your platform under **Assets**, and install the package. No GitHub sign-in is required. Separate platform artifacts remain available in GitHub Actions.
 
@@ -79,7 +74,7 @@ Open [releases and downloads](https://github.com/dogchenya/GatherPack/releases/t
 | Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-unknown-linux-gnu-GatherPack_1.0.0_amd64.deb) | Install the `.deb` |
 | Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-unknown-linux-gnu-GatherPack_1.0.0_amd64.AppImage) | Make the `.AppImage` executable and run it |
 
-Quit the previous GatherPack version before upgrading on Ubuntu. For a disconnected bridge, use the in-app connection diagnostics and confirmed reconnection. If it still fails, copy diagnostics and see [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english). The app never automatically interrupts file-manager operations and distinguishes missing dependencies from an installed but unloaded bridge.
+Quit any running GatherPack instance before installing. For a disconnected bridge, use the in-app connection diagnostics and confirmed reconnection. If it still fails, copy diagnostics and see [Nautilus shortcut troubleshooting](docs/nautilus-shortcut.md#english). The app never automatically interrupts file-manager operations and distinguishes missing dependencies from an installed but unloaded bridge.
 
 Linux installers, corresponding source, and verification materials are separate downloads. For normal installation, choose either the `.deb` or AppImage. `x64`, `x86_64`, and `amd64` all mean 64-bit Intel/AMD; 32-bit x86 builds are currently unavailable.
 
@@ -87,7 +82,7 @@ The release includes a separate `corresponding-source.tar`; ordinary installatio
 
 Installers are unsigned, and the macOS packages are not notarized. Linux shortcut integration has been validated with **GNOME / X11 / Nautilus**; see [Linux integration](docs/development.en.md#linux-integration) for initial setup.
 
-See [UI and validation notes](docs/ui-redesign.md) for this release. Ubuntu GNOME/X11 covers actual drag/drop, collection shortcuts, native choosers, graph exploration, packing, and window movement. Full Windows/macOS file-manager interaction, Wayland, and other Linux file managers still need validation. Older evidence remains in the compatibility documentation.
+Ubuntu GNOME/X11 covers actual drag/drop, collection shortcuts, native choosers, graph exploration, packing, and window movement. Full Windows/macOS file-manager interaction, Wayland, and other Linux file managers still need validation.
 
 ## Getting started
 

@@ -13,9 +13,7 @@
 
 GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工具。把不同目录里的文件和文件夹拖进悬浮收集栏，整理好清单后，直接导出 ZIP、7z 或 tar.gz。整个过程在本机完成，无需账号或网络连接。
 
-旧版 easy_pack 用户首次启动时会导入清单、设置和报告；旧记录保留。迁移后如需开机启动，请在设置中重新启用；macOS 请按系统提示授予 Finder 自动化权限。
-
-## 新版功能与使用方法
+## 功能与使用方法
 
 | 功能 | 使用方法 |
 | --- | --- |
@@ -37,9 +35,9 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 <img src="docs/assets/settings-v1.0.0-zh.png" width="360" alt="界面语言和贴边隐藏设置">
 
-新版增加撤销整理、来源重新定位、实际窗口置顶及打包中的持续收集，详见 [界面与交互更新](docs/ui-redesign.md)。
+支持撤销整理、来源重新定位、窗口置顶及打包中的持续收集。
 
-Windows 不再保留多余的原生白框；窗口圆角外保持透明，旧用户扩展覆盖系统 Nautilus 桥接的问题也已修正。Ubuntu 升级后如仍提示未连接，请使用“本地收集连接”中的检查与重连功能，先结束文件操作，再确认重新加载扩展。
+窗口圆角外保持透明。Ubuntu 如提示未连接，请使用“本地收集连接”中的检查与重连功能，先结束文件操作，再确认重新加载扩展。
 
 反复切换清单与文件全景时，保留窗口当前位置和手动调整的高度。
 
@@ -52,7 +50,7 @@ Windows 不再保留多余的原生白框；窗口圆角外保持透明，旧用
 ## 功能
 
 - **跨目录收集**：拖入文件、整个文件夹，或通过快捷键收集文件管理器中的选中项。
-- **轻量悬浮栏**：整块图标与展开后的标题栏均可拖动；图标和清单均支持左右贴边滑动隐藏、悬停恢复，可在设置中关闭。
+- **轻量悬浮栏**：整块图标与展开后的标题栏均可拖动；图标和清单均支持上下左右贴边滑动隐藏、悬停恢复，可在设置中关闭。
 - **中英双语**：默认简体中文，在设置中切换 English，保存后下次启动沿用。
 - **三种压缩格式**：支持 ZIP、7z、tar.gz，保存默认格式，也可为单次任务临时切换。
 - **打包前预览**：查看包内目录结构、重名处理结果和不可用来源，确认后再开始。
@@ -64,10 +62,7 @@ Windows 不再保留多余的原生白框；窗口圆角外保持透明，旧用
 
 ## 下载与安装
 
-稳定版统一使用 `v主版本.次版本.修订版本` 标签，历史 Alpha 保留为预发布；请优先使用 Latest 标记的稳定版。参见[版本与分支约定](docs/releasing.md)。
-
-
-当前版本：**1.0.0**，首个稳定版本，安装包在 GitHub Releases 提供。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
+当前稳定版本：**1.0.0**。安装包在 GitHub Releases 提供，Linux DEB 支持 Ubuntu 22.04 和 24.04。
 
 打开 [发布与下载](https://github.com/dogchenya/GatherPack/releases/tag/v1.0.0)，在 **Assets** 中下载对应系统的安装包；无需登录 GitHub。GitHub Actions 仍保留按系统与架构分开的构建产物。
 
@@ -79,7 +74,7 @@ Windows 不再保留多余的原生白框；窗口圆角外保持透明，旧用
 | Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-unknown-linux-gnu-GatherPack_1.0.0_amd64.deb) | 安装 `.deb` |
 | Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v1.0.0/gatherpack-1.0.0-x86_64-unknown-linux-gnu-GatherPack_1.0.0_amd64.AppImage) | 赋予 `.AppImage` 执行权限后运行 |
 
-在 Ubuntu 上升级 GatherPack 前，请先退出旧版应用。若快捷键提示桥接未加载，先使用应用中的连接检查与重连；未解决时复制诊断信息，并参考 [Nautilus 快捷键排查](docs/nautilus-shortcut.md)。应用不会自动中断文件管理器操作，也不会将已安装但尚未加载的依赖一律提示为缺失。
+安装前请先退出正在运行的 GatherPack。若快捷键提示桥接未加载，先使用应用中的连接检查与重连；未解决时复制诊断信息，并参考 [Nautilus 快捷键排查](docs/nautilus-shortcut.md)。应用不会自动中断文件管理器操作，也不会将已安装但尚未加载的依赖一律提示为缺失。
 
 Linux 安装包、对应源码和校验材料分别下载，普通安装只需选择 `.deb` 或 AppImage 其中一种。`x64`、`x86_64`、`amd64` 均指 Intel/AMD 64 位架构，目前没有 32 位 x86 包。
 
@@ -87,7 +82,7 @@ Linux 安装包、对应源码和校验材料分别下载，普通安装只需�
 
 安装包尚未签名，macOS 包尚未公证。Linux 快捷键集成以 **GNOME / X11 / Nautilus** 为验证基线；首次启用步骤见 [Linux 集成说明](docs/development.md#linux-integration)。
 
-本轮验证记录见 [界面与交互更新](docs/ui-redesign.md)。Ubuntu GNOME/X11 已覆盖真实拖入、全局快捷键、文件选择、关系图、打包及窗口拖动；Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证。历史证据分别保存在 [快捷键排查](docs/nautilus-shortcut.md#alpha7-validation) 与 [兼容性记录](docs/prototype-validation.md)。
+Ubuntu GNOME/X11 已覆盖真实拖入、全局快捷键、文件选择、关系图、打包及窗口拖动；Windows/macOS 文件管理器完整桌面交互、Wayland 及其他 Linux 文件管理器仍待验证。
 
 ## 快速上手
 

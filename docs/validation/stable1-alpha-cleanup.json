@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "date": "2026-10-24",
+  "releases": [
+    "v1.0.0"
+  ],
+  "tags": [
+    "v1.0.0"
+  ],
+  "branches": [
+    "master"
+  ],
+  "latest": "v1.0.0",
+  "stableAssetCount": 19,
+  "removedReleasesAndTags": [
+    "v0.1.0-alpha.8",
+    "v0.1.0-alpha.9",
+    "v0.1.0-alpha.10",
+    "v0.1.0-alpha.11",
+    "v0.1.0-alpha.12",
+    "v0.1.0-alpha.13"
+  ],
+  "checks": [
+    "six Alpha releases and their download attachments deleted",
+    "six remote Alpha tags deleted",
+    "stable release remains Latest and is not prerelease",
+    "all 19 stable asset IDs, names and digests unchanged",
+    "both READMEs omit old versions and migration history"
+  ]
+}

@@ -8,7 +8,7 @@
 - 拖到上下左右任一边缘，松开并移开鼠标约 0.8 秒后滑出；上下保留横条、左右保留竖条。多边接近时选择最近或越界最多的边缘，恢复保持原视图及尺寸。可见弹窗、原生选择器、打包期间暂停隐藏。
 - 发布前[本机 Windows 26 项检查](validation/stable1-windows-source-desktop.json)、[GNOME/X11 24 项四边/语言检查](validation/stable1-linux-source-features.json)通过。预验证报告分别绑定开发程序摘要；正式包以安装后证据为准。
 - Windows 构建任务验证实际 NSIS 安装包，运行核心及重启断言，并执行 26 项原生四边/越界/弹窗检查后卸载。稳定版发布器必须核对这份报告的源码提交和实际 EXE 安装包 SHA256；同时继续要求双 Ubuntu 兼容性及两架构实际 DMG 检查。
-- [分支、标签和发布约定](releasing.md)：仅维护 `master` 主线，清理三个已合并的工作分支；历史 Alpha 标签和资源保持不变，均为预发布。稳定版采用 `v1.0.0`，通过验证后设为 Latest。
+- [分支、标签和发布约定](releasing.md)：仅维护 `master` 主线，清理三个已合并的工作分支。按维护者最新要求，历史 Alpha Release、附件和标签已删除，公开下载仅保留 Latest 稳定版 `v1.0.0`。
 
 ### 1.0.0 实际安装包验证
 
@@ -29,6 +29,8 @@
 [v1.0.0 已公开发布并设为 Latest](https://github.com/dogchenya/GatherPack/releases/tag/v1.0.0)，未标记 Pre-release；标签与发布目标均为上述应用产物提交。发布页和 DEB 下载匿名访问均返回 HTTP 200。[仓库整理核验](validation/stable1-repository-organization.json)记录主线、标签和历史发布资源保护结果。安装包尚未签名，macOS 尚未公证；Linux 桌面交互覆盖 GNOME/X11/Nautilus，本次不将结果外推到 Wayland 或其他文件管理器。
 
 ## alpha.13 画布移除与靠边触发修正
+
+以下为开发与验证历史。相关 Alpha Release、下载资源和标签已于 2026-10-24 按维护者要求删除，历史发布链接不再可用；当前下载请使用 [Latest 稳定版](https://github.com/dogchenya/GatherPack/releases/latest)。当前仓库状态见 [Alpha 清理核验](validation/stable1-alpha-cleanup.json)。
 
 - 文件全景选中真实文件、文件夹或问题项后，可在详情区选择“从本次打包移除”。子文件及子文件夹使用来源路径排除，目录分支整体跳过扫描；预览、字节统计和三种打包格式保持一致。仅修改收集引用，不删除或移动源文件，支持撤销与随清单保存。重新添加已排除的单个子项不会恢复其他已排除的兄弟文件。
 - 贴边触发范围从 12 扩大到 32 个逻辑像素，兼顾屏幕与工作区边缘。取消置顶不再暂停隐藏。动画期间保留观察到的原始位置，结束时再调整成唤回条，避免 GTK 异步吸附时因位置暂时不一致取消隐藏。继续保留 360ms 滑出/滑回，以及弹窗、选择器、打包时暂停。

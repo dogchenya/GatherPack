@@ -31,6 +31,8 @@ pub struct Rename {
 #[serde(rename_all = "camelCase")]
 pub struct Plan {
     pub sources: Vec<String>,
+    #[serde(default)]
+    pub excluded: Vec<String>,
     pub entries: Vec<PlannedEntry>,
     pub issues: Vec<Issue>,
     pub renames: Vec<Rename>,
@@ -94,8 +96,13 @@ fn issue(plan: &mut Plan, path: &Path, message: String, file: bool) {
         file,
     });
 }
-fn scan(path: &Path, destination: String, plan: &mut Plan, cancel: &AtomicBool) {
-    if cancel.load(Ordering::Relaxed) {
+fn scan(path: &Path, destination: String, plan: &mut Plan, cancel: &AtomicBool, root: &Path) {
+    if cancel.load(Ordering::Relaxed)
+        || plan
+            .excluded
+            .iter()
+            .any(|p| path.starts_with(p) && !root.starts_with(p))
+    {
         return;
     }
     let m = match fs::symlink_metadata(path) {
@@ -146,6 +153,13 @@ fn scan(path: &Path, destination: String, plan: &mut Plan, cancel: &AtomicBool) 
             if cancel.load(Ordering::Relaxed) {
                 break;
             }
+            if plan
+                .excluded
+                .iter()
+                .any(|p| child.path().starts_with(p) && !root.starts_with(p))
+            {
+                continue;
+            }
             let original = child.file_name().to_string_lossy().into_owned();
             let dir = child.file_type().map(|t| t.is_dir()).unwrap_or(false);
             let name = unique(&original, &mut used, dir);
@@ -156,7 +170,7 @@ fn scan(path: &Path, destination: String, plan: &mut Plan, cancel: &AtomicBool) 
                     destination: target.clone(),
                 });
             }
-            scan(&child.path(), target, plan, cancel);
+            scan(&child.path(), target, plan, cancel, root);
         }
     } else {
         plan.files += 1;
@@ -173,8 +187,16 @@ pub fn build_plan(sources: Vec<String>) -> Plan {
     build_plan_with_cancel(sources, &AtomicBool::new(false))
 }
 pub fn build_plan_with_cancel(sources: Vec<String>, cancel: &AtomicBool) -> Plan {
+    build_plan_excluding(sources, vec![], cancel)
+}
+pub fn build_plan_excluding(
+    sources: Vec<String>,
+    excluded: Vec<String>,
+    cancel: &AtomicBool,
+) -> Plan {
     let mut plan = Plan {
         sources: sources.clone(),
+        excluded,
         ..Plan::default()
     };
     let canonical: Vec<PathBuf> = sources
@@ -186,15 +208,34 @@ pub fn build_plan_with_cancel(sources: Vec<String>, cancel: &AtomicBool) -> Plan
         })
         .collect();
     let mut used = HashSet::new();
+    let excluded_canonical: Vec<PathBuf> = plan
+        .excluded
+        .iter()
+        .map(|p| {
+            Path::new(p)
+                .canonicalize()
+                .unwrap_or_else(|_| PathBuf::from(p))
+        })
+        .collect();
     for (i, source) in sources.iter().enumerate() {
         if cancel.load(Ordering::Relaxed) {
             break;
+        }
+        if plan
+            .excluded
+            .iter()
+            .any(|p| Path::new(source) == Path::new(p))
+        {
+            continue;
         }
         if canonical.iter().enumerate().any(|(j, p)| {
             i != j
                 && ((canonical[i] == *p && j < i)
                     || (canonical[i] != *p
                         && canonical[i].starts_with(p)
+                        && !excluded_canonical.iter().any(|excluded| {
+                            canonical[i].starts_with(excluded) && Path::new(excluded).starts_with(p)
+                        })
                         && fs::symlink_metadata(&sources[j])
                             .map(|m| m.is_dir() && !is_link(&m))
                             .unwrap_or(false)))
@@ -219,7 +260,7 @@ pub fn build_plan_with_cancel(sources: Vec<String>, cancel: &AtomicBool) -> Plan
                 destination: target.clone(),
             });
         }
-        scan(path, target, &mut plan, cancel);
+        scan(path, target, &mut plan, cancel, path);
     }
     let nonempty: HashSet<_> = plan
         .entries

@@ -88,6 +88,100 @@ fn collisions_overlap_restore_and_source_protection() {
         .iter()
         .any(|i| i.blocking));
 }
+
+#[test]
+fn canvas_removal_excludes_files_subtrees_and_archives_without_touching_sources() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path().join("bundle");
+    fs::create_dir_all(root.join("nested")).unwrap();
+    fs::create_dir_all(root.join("nested-other")).unwrap();
+    fs::write(root.join("remove.txt"), b"keep original").unwrap();
+    fs::write(root.join("nested/private.txt"), b"private").unwrap();
+    fs::write(root.join("nested-other/keep.txt"), b"included").unwrap();
+    let mut collection = Collection::restore(vec![root.to_string_lossy().into_owned()]);
+    assert!(collection.exclude(&root.join("remove.txt").to_string_lossy()));
+    assert!(collection.exclude(&root.join("nested").to_string_lossy()));
+    assert!(!collection.exclude(&dir.path().join("outside").to_string_lossy()));
+    let excluded = collection.excluded();
+    let plan = build_plan_excluding(
+        collection.paths(),
+        excluded.clone(),
+        &AtomicBool::new(false),
+    );
+    assert_eq!(plan.files, 1);
+    assert_eq!(plan.total_bytes, 8);
+    assert!(plan
+        .entries
+        .iter()
+        .all(|e| !e.destination.ends_with("remove.txt")
+            && !e.destination.starts_with("bundle/nested/")));
+    for format in [Format::Zip, Format::SevenZip, Format::TarGz] {
+        let archive = dir.path().join(format!("filtered.{}", format.extension()));
+        let report = pack(&plan, &archive, format, &AtomicBool::new(false), |_| {});
+        assert!(report.delivered, "{:?}", report.error);
+        let extract = dir.path().join(format!("extract-{}", format.extension()));
+        fs::create_dir(&extract).unwrap();
+        match format {
+            Format::Zip => zip::ZipArchive::new(fs::File::open(&archive).unwrap())
+                .unwrap()
+                .extract(&extract)
+                .unwrap(),
+            Format::TarGz => tar::Archive::new(flate2::read::GzDecoder::new(
+                fs::File::open(&archive).unwrap(),
+            ))
+            .unpack(&extract)
+            .unwrap(),
+            Format::SevenZip => sevenz_rust::decompress_file(&archive, &extract).unwrap(),
+        }
+        assert!(!extract.join("bundle/remove.txt").exists());
+        assert!(!extract.join("bundle/nested").exists());
+        assert_eq!(
+            fs::read(extract.join("bundle/nested-other/keep.txt")).unwrap(),
+            b"included"
+        );
+    }
+    assert_eq!(fs::read(root.join("remove.txt")).unwrap(), b"keep original");
+    assert_eq!(
+        fs::read(root.join("nested/private.txt")).unwrap(),
+        b"private"
+    );
+    let mut restored = Collection::restore(collection.paths());
+    restored.restore_excluded(excluded);
+    assert_eq!(
+        build_plan_excluding(
+            restored.paths(),
+            restored.excluded(),
+            &AtomicBool::new(false)
+        ),
+        plan
+    );
+    restored.add(vec![root.join("nested")]);
+    assert_eq!(
+        build_plan_excluding(
+            restored.paths(),
+            restored.excluded(),
+            &AtomicBool::new(false)
+        )
+        .files,
+        2
+    );
+    restored.exclude(&root.join("nested").to_string_lossy());
+    fs::write(root.join("nested/still-excluded.txt"), b"remain excluded").unwrap();
+    restored.add(vec![root.join("nested/private.txt")]);
+    let partial = build_plan_excluding(
+        restored.paths(),
+        restored.excluded(),
+        &AtomicBool::new(false),
+    );
+    assert_eq!(
+        partial.files, 2,
+        "re-adding one child must not restore its excluded siblings"
+    );
+    assert!(!partial
+        .entries
+        .iter()
+        .any(|e| e.source.ends_with("still-excluded.txt")));
+}
 #[test]
 fn cancellation_failure_and_no_clobber_leave_no_archive() {
     for format in [Format::Zip, Format::SevenZip, Format::TarGz] {

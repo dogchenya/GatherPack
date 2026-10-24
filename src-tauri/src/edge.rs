@@ -171,7 +171,6 @@ fn tick(app: &tauri::AppHandle) {
     };
     if blocked
         || !state.settings.lock().unwrap().edge_hide
-        || !state.pinned.load(std::sync::atomic::Ordering::Relaxed)
         || state.running.load(std::sync::atomic::Ordering::Relaxed)
         || !window.is_visible().unwrap_or(false)
     {
@@ -278,7 +277,14 @@ fn tick(app: &tauri::AppHandle) {
         return;
     }
     let scale = window.scale_factor().unwrap_or(1.0);
-    let Some(side) = side(rect, area, (12.0 * scale).round() as i32) else {
+    let screen = Rect {
+        x: monitor.position().x,
+        y: monitor.position().y,
+        width: monitor.size().width,
+        height: monitor.size().height,
+    };
+    let threshold = (32.0 * scale).round() as i32;
+    let Some(side) = side(rect, area, threshold).or_else(|| side(rect, screen, threshold)) else {
         return;
     };
     let full = Rect {
@@ -307,15 +313,14 @@ fn tick(app: &tauri::AppHandle) {
     };
     controller.hidden = Some(Hidden {
         side,
-        full,
+        // Keep the observed geometry until the animation finishes. GTK applies
+        // edge snapping asynchronously; an intermediate position must not cancel hiding.
+        full: rect,
         strip,
         hiding: true,
     });
     controller.changed = Some(now);
     drop(controller);
-    if rect != full {
-        let _ = window.set_position(tauri::PhysicalPosition::new(full.x, full.y));
-    }
     crate::emit(app);
 }
 
@@ -349,6 +354,8 @@ mod tests {
         assert_eq!(side(icon, area, 12), Some(Side::Left));
         assert_eq!(side(Rect { x: -104, ..icon }, area, 12), Some(Side::Right));
         assert_eq!(side(Rect { x: -900, ..icon }, area, 12), None);
+        assert_eq!(side(Rect { x: -1896, ..icon }, area, 32), Some(Side::Left));
+        assert_eq!(side(Rect { x: -1896, ..icon }, area, 12), None);
         assert!(contains(icon, tauri::PhysicalPosition::new(-1900.0, 220.0)));
         assert!(!contains(
             icon,

@@ -52,7 +52,7 @@ for (const name of ['LICENSE','THIRD_PARTY_NOTICES.md','third-party.md','license
 await writeFile(join(output, 'SHA256SUMS.txt'), sums.sort().join('\n') + '\n');
 await writeFile(join(output, 'release-tag.txt'), 'v' + version);
 await writeFile(join(output, 'release-notes.md'), [
-  '贴边隐藏改为完整滑出、滑回动效，同时支持图标和展开清单，保留原视图与尺寸；弹窗、文件选择和打包期间暂停隐藏。新增 Linux 当前文件管理器进程诊断与经确认后的重连，可清理污染的 Python 环境、匹配 XDG 扩展目录并保护其他扩展。中英文 README 同步更新功能说明、设置截图与演示。保留中英切换、圆角和窗口位置修正。',
+  '文件画布新增文件、文件夹及嵌套子项移除，文件夹按整个分支排除，支持撤销与重启保存，原文件保留原处。贴边隐藏扩大到约 32 像素靠边范围，独立于置顶状态，保留滑出、滑回动效，并修正 GTK 异步定位导致隐藏被取消的问题。中英文 README 同步更新用法、画布截图和原生动效演示。',
   '', 'Windows x64、macOS 14+ Apple Silicon / Intel、Linux x86_64。Ubuntu 22.04 / 24.04 安装验证通过。',
   '', '只需下载对应平台的 .exe / .dmg / .deb / .AppImage；Linux 对应源码和 SHA256 校验材料单独提供。升级前请退出旧版应用。',
   '', '安装包尚未签名，macOS 尚未公证。Linux 快捷键使用 GNOME/X11/Nautilus；提示桥接未加载时，打开“本地收集连接”检查实际连接，结束复制、移动后确认重连；仍失败可复制诊断。',

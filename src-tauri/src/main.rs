@@ -16,9 +16,7 @@ impl Drop for DialogTopmostGuard {
         let _ = self.0.set_always_on_top(self.1);
     }
 }
-use gatherpack_collection::{
-    build_plan, build_plan_with_cancel, pack, Collection, Entry, Format, Plan, Report,
-};
+use gatherpack_collection::{build_plan_excluding, pack, Collection, Entry, Format, Plan, Report};
 use serde::{Deserialize, Serialize};
 use std::{
     path::{Path, PathBuf},
@@ -73,6 +71,8 @@ impl Default for Settings {
 #[serde(rename_all = "camelCase")]
 struct Saved {
     paths: Vec<String>,
+    #[serde(default)]
+    excluded: Vec<String>,
     settings: Settings,
 }
 #[derive(Clone, Serialize, Default)]
@@ -96,7 +96,7 @@ struct AppState {
     >,
     smoke_test: bool,
     collection: Mutex<Collection>,
-    undo_collection: Mutex<Option<(Vec<String>, Option<String>)>>,
+    undo_collection: Mutex<Option<(Vec<String>, Vec<String>, Option<String>)>>,
     panel_wide: AtomicBool,
     pinned: AtomicBool,
     settings: Mutex<Settings>,
@@ -120,6 +120,7 @@ struct Snapshot {
     dock_hidden: Option<edge::Side>,
     dock_motion: Option<edge::Motion>,
     entries: Vec<Entry>,
+    excluded: Vec<String>,
     message: String,
     shortcut_status: String,
     shortcut_last_triggered: Option<u64>,
@@ -131,6 +132,10 @@ struct Snapshot {
     validation: Option<validation::ValidationContext>,
 }
 fn read_snapshot(state: &AppState) -> Snapshot {
+    let (entries, excluded) = {
+        let c = state.collection.lock().unwrap();
+        (c.entries(), c.excluded())
+    };
     let (dock_hidden, dock_motion) = {
         let edge = state.edge.lock().unwrap();
         (edge.side(), edge.motion())
@@ -138,7 +143,8 @@ fn read_snapshot(state: &AppState) -> Snapshot {
     Snapshot {
         dock_hidden,
         dock_motion,
-        entries: state.collection.lock().unwrap().entries(),
+        entries,
+        excluded,
         message: state.last_message.lock().unwrap().clone(),
         shortcut_status: state.shortcut_status.lock().unwrap().clone(),
         shortcut_last_triggered: match state.shortcut_last_triggered.load(Ordering::Relaxed) {
@@ -213,8 +219,13 @@ fn save_json(path: &Path, value: &impl Serialize) -> Result<(), String> {
 fn persist(app: &tauri::AppHandle) {
     let state = app.state::<AppState>();
     let _guard = state.storage.lock().unwrap();
+    let (paths, excluded) = {
+        let c = state.collection.lock().unwrap();
+        (c.paths(), c.excluded())
+    };
     let saved = Saved {
-        paths: state.collection.lock().unwrap().paths(),
+        paths,
+        excluded,
         settings: state.settings.lock().unwrap().clone(),
     };
     if let Err(e) = data_dir(app).and_then(|p| save_json(&p.join("state.json"), &saved)) {
@@ -259,7 +270,8 @@ fn remove_entry(path: String, app: tauri::AppHandle) {
     let state = app.state::<AppState>();
     let mut collection = state.collection.lock().unwrap();
     if collection.paths().contains(&path) {
-        *state.undo_collection.lock().unwrap() = Some((collection.paths(), None));
+        *state.undo_collection.lock().unwrap() =
+            Some((collection.paths(), collection.excluded(), None));
         collection.remove(&path);
     }
     drop(collection);
@@ -267,11 +279,26 @@ fn remove_entry(path: String, app: tauri::AppHandle) {
     emit(&app);
 }
 #[tauri::command]
+fn exclude_entry(path: String, app: tauri::AppHandle) -> Result<(), String> {
+    let state = app.state::<AppState>();
+    let mut collection = state.collection.lock().unwrap();
+    let previous = (collection.paths(), collection.excluded(), None);
+    if !collection.exclude(&path) {
+        return Err("该来源已从清单移除，请重新添加".into());
+    }
+    *state.undo_collection.lock().unwrap() = Some(previous);
+    drop(collection);
+    persist(&app);
+    emit(&app);
+    Ok(())
+}
+#[tauri::command]
 fn clear_entries(app: tauri::AppHandle) {
     let state = app.state::<AppState>();
     let mut collection = state.collection.lock().unwrap();
     if !collection.paths().is_empty() {
-        *state.undo_collection.lock().unwrap() = Some((collection.paths(), None));
+        *state.undo_collection.lock().unwrap() =
+            Some((collection.paths(), collection.excluded(), None));
         collection.clear();
     }
     drop(collection);
@@ -282,7 +309,9 @@ fn clear_entries(app: tauri::AppHandle) {
 fn undo_collection(app: tauri::AppHandle) {
     let state = app.state::<AppState>();
     let mut collection = state.collection.lock().unwrap();
-    if let Some((mut previous, replacement)) = state.undo_collection.lock().unwrap().take() {
+    if let Some((mut previous, excluded, replacement)) =
+        state.undo_collection.lock().unwrap().take()
+    {
         // Keep items collected after the removal and restore the original order.
         for path in collection.paths() {
             if replacement.as_ref() == Some(&path) {
@@ -300,6 +329,7 @@ fn undo_collection(app: tauri::AppHandle) {
             }
         }
         *collection = Collection::restore(previous);
+        collection.restore_excluded(excluded);
     }
     drop(collection);
     persist(&app);
@@ -371,9 +401,10 @@ fn replace_reference(
     let state = app.state::<AppState>();
     let mut collection = state.collection.lock().unwrap();
     let previous = collection.paths();
+    let excluded = collection.excluded();
     let replacement_path = replacement.to_string_lossy().into_owned();
     collection.relink(path, replacement)?;
-    *state.undo_collection.lock().unwrap() = Some((previous, Some(replacement_path)));
+    *state.undo_collection.lock().unwrap() = Some((previous, excluded, Some(replacement_path)));
     drop(collection);
     *state.last_message.lock().unwrap() =
         "来源已重新定位，请核对更新后的目录预览；正在执行的任务不受影响。".into();
@@ -457,8 +488,10 @@ async fn pick_entries(app: tauri::AppHandle, directories: bool) -> Result<(), St
 async fn prepare(app: tauri::AppHandle) -> Result<Plan, String> {
     tauri::async_runtime::spawn_blocking(move || {
         let state = app.state::<AppState>();
-        let paths = state.collection.lock().unwrap().paths();
-        let plan = build_plan(paths);
+        let collection = state.collection.lock().unwrap();
+        let (paths, excluded) = (collection.paths(), collection.excluded());
+        drop(collection);
+        let plan = build_plan_excluding(paths, excluded, &AtomicBool::new(false));
         *state.prepared.lock().unwrap() = Some(plan.clone());
         plan
     })
@@ -519,7 +552,11 @@ async fn start_pack(
         .unwrap()
         .clone()
         .ok_or("请先检查目录预览")?;
-    if plan != expected_plan || state.collection.lock().unwrap().paths() != plan.sources {
+    let matches = {
+        let collection = state.collection.lock().unwrap();
+        collection.paths() == plan.sources && collection.excluded() == plan.excluded
+    };
+    if plan != expected_plan || !matches {
         return Err("清单或预览已改变，请重新检查并确认".into());
     }
     if state.running.swap(true, Ordering::SeqCst) {
@@ -539,7 +576,8 @@ async fn start_pack(
         let app = worker_app;
         let state = app.state::<AppState>();
         // The task owns this plan; subsequent public collection changes are independent.
-        let fresh = build_plan_with_cancel(plan.sources.clone(), &state.cancel);
+        let fresh =
+            build_plan_excluding(plan.sources.clone(), plan.excluded.clone(), &state.cancel);
         if state.cancel.load(Ordering::Relaxed) {
             return Err("用户取消准备".into());
         }
@@ -972,7 +1010,9 @@ fn main() {
                     Err(e) => Err(e.to_string()),
                 }) {
                     Ok(Some(saved)) => {
-                        *state.collection.lock().unwrap() = Collection::restore(saved.paths);
+                        let mut collection = Collection::restore(saved.paths);
+                        collection.restore_excluded(saved.excluded);
+                        *state.collection.lock().unwrap() = collection;
                         *state.settings.lock().unwrap() = saved.settings;
                     }
                     Ok(None) => {}
@@ -1105,6 +1145,7 @@ fn main() {
             set_edge_blocked,
             frontend_ready,
             remove_entry,
+            exclude_entry,
             clear_entries,
             undo_collection,
             relink_entry,
@@ -1167,16 +1208,23 @@ mod tests {
         let path = dir.path().join("state.json");
         let mut saved = Saved {
             paths: vec![source.to_string_lossy().into_owned()],
+            excluded: vec![],
             settings: Settings::default(),
         };
         save_json(&path, &saved).unwrap();
         saved.settings.format = Format::SevenZip;
+        saved.excluded = vec![dir
+            .path()
+            .join("nested/omit.txt")
+            .to_string_lossy()
+            .into_owned()];
         saved.settings.last_directory = Some(dir.path().to_string_lossy().into_owned());
         save_json(&path, &saved).unwrap();
         let restored: Saved = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
         assert_eq!(restored.settings.format, Format::SevenZip);
         assert!(!restored.settings.autostart);
         assert_eq!(restored.paths, saved.paths);
+        assert_eq!(restored.excluded, saved.excluded);
         assert_eq!(std::fs::read(&source).unwrap(), b"preserved");
         std::fs::remove_file(&source).unwrap();
         let entries = Collection::restore(restored.paths).entries();

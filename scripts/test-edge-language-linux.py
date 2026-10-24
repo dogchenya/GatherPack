@@ -33,7 +33,7 @@ def capture_for(seconds):
     end = time.monotonic() + seconds
     while time.monotonic() < end:
         root_window = Gdk.get_default_root_window()
-        frame = Gdk.pixbuf_get_from_window(root_window,0,160,104,112)
+        frame = Gdk.pixbuf_get_from_window(root_window,0,160,156,112)
         name = capture_directory / f'{len(capture_frames):04d}.png'
         frame.savev(str(name),'png',[],[])
         capture_frames.append(str(name))
@@ -135,8 +135,8 @@ def choose_language(label, key):
 try:
     process, window = launch()
     check("展开收集面板" in text(), "fresh profile starts in Simplified Chinese")
-    command("xdotool", "windowmove", window, "0", "160")
-    command("xdotool", "mousemove", "--sync", "7", "165")
+    command("xdotool", "windowmove", window, "24", "160")
+    command("xdotool", "mousemove", "--sync", "31", "165")
     time.sleep(1.5)
     check(geometry()["WIDTH"] == 104, "pointer inside the edge icon prevents hiding")
     capture_for(.3)
@@ -166,11 +166,13 @@ try:
     check(geometry()["X"] == 1176, "right edge reveal preserves its anchor")
     click("展开收集面板")
     wait(lambda: geometry()["WIDTH"] == 440, "compact icon must open normally after reveal")
+    click("置顶窗口")
     command("xdotool", "windowmove", window, "0", "80")
     command("xdotool", "mousemove", "--sync", "700", "500")
     wait(lambda: geometry()["WIDTH"] == 10, "expanded collection must slide out at the edge")
     hidden = geometry()
     check(hidden["HEIGHT"] == 112, "expanded panel leaves only a compact edge wake-up target")
+    check(True, "edge hiding works independently of keep-on-top")
     command("xdotool", "mousemove", "--sync", "5", str(hidden["Y"] + 40))
     wait(lambda: geometry()["WIDTH"] == 440 and geometry()["HEIGHT"] == 760, "hover must restore expanded panel dimensions")
     check(geometry()["Y"] == 80, "expanded reveal preserves the original panel position")

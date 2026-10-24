@@ -96,6 +96,7 @@ fn inspect(path: &Path) -> Entry {
 #[derive(Default)]
 pub struct Collection {
     entries: Vec<Entry>,
+    excluded: Vec<String>,
 }
 #[derive(Default, Serialize)]
 pub struct AddReport {
@@ -107,7 +108,26 @@ impl Collection {
     pub fn restore(paths: Vec<String>) -> Self {
         Self {
             entries: paths.into_iter().map(|p| inspect(Path::new(&p))).collect(),
+            excluded: vec![],
         }
+    }
+    pub fn excluded(&self) -> Vec<String> {
+        self.excluded.clone()
+    }
+    pub fn restore_excluded(&mut self, excluded: Vec<String>) {
+        self.excluded = excluded;
+    }
+    /// Remove references to a file/subtree from every collected parent. Never touches disk.
+    pub fn exclude(&mut self, path: &str) -> bool {
+        let target = Path::new(path);
+        if !self.entries.iter().any(|e| target.starts_with(&e.path)) {
+            return false;
+        }
+        self.entries
+            .retain(|e| !Path::new(&e.path).starts_with(target));
+        self.excluded.retain(|e| !Path::new(e).starts_with(target));
+        self.excluded.push(path.to_owned());
+        true
     }
     pub fn paths(&self) -> Vec<String> {
         self.entries.iter().map(|e| e.path.clone()).collect()
@@ -141,6 +161,8 @@ impl Collection {
                 continue;
             }
             let canonical = path.canonicalize().unwrap_or(path.clone());
+            // Explicitly collecting an excluded source restores that source/subtree.
+            self.excluded.retain(|e| !Path::new(e).starts_with(&path));
             if self.entries.iter().any(|e| {
                 Path::new(&e.path)
                     .canonicalize()
@@ -157,6 +179,7 @@ impl Collection {
     }
     pub fn remove(&mut self, path: &str) {
         self.entries.retain(|e| e.path != path);
+        self.excluded.retain(|e| !Path::new(e).starts_with(path));
     }
     /// Replace only a collection reference; never move or modify either source.
     pub fn relink(&mut self, original: &str, replacement: PathBuf) -> Result<(), String> {
@@ -177,9 +200,12 @@ impl Collection {
             return Err("该来源已在清单中，请移除失效项目以免重复".into());
         }
         self.entries[index] = inspect(&replacement);
+        self.excluded
+            .retain(|e| !Path::new(e).starts_with(original));
         Ok(())
     }
     pub fn clear(&mut self) {
         self.entries.clear();
+        self.excluded.clear();
     }
 }

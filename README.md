@@ -19,22 +19,23 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 
 | 功能 | 使用方法 |
 | --- | --- |
-| 滑动贴边隐藏 | 把收起图标或展开清单拖到屏幕左/右边缘，移开鼠标后滑出隐藏，仅留唤回条；悬停滑回，保留原视图和窗口尺寸，展开窗口仍可正常调整大小。设置、文件选择和打包期间暂停隐藏。 |
+| 滑动贴边隐藏 | 把收起图标或展开清单拖到距离屏幕左/右边缘约 32 像素以内，移开鼠标约 0.8 秒后滑出隐藏，仅留唤回条；悬停滑回，保留原视图和窗口尺寸，展开窗口仍可正常调整大小。设置、文件选择和打包期间暂停隐藏。 |
+| 画布移除 | 在文件全景中选中文件或文件夹，点击“从本次打包移除”；支持子项，移除文件夹会排除整个分支。点击“撤销”恢复；排除结果随清单保存，重新添加对应来源可恢复收集。源文件保留原处。 |
 | 中文 / English | 在设置的“界面语言”中选择语言，即时预览；保存后重启沿用，取消恢复原语言。默认简体中文。 |
 | Linux 连接检查 | 点击底部“本地收集”→“检查文件管理器连接”，查看当前 Nautilus 进程、Python 加载器与会话诊断。检查不会关闭窗口。 |
 | Linux 一键重连 | 文件复制、移动结束后，在连接检查中点击“重新连接文件管理器”，确认后重启文件管理器并重新加载扩展。其他扩展文件不会被覆盖；若仍失败，可复制诊断信息继续排查。 |
 
-贴边隐藏可在设置中关闭；取消窗口置顶时也会暂停隐藏。快捷键注册成功与 Nautilus 扩展连接成功是两件事；出现“桥接未加载”时，请使用上述连接检查，不要反复安装已存在的依赖。
+贴边隐藏可在设置中关闭；贴边隐藏与置顶相互独立，取消置顶后仍可使用。快捷键注册成功与 Nautilus 扩展连接成功是两件事；出现“桥接未加载”时，请使用上述连接检查，不要反复安装已存在的依赖。
 
-<img src="docs/assets/edge-slide-alpha12.gif" width="156" alt="悬浮框滑出隐藏和滑回恢复动效">
+<img src="docs/assets/edge-slide-alpha13.gif" width="156" alt="悬浮框滑出隐藏和滑回恢复动效">
 
 *GNOME/X11 原生窗口录屏，空清单演示。展开清单同样支持贴边滑动隐藏；系统开启减少动态效果时会简化动画。*
 
-<img src="docs/assets/shelf-alpha12.png" width="440" alt="GatherPack 收集面板">
+<img src="docs/assets/shelf-alpha13.png" width="440" alt="GatherPack 收集面板">
 
-*alpha.12 正式前端，示例文件截图。应用默认简体中文，可在设置中切换 English。*
+*alpha.13 正式前端，示例文件截图。应用默认简体中文，可在设置中切换 English。*
 
-<img src="docs/assets/settings-alpha12-zh.png" width="360" alt="界面语言和贴边隐藏设置">
+<img src="docs/assets/settings-alpha13-zh.png" width="360" alt="界面语言和贴边隐藏设置">
 
 新版增加撤销整理、来源重新定位、实际窗口置顶及打包中的持续收集，详见 [界面与交互更新](docs/ui-redesign.md)。
 
@@ -43,6 +44,10 @@ GatherPack 是面向 Windows、macOS 和 Linux 的桌面文件收集与打包工
 alpha.10 修复清单与文件全景反复切换时窗口逐步上移的问题，保留窗口当前位置和手动调整的高度。
 
 alpha.12 将图标和展开清单的贴边隐藏升级为滑入、滑出动效，并加入 Linux 当前进程诊断与经确认后的连接修复；保留 alpha.11 的中英文界面切换。
+
+<img src="docs/assets/graph-alpha13.png" width="900" alt="选择文件或文件夹后从本次打包移除">
+
+*alpha.13 正式界面，使用示例文件展示画布移除入口。*
 
 ## 功能
 
@@ -59,17 +64,17 @@ alpha.12 将图标和展开清单的贴边隐藏升级为滑入、滑出动效�
 
 ## 下载与安装
 
-当前版本：**0.1.0-alpha.12**，处于 Alpha 阶段，安装包在 GitHub Releases 提供。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
+当前版本：**0.1.0-alpha.13**，处于 Alpha 阶段，安装包在 GitHub Releases 提供。Ubuntu 22.04 请使用此新版；alpha.4 的 Linux 包要求 GLIBC 2.39，不支持 22.04。
 
-打开 [发布与下载](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.12)，在 **Assets** 中下载对应系统的安装包；无需登录 GitHub。GitHub Actions 仍保留按系统与架构分开的构建产物。
+打开 [发布与下载](https://github.com/dogchenya/GatherPack/releases/tag/v0.1.0-alpha.13)，在 **Assets** 中下载对应系统的安装包；无需登录 GitHub。GitHub Actions 仍保留按系统与架构分开的构建产物。
 
 | 平台 | 下载项 | 安装方式 |
 | --- | --- | --- |
-| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.12_x64-setup.exe) | 运行 `.exe` 安装程序 |
-| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-aarch64-apple-darwin-GatherPack_0.1.0-alpha.12_aarch64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
-| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-apple-darwin-GatherPack_0.1.0-alpha.12_x64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
-| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.12_amd64.deb) | 安装 `.deb` |
-| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.12/gatherpack-0.1.0-alpha.12-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.12_amd64.AppImage) | 赋予 `.AppImage` 执行权限后运行 |
+| Windows x64 | [Windows x64 · EXE](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-pc-windows-msvc-GatherPack_0.1.0-alpha.13_x64-setup.exe) | 运行 `.exe` 安装程序 |
+| macOS 14+ · Apple Silicon | [Apple Silicon · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-aarch64-apple-darwin-GatherPack_0.1.0-alpha.13_aarch64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
+| macOS 14+ · Intel | [Intel · DMG](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-apple-darwin-GatherPack_0.1.0-alpha.13_x64.dmg) | 打开 `.dmg`，将应用拖入 Applications |
+| Linux x86_64 · Ubuntu 22.04 / 24.04 | [Linux x86_64 · DEB](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.13_amd64.deb) | 安装 `.deb` |
+| Linux x86_64 · AppImage | [Linux x86_64 · AppImage](https://github.com/dogchenya/GatherPack/releases/download/v0.1.0-alpha.13/gatherpack-0.1.0-alpha.13-x86_64-unknown-linux-gnu-GatherPack_0.1.0-alpha.13_amd64.AppImage) | 赋予 `.AppImage` 执行权限后运行 |
 
 在 Ubuntu 上升级 GatherPack 前，请先退出旧版应用。若快捷键提示桥接未加载，先使用应用中的连接检查与重连；未解决时复制诊断信息，并参考 [Nautilus 快捷键排查](docs/nautilus-shortcut.md)。应用不会自动中断文件管理器操作，也不会将已安装但尚未加载的依赖一律提示为缺失。
 

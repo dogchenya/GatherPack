@@ -40,8 +40,15 @@ try {
           case 'set_expanded': state.expanded = args.expanded; break;
           case 'pick_entries': state.entries = plan.sources.map((path, i) => ({ path, name: path.split('/').pop(), isDirectory: false, size: i === 2 ? null : [5, 7][i], status: i === 2 ? '不可用' : '可用' })); break;
           case 'remove_entry': window.__undoEntries = structuredClone(state.entries); state.entries = state.entries.filter(e => e.path !== args.path); break;
+          case 'exclude_entry': {
+            window.__undoEntries = structuredClone(state.entries);
+            window.__canvasUndo = structuredClone(window.__previewPlan);
+            window.__previewPlan.entries = window.__previewPlan.entries.filter(e => e.source !== args.path && !e.source.startsWith(args.path + '/'));
+            state.excluded = [args.path]; window.__previewPlan.excluded = state.excluded;
+            break;
+          }
           case 'clear_entries': window.__undoEntries = structuredClone(state.entries); state.entries = []; break;
-          case 'undo_collection': state.entries = [...window.__undoEntries, ...state.entries.filter(e => !window.__undoEntries.some(old => old.path === e.path))]; break;
+          case 'undo_collection': state.entries = [...window.__undoEntries, ...state.entries.filter(e => !window.__undoEntries.some(old => old.path === e.path))]; if (window.__canvasUndo) { window.__previewPlan = window.__canvasUndo; delete window.__canvasUndo; state.excluded = []; } break;
           case 'set_pinned': window.__pinned = args.pinned; return;
           case 'set_panel_wide': window.__wide = args.wide; return;
           case 'prepare': return state.entries.length ? structuredClone(window.__previewPlan ?? plan) : { ...plan, sources: [], entries: [], issues: [], renames: [], files: 0, totalBytes: 0 };
@@ -149,6 +156,17 @@ try {
   await page.screenshot({ path: 'artifacts/validation/ui-graph.png', fullPage: true });
   await page.getByRole('button', { name: '文件夹：文档', exact: true }).click();
   assert.equal(await page.getByRole('button', { name: '文件：资料-15.txt', exact: true }).count(), 0, 'collapsing a folder hides only its graph descendants');
+  await page.getByRole('button', { name: '从本次打包移除', exact: true }).click();
+  await page.waitForFunction(() => window.__testState.excluded?.[0] === '/work/项目/文档');
+  await page.getByRole('button', { name: '文件夹：项目', exact: true }).click();
+  assert.equal(await page.getByRole('button', { name: '文件夹：文档', exact: true }).count(), 0, 'removed folder disappears from the canvas');
+  await page.locator('footer').getByRole('button', { name: '撤销', exact: true }).click();
+  await page.getByRole('button', { name: '文件夹：项目', exact: true }).click();
+  await page.getByRole('button', { name: '文件夹：文档', exact: true }).click();
+  await page.getByRole('button', { name: '文件：资料-0.txt', exact: true }).click();
+  await page.getByRole('button', { name: '从本次打包移除', exact: true }).click();
+  await page.waitForFunction(() => window.__testState.excluded?.[0] === '/work/项目/文档/资料-0.txt');
+  await page.locator('footer').getByRole('button', { name: '撤销', exact: true }).click();
   await page.evaluate(entries => { delete window.__previewPlan; window.__testState.entries = entries; window.__emitTestState(); }, originals);
   await page.getByRole('button', { name: '文件：report (2).txt', exact: true }).waitFor();
   // Check broad header movement without accidentally turning settings into a drag.
@@ -280,19 +298,20 @@ try {
     await page.locator('.collection-summary').getByText('7 个文件', { exact: false }).waitFor();
     await page.locator('.toast').waitFor({ state: 'hidden' });
     await mkdir('docs/assets', { recursive: true });
-    await page.screenshot({ path: 'docs/assets/shelf-alpha12.png' });
+    await page.screenshot({ path: 'docs/assets/shelf-alpha13.png' });
     await page.getByRole('button', {name:'设置',exact:true}).click();
-    await page.screenshot({path:'docs/assets/settings-alpha12-zh.png'});
+    await page.screenshot({path:'docs/assets/settings-alpha13-zh.png'});
     await page.getByRole('combobox', {name:'界面语言'}).selectOption('en');
     await page.getByRole('heading', {name:'App settings'}).waitFor();
-    await page.screenshot({path:'docs/assets/settings-alpha12-en.png'});
+    await page.screenshot({path:'docs/assets/settings-alpha13-en.png'});
     await page.getByRole('button', {name:'Cancel',exact:true}).click();
     await page.setViewportSize({ width: 900, height: 760 });
     await page.getByRole('button', { name: '文件关系图', exact: true }).click();
     await page.getByRole('button', { name: '文件夹：设计素材', exact: true }).click();
     await page.getByRole('button', { name: '适应画布', exact: true }).click();
-    await page.screenshot({ path: 'docs/assets/graph-alpha12.png' });
+    await page.screenshot({ path: 'docs/assets/graph-alpha13.png' });
   }
   console.log('UI integration passed (including 440px shelf/modal bounds, undo, native pin, graph width, keyboard capture/focus trap/Escape): collect, graph selection/issues/zoom/reveal, shortcut retry, full-header and compact-icon drag/click separation, preview, packing isolation and report; no page errors.');
 } finally { await browser.close(); server.close(); }
+
 

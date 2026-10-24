@@ -42,6 +42,13 @@ export async function runNativeValidation(context: Context) {
       const slow = path('fixtures', 'slow.bin');
       await add(a, b, bundle, overlap, a);
       check((await snap()).entries.length === 4, 'real collection de-duplicates repeated paths');
+      await invoke('exclude_entry', { path: overlap });
+      check(!(await prepare()).entries.some(e => e.destination.endsWith('nested/file.txt')), 'canvas file removal excludes nested contents from the real plan');
+      await invoke('undo_collection');
+      check((await prepare()).entries.some(e => e.destination.endsWith('nested/file.txt')), 'undo restores canvas file inclusion');
+      await invoke('exclude_entry', { path: path('fixtures', 'Bundle', 'nested') });
+      check(!(await prepare()).entries.some(e => e.destination.includes('/nested')), 'canvas folder removal excludes its complete subtree');
+      await invoke('undo_collection');
       await invoke('validation_relink', { path: b, replacement: next });
       check((await snap()).entries[1].path === next, 'relink replaces the reference in place through production implementation');
       await invoke('undo_collection');

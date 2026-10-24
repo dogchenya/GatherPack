@@ -14,7 +14,7 @@ function label(name: string) {
   return result;
 }
 
-export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: string) => void }) {
+export function FileGraph({ plan, reveal, remove }: { plan: GraphPlan; reveal: (path: string) => void; remove: (path: string) => void }) {
   const { t } = useI18n();
   const displayName = (node: Node) => node.id === ROOT || node.id === 'issues' || node.id.startsWith('more:') ? t(node.name) : node.name;
   const model = useMemo(() => buildGraph(plan), [plan]);
@@ -111,8 +111,8 @@ export function FileGraph({ plan, reveal }: { plan: GraphPlan; reveal: (path: st
         </g>)}
       </g>
     </svg>
-    <div className="graph-caption"><span>{t("共 ")}{model.count} {t(" 个节点 · 当前显示 ")}{layout.positions.length} {t(" 个")}</span><span>{t("只读查看，不改变收集清单")}</span></div>
+    <div className="graph-caption"><span>{t("共 ")}{model.count} {t(" 个节点 · 当前显示 ")}{layout.positions.length} {t(" 个")}</span><span>{t("移除仅影响打包，源文件保留原处")}</span></div>
     {layout.positions.length >= MAX_NODES - 2 && <p className="graph-limit">{t("已达到单屏节点上限，请收起其他分支后继续展开。完整内容仍可在目录预览中查看。")}</p>}
-    {selected ? <div className="graph-detail"><div><strong>{displayName(selected)}</strong><p>{t(selected.issue || (selected.directory ? '文件夹' : size(selected.bytes)))}</p><p className="graph-path">{selected.source || t('待处理项汇总')}</p>{selected.destination && <p className="hint">{t("打包路径：")}{selected.destination}</p>}</div>{selected.source && <button onClick={() => reveal(selected.source)}>{t("定位来源")}</button>}</div> : <div className="graph-detail graph-detail-empty">{t("选择一个节点，查看完整路径、大小和打包位置。")}</div>}
+    {selected ? <div className="graph-detail"><div><strong>{displayName(selected)}</strong><p>{t(selected.issue || (selected.directory ? '文件夹' : size(selected.bytes)))}</p><p className="graph-path">{selected.source || t('待处理项汇总')}</p>{selected.destination && <p className="hint">{t("打包路径：")}{selected.destination}</p>}</div>{selected.source && <div className="graph-detail-actions"><button onClick={() => reveal(selected.source)}>{t("定位来源")}</button><button className="danger" onClick={() => remove(selected.source)}>{t("从本次打包移除")}</button></div>}</div> : <div className="graph-detail graph-detail-empty">{t("选择一个节点，查看完整路径、大小和打包位置。")}</div>}
   </section>;
 }

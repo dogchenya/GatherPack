@@ -19,6 +19,7 @@
 
 - Ubuntu 22.04 的实际 DEB 安装后通过 [18 项贴边与语言检查](validation/alpha13-ubuntu22-features.json)、[138 项桌面交互](validation/alpha13-ubuntu22-desktop.json)、[48 次视图位置切换](validation/alpha13-ubuntu22-position.json)、[确认重连](validation/alpha13-ubuntu22-connection.json)、[快捷键恢复](validation/alpha13-ubuntu22-shortcuts.json)及核心 IPC 31 项、重启恢复 5 项。画布实际移除嵌套文件、目录并撤销，源文件不变。随后卸载并确认系统桥接及程序已移除。DEB SHA256：`d154d68526eb5cc7f4b67194b1e3cdec2d50c90e5ff2419e81c566c9655b9195`。
 - 快捷键冲突测试中的第二个实例原本放在 x=20，扩大触发范围后会正常自动隐藏；测试脚本改为先悬停唤回，再移到 x=100 后点击展开。仅重跑受影响的快捷键检查，应用产物未改变。
+- 同一 DEB 在 Ubuntu 24.04 也完成安装、核心 IPC 31 项及重启 5 项、[18 项贴边/语言](validation/alpha13-ubuntu24-features.json)、[138 项完整桌面](validation/alpha13-ubuntu24-desktop.json)、[48 次视图位置](validation/alpha13-ubuntu24-position.json)、[确认重连](validation/alpha13-ubuntu24-connection.json)、[快捷键恢复](validation/alpha13-ubuntu24-shortcuts.json)及卸载检查。两套系统的报告均绑定上述相同 DEB，程序 SHA256 均为 `c532d103ee254b444ad7ca6fcc0dff667006a326252a6d016034c70a85b2a08b`。
 - [Windows 安装器](validation/alpha13-windows-installer.json)通过安装、授权资源、核心与重启检查及卸载。[Apple Silicon](validation/alpha13-macos-install-aarch64-apple-darwin.json) 与 [Intel](validation/alpha13-macos-install-x86_64-apple-darwin.json) 实际 DMG 均通过来源和 SHA256 核对、只读挂载、运行与分离镜像。
 
 [四平台构建与双 Ubuntu 兼容性检查](https://github.com/dogchenya/GatherPack/actions/runs/40052750295)、[两种 Mac 实际 DMG 检查](https://github.com/dogchenya/GatherPack/actions/runs/40053533779)均已通过。

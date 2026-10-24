@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "executable": "/var/cache/easy-pack/target/release/gatherpack",
+  "executableSHA256": "25a2648b6f65d0f06440d658e350d57c7e40fb72c98b44fec30ed508dab6d3e5",
+  "packageSHA256": null,
+  "checks": [
+    {
+      "mode": "compact",
+      "corners": [
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ]
+      ],
+      "width": 104,
+      "height": 112
+    },
+    {
+      "mode": "expanded",
+      "corners": [
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ],
+        [
+          64,
+          13,
+          115
+        ]
+      ],
+      "width": 440,
+      "height": 760
+    }
+  ]
+}

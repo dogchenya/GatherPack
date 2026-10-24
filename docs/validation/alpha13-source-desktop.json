@@ -1,0 +1,560 @@
+{
+  "passed": true,
+  "executable": "/var/cache/easy-pack/target/release/gatherpack",
+  "executableSHA256": "25a2648b6f65d0f06440d658e350d57c7e40fb72c98b44fec30ed508dab6d3e5",
+  "packageSHA256": null,
+  "checks": [
+    {
+      "name": "Nautilus live selection bridge returns successfully",
+      "passed": true
+    },
+    {
+      "name": "mixed file/folder selection is read directly",
+      "passed": true
+    },
+    {
+      "name": "foreground second window excludes background selection",
+      "passed": true
+    },
+    {
+      "name": "new current tab reads its own selection",
+      "passed": true
+    },
+    {
+      "name": "switching tabs does not reuse the prior tab selection",
+      "passed": true
+    },
+    {
+      "name": "empty current selection does not reuse previous paths",
+      "passed": true
+    },
+    {
+      "name": "selection query preserves foreground focus",
+      "passed": true
+    },
+    {
+      "name": "global shortcut test starts with a fresh isolated profile",
+      "passed": true
+    },
+    {
+      "name": "real global hotkey appends Nautilus mixed selection through Rust",
+      "passed": true
+    },
+    {
+      "name": "real collection hotkey does not steal focus",
+      "passed": true
+    },
+    {
+      "name": "collection preserves unrelated clipboard contents",
+      "passed": true
+    },
+    {
+      "name": "real hotkey appends a second source directory",
+      "passed": true
+    },
+    {
+      "name": "empty hotkey capture leaves the collection unchanged",
+      "passed": true
+    },
+    {
+      "name": "native Nautilus file drag is received by the Tauri window",
+      "passed": true
+    },
+    {
+      "name": "native drag preserves source bytes",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 收起面板 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "collection icon hides before a real Nautilus drag",
+      "passed": true
+    },
+    {
+      "name": "a native drop on the hidden strip restores and opens the collection",
+      "passed": true
+    },
+    {
+      "name": "dropping existing files on the edge strip does not duplicate sources",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 添加文件 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "add files opens a native file picker",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native picker selection reaches the persistent collection",
+      "passed": true
+    },
+    {
+      "name": "native picker does not modify its source",
+      "passed": true
+    },
+    {
+      "name": "floating window returns to always-on-top after picker closes",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 置顶窗口 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "pin button disables the actual native always-on-top state",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 添加文件夹 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "add folder opens its native folder chooser",
+      "passed": true
+    },
+    {
+      "name": "folder chooser exposes its visible filesystem Home location",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native folder chooser adds the whole folder",
+      "passed": true
+    },
+    {
+      "name": "closing a native chooser preserves the user's unpinned preference",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 置顶窗口 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 文件关系图 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 文件：.hidden button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 放大关系图 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 适应画布 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "file graph exploration preserves the collection and pack settings",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 从本次打包移除 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "canvas removes a nested file through production IPC and persists its exclusion",
+      "passed": true
+    },
+    {
+      "name": "canvas removal preserves the original nested file",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 撤销 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native undo restores nested file inclusion",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 文件夹：selected-folder button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 从本次打包移除 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "canvas folder removal removes its collection reference",
+      "passed": true
+    },
+    {
+      "name": "canvas folder removal preserves the source subtree",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 撤销 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native undo restores the removed folder",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 收集清单 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 检查并打包 → button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 选择保存位置 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "pack confirmation opens a native save dialog",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 开始打包 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "complete native UI flow delivers the selected ZIP output",
+      "passed": true
+    },
+    {
+      "name": "UI-created ZIP restores all selected content, hidden files and empty folder",
+      "passed": true
+    },
+    {
+      "name": "native UI result report matches the seven archived files",
+      "passed": true
+    },
+    {
+      "name": "native UI packing retains the six public collection entries",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 目录与问题 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 重新检查 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 重新定位文件 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native chooser focuses one editable location field",
+      "passed": true
+    },
+    {
+      "name": "native chooser accepts the full location through accessibility input",
+      "passed": true
+    },
+    {
+      "name": "native location entry exposes its activate action",
+      "passed": true
+    },
+    {
+      "name": "native relink picker replaces the stale reference without duplicating collection entries",
+      "passed": true
+    },
+    {
+      "name": "relink preserves the chosen source bytes",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 撤销 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "UI undo restores the original reference and removes the relink replacement",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 设置 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "settings exposes one native-accessible autostart checkbox",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 保存设置 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "settings UI persists autostart=True",
+      "passed": true
+    },
+    {
+      "name": "actual desktop startup registration matches setting=True",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 设置 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "settings exposes one native-accessible autostart checkbox",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 保存设置 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "settings UI persists autostart=False",
+      "passed": true
+    },
+    {
+      "name": "actual desktop startup registration matches setting=False",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 本地收集 · 快捷键已注册 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 重新注册 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 完成 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 收起面板 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "re-register button restores actual foreground collection hotkey",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 展开收集面板 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "expanded panel moves from its broad sticky header",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 收起面板 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "collapse returns to the compact floating window",
+      "passed": true
+    },
+    {
+      "name": "the app drag handle moves its real native window",
+      "passed": true
+    },
+    {
+      "name": "dragging the whole compact icon moves the native window",
+      "passed": true
+    },
+    {
+      "name": "dragging compact icon does not expand panel",
+      "passed": true
+    },
+    {
+      "name": "clicking the compact icon reopens the collection panel",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 应用菜单 button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "native WebView exposes one accessible 退出 GatherPack button",
+      "passed": true
+    },
+    {
+      "name": "UI button has a visible interaction target",
+      "passed": true
+    },
+    {
+      "name": "application menu exits normally after packing",
+      "passed": true
+    }
+  ]
+}

@@ -94,7 +94,13 @@ def geometry(window):
 
 def expand(window):
     wait(lambda: "展开收集面板" in app_text(), "The real WebView must finish mounting before the compact click")
-    command("xdotool", "windowmove", window, "20", "40")
+    # A second instance can already be edge-hidden while its WebView mounts.
+    # Wake the actual window first, then move beyond the 32px docking zone.
+    bounds = geometry(window)
+    command("xdotool", "mousemove", str(bounds["X"] + bounds["WIDTH"] // 2), str(bounds["Y"] + min(44, bounds["HEIGHT"] // 2)))
+    wait(lambda: geometry(window)["WIDTH"] >= 80, "Hover must reveal the tested instance")
+    time.sleep(.5)
+    command("xdotool", "windowmove", window, "100", "40")
     focus(window)
     bounds = geometry(window)
     command("xdotool", "mousemove", str(bounds["X"] + 52), str(bounds["Y"] + 44), "click", "1")

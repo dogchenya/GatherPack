@@ -10,6 +10,24 @@
 - Windows 构建任务验证实际 NSIS 安装包，运行核心及重启断言，并执行 26 项原生四边/越界/弹窗检查后卸载。稳定版发布器必须核对这份报告的源码提交和实际 EXE 安装包 SHA256；同时继续要求双 Ubuntu 兼容性及两架构实际 DMG 检查。
 - [分支、标签和发布约定](releasing.md)：仅维护 `master` 主线，清理三个已合并的工作分支；历史 Alpha 标签和资源保持不变，均为预发布。稳定版采用 `v1.0.0`，通过验证后设为 Latest。
 
+### 1.0.0 实际安装包验证
+
+应用产物源码提交：`70e2c6c9a6aabcf54caa9c250a4a252353319df8`。后续验证脚本和报告提交不改变安装包或稳定版标签。
+
+- [Windows 实际 EXE 安装报告](validation/stable1-windows-installer.json)：安装、授权材料、31 项核心 IPC、5 项重启恢复、26 项原生四边/越界/弹窗检查及卸载通过。[本机开发程序检查](validation/stable1-windows-source-desktop.json)另含 Windows 150% 缩放环境。
+- [Apple Silicon DMG](validation/stable1-macos-install-aarch64-apple-darwin.json) 和 [Intel DMG](validation/stable1-macos-install-x86_64-apple-darwin.json) 实际镜像完成来源核对、挂载、运行及分离。
+- Ubuntu 22.04 的同一份实际 DEB 完成安装、31 项核心 IPC、5 项重启恢复、[24 项四边/语言](validation/stable1-ubuntu22-features.json)、[138 项桌面交互](validation/stable1-ubuntu22-desktop.json)、[48 次视图切换](validation/stable1-ubuntu22-position.json)、[透明圆角](validation/stable1-ubuntu22-corners.json)、[确认重连](validation/stable1-ubuntu22-connection.json)、[24 项快捷键恢复](validation/stable1-ubuntu22-shortcuts.json)和[卸载](validation/stable1-ubuntu22-installer.json)检查。DEB SHA256：`71ff2b4a1670f1ab8d7b82270017bc5cbc75cb04ae371ad670da7a2d3dae2a6e`。
+- Ubuntu 24.04 使用相同 DEB，也通过安装、31 项核心 IPC、5 项重启恢复、[24 项四边/语言](validation/stable1-ubuntu24-features.json)、[138 项桌面交互](validation/stable1-ubuntu24-desktop.json)、[48 次视图切换](validation/stable1-ubuntu24-position.json)、[透明圆角](validation/stable1-ubuntu24-corners.json)、[确认重连](validation/stable1-ubuntu24-connection.json)、[24 项快捷键升级恢复](validation/stable1-ubuntu24-shortcuts.json)及[卸载](validation/stable1-ubuntu24-installer.json)。
+- 完整桌面拖动测试先将面板移入可拖动的工作区，避免先前步骤把高面板放在屏幕底部后，继续向下拖动被正常边界限制。GTK 四边检查等待尺寸与位置同时到达目标，避免采样原生窗口异步更新的中间帧；重跑使用同一安装包。
+
+[四目标构建与双 Ubuntu 兼容性](https://github.com/dogchenya/GatherPack/actions/runs/40059407700)、[两种 Mac 实际 DMG 验证](https://github.com/dogchenya/GatherPack/actions/runs/40060156705)通过。
+
+实际 AppImage 在 Ubuntu 24.04 的独立 GNOME/X11 桌面以解压运行方式完成 31 项核心 IPC、5 项重启恢复、[24 项四边/语言](validation/stable1-appimage-features.json)、[确认重连](validation/stable1-appimage-connection.json)及[22 项快捷键恢复](validation/stable1-appimage-shortcuts.json)。AppImage SHA256：`57a401e9a5f59b4cec03b242e4cec110147e04db6ec89b440493d92d4ac6344d`。
+
+[发布资源准备](https://github.com/dogchenya/GatherPack/actions/runs/40060543966)通过，19 项资源完整上传。[工件核验](validation/stable1-artifact-verification.json)确认六份安装包/对应源码摘要与 GitHub 下载资源一致，实际下载测试的 Windows EXE、DEB 和 AppImage 与发布包一致。
+
+[v1.0.0 已公开发布并设为 Latest](https://github.com/dogchenya/GatherPack/releases/tag/v1.0.0)，未标记 Pre-release；标签与发布目标均为上述应用产物提交。发布页和 DEB 下载匿名访问均返回 HTTP 200。[仓库整理核验](validation/stable1-repository-organization.json)记录主线、标签和历史发布资源保护结果。安装包尚未签名，macOS 尚未公证；Linux 桌面交互覆盖 GNOME/X11/Nautilus，本次不将结果外推到 Wayland 或其他文件管理器。
+
 ## alpha.13 画布移除与靠边触发修正
 
 - 文件全景选中真实文件、文件夹或问题项后，可在详情区选择“从本次打包移除”。子文件及子文件夹使用来源路径排除，目录分支整体跳过扫描；预览、字节统计和三种打包格式保持一致。仅修改收集引用，不删除或移动源文件，支持撤销与随清单保存。重新添加已排除的单个子项不会恢复其他已排除的兄弟文件。

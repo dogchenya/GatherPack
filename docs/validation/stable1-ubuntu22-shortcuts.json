@@ -1,0 +1,104 @@
+{
+  "passed": true,
+  "executableSHA256": "a8b76a909fa9fa050db79e600ea2ff0a004ca96706f2dc4b6fa803476e8bc4e4",
+  "packageSHA256": "71ff2b4a1670f1ab8d7b82270017bc5cbc75cb04ae371ad670da7a2d3dae2a6e",
+  "systemUpgrade": true,
+  "checks": [
+    {
+      "name": "real Nautilus loader imports the legacy user module before repair",
+      "passed": true
+    },
+    {
+      "name": "fresh Nautilus starts before the user bridge exists",
+      "passed": true
+    },
+    {
+      "name": "installed app removes the faulty managed extension that actually prevented Nautilus from loading the system bridge",
+      "passed": true
+    },
+    {
+      "name": "installed loader is diagnosed without asking to install it again",
+      "passed": true
+    },
+    {
+      "name": "first installation explains that the running Nautilus must load its new bridge",
+      "passed": true
+    },
+    {
+      "name": "recovery shortcut starts in the real foreground file manager",
+      "passed": true
+    },
+    {
+      "name": "actual hotkey reports an unloaded bridge separately from missing dependencies",
+      "passed": true
+    },
+    {
+      "name": "unloaded bridge cannot collect stale or unrelated paths",
+      "passed": true
+    },
+    {
+      "name": "recovery shortcut starts in the real foreground file manager",
+      "passed": true
+    },
+    {
+      "name": "actual hotkey recovers after the new bridge loads without restarting the app",
+      "passed": true
+    },
+    {
+      "name": "Recovery UI exposes one 设置 button",
+      "passed": true
+    },
+    {
+      "name": "shortcut conflict with another running instance is visible",
+      "passed": true
+    },
+    {
+      "name": "Recovery UI exposes one 保存设置 button",
+      "passed": true
+    },
+    {
+      "name": "recovery shortcut starts in the real foreground file manager",
+      "passed": true
+    },
+    {
+      "name": "saving the unchanged shortcut restores real collection after conflict removal",
+      "passed": true
+    },
+    {
+      "name": "Recovery UI exposes one 本地收集 · 快捷键已注册 button",
+      "passed": true
+    },
+    {
+      "name": "Recovery UI exposes one 重新注册 button",
+      "passed": true
+    },
+    {
+      "name": "Recovery UI exposes one 完成 button",
+      "passed": true
+    },
+    {
+      "name": "recovery shortcut starts in the real foreground file manager",
+      "passed": true
+    },
+    {
+      "name": "explicit re-registration preserves actual foreground collection",
+      "passed": true
+    },
+    {
+      "name": "Caps Lock is actually enabled during the shortcut test",
+      "passed": true
+    },
+    {
+      "name": "recovery shortcut starts in the real foreground file manager",
+      "passed": true
+    },
+    {
+      "name": "real collection shortcut works with Caps Lock enabled",
+      "passed": true
+    },
+    {
+      "name": "recovery preserves original source bytes",
+      "passed": true
+    }
+  ]
+}

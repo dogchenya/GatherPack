@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "stableVersion": "v1.0.0",
+  "latest": "v1.0.0",
+  "producer": "70e2c6c9a6aabcf54caa9c250a4a252353319df8",
+  "branches": [
+    "master"
+  ],
+  "historicalPrereleases": [
+    "v0.1.0-alpha.13",
+    "v0.1.0-alpha.9",
+    "v0.1.0-alpha.8",
+    "v0.1.0-alpha.12",
+    "v0.1.0-alpha.11",
+    "v0.1.0-alpha.10"
+  ],
+  "checks": [
+    "stable release is public, Latest and not prerelease",
+    "all six historical tag references unchanged",
+    "historical release assets and original notes preserved",
+    "historical prereleases point to current Latest",
+    "only master remains; no open pull requests"
+  ],
+  "tags": [
+    "b2d49ebd21ec2370e83b43cf9426e2a1f22c5e29 refs/tags/v0.1.0-alpha.10",
+    "de708b5d5223664c8fb5d491d31e376d6ff6cd6b refs/tags/v0.1.0-alpha.11",
+    "00be17199c1494fa467bdf77ba579b645595e8bc refs/tags/v0.1.0-alpha.12",
+    "d278ae53efd311c949147198c8c902e1be495ed8 refs/tags/v0.1.0-alpha.13",
+    "d40899154bc76259316f5be04e41c6cd2cf8cc48 refs/tags/v0.1.0-alpha.8",
+    "016f23bf5c0ffbc8dbc45eccc38a01f334c857a1 refs/tags/v0.1.0-alpha.9",
+    "70e2c6c9a6aabcf54caa9c250a4a252353319df8 refs/tags/v1.0.0"
+  ],
+  "publicAccess": {
+    "method": "anonymous HTTP HEAD with redirects",
+    "debDownload": 200,
+    "releasePage": 200
+  }
+}

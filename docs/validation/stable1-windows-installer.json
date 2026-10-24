@@ -1,0 +1,126 @@
+{
+  "installerSHA256": "fa40353fc4b3899593fc6789da4d2186ff8ca671d05968ee25d7025fb760accd",
+  "passed": true,
+  "installer": "D:\\a\\GatherPack\\GatherPack\\artifacts\\x86_64-pc-windows-msvc\\gatherpack-1.0.0-x86_64-pc-windows-msvc-GatherPack_1.0.0_x64-setup.exe",
+  "installation": "D:\\a\\GatherPack\\GatherPack\\artifacts\\validation\\windows-install-e02eb0deefe94f0cad4f3715da39dd0f",
+  "checks": [
+    "Silent install succeeds and installs the expected executable",
+    "Installed executable product name and version match the current brand",
+    "Installed resources include dependency and NSIS license notices",
+    "Installed Rust standard-library copyright text matches the original SHA256",
+    "Installed executable passes core and restart native IPC scenarios",
+    "Installed executable passes 26 four-edge, crossed-edge and dialog native desktop checks",
+    "Silent uninstall removes the executable and installation registration"
+  ],
+  "desktopValidation": {
+    "passed": true,
+    "executableSHA256": "5c1318c759a133494d090fb85595ad2754c562a72b703c8032ac156cad5dc917",
+    "checks": [
+      {
+        "name": "compact viewport is exactly 104 logical pixels",
+        "passed": true
+      },
+      {
+        "name": "native frame and client dimensions match",
+        "passed": true
+      },
+      {
+        "name": "left becomes a 10 logical pixel wake tab",
+        "passed": true
+      },
+      {
+        "name": "left wake tab stays fully inside the work area",
+        "passed": true
+      },
+      {
+        "name": "left restores compact width without growth",
+        "passed": true
+      },
+      {
+        "name": "left still hides after crossing the screen edge",
+        "passed": true
+      },
+      {
+        "name": "right becomes a 10 logical pixel wake tab",
+        "passed": true
+      },
+      {
+        "name": "right wake tab stays fully inside the work area",
+        "passed": true
+      },
+      {
+        "name": "right restores compact width without growth",
+        "passed": true
+      },
+      {
+        "name": "right still hides after crossing the screen edge",
+        "passed": true
+      },
+      {
+        "name": "top becomes a 10 logical pixel wake tab",
+        "passed": true
+      },
+      {
+        "name": "top wake tab stays fully inside the work area",
+        "passed": true
+      },
+      {
+        "name": "top restores compact width without growth",
+        "passed": true
+      },
+      {
+        "name": "top still hides after crossing the screen edge",
+        "passed": true
+      },
+      {
+        "name": "bottom becomes a 10 logical pixel wake tab",
+        "passed": true
+      },
+      {
+        "name": "bottom wake tab stays fully inside the work area",
+        "passed": true
+      },
+      {
+        "name": "bottom restores compact width without growth",
+        "passed": true
+      },
+      {
+        "name": "bottom still hides after crossing the screen edge",
+        "passed": true
+      },
+      {
+        "name": "visible dialog pauses native edge hiding",
+        "passed": true
+      },
+      {
+        "name": "collapsed dialog releases native edge hiding",
+        "passed": true
+      },
+      {
+        "name": "expanded panel hides at left",
+        "passed": true
+      },
+      {
+        "name": "expanded left preserves size",
+        "passed": true
+      },
+      {
+        "name": "expanded panel hides at top",
+        "passed": true
+      },
+      {
+        "name": "expanded top preserves size",
+        "passed": true
+      },
+      {
+        "name": "expanded panel hides at bottom",
+        "passed": true
+      },
+      {
+        "name": "expanded bottom preserves size",
+        "passed": true
+      }
+    ],
+    "commit": "70e2c6c9a6aabcf54caa9c250a4a252353319df8"
+  }
+}

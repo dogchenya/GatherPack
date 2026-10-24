@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "executableSHA256": "57a401e9a5f59b4cec03b242e4cec110147e04db6ec89b440493d92d4ac6344d",
+  "packageSHA256": "57a401e9a5f59b4cec03b242e4cec110147e04db6ec89b440493d92d4ac6344d",
+  "checks": [
+    "fresh profile starts in Simplified Chinese",
+    "pointer inside the edge icon prevents hiding",
+    "left handle stays fully on screen",
+    "left edge reveal preserves its anchor",
+    "moving away from an edge detaches auto-hide",
+    "right handle remains reachable on screen",
+    "right edge reveal preserves its anchor",
+    "top horizontal tab stays in the work area",
+    "top reveal preserves the horizontal anchor",
+    "bottom horizontal tab stays in the work area",
+    "bottom reveal preserves the horizontal anchor",
+    "expanded panel leaves only a compact edge wake-up target",
+    "edge hiding works independently of keep-on-top",
+    "expanded reveal preserves the original panel position",
+    "expanded top restores its anchor",
+    "expanded bottom restores its anchor",
+    "expanded reveal restores normal resize bounds",
+    "settings suspend edge hiding while the pointer is outside",
+    "settings controls preview in English",
+    "cancelled language preview does not write preferences",
+    "native window title follows the saved language",
+    "English persists across a real process restart",
+    "Chinese and auto-hide opt-out persist together",
+    "disabling auto-hide keeps the edge icon visible"
+  ],
+  "motionFrames": null,
+  "motionRevealStart": 0
+}

@@ -19,3 +19,9 @@
 | rebrand/gatherpack | 101d6ae8b1ce8ccdfcfada382b45c33a1f559924 |
 
 历史 `v0.1.0-alpha.8` 至 `v0.1.0-alpha.13` 保留，避免破坏已有下载链接；这些版本均属于预发布，不代表本次稳定交付。
+
+2026-10-24 整理完成：仓库仅保留 `master` 分支，七个公开标签包含六个历史 Alpha 和首个稳定标签 `v1.0.0`。历史标签、资源及原始说明均保留，旧 Release 顶部增加 Latest 稳定版入口。
+
+[v1.0.0](https://github.com/dogchenya/GatherPack/releases/tag/v1.0.0) 已公开、设为 Latest，未标记 Pre-release。标签和发布目标固定到安装包源码 `70e2c6c9a6aabcf54caa9c250a4a252353319df8`，后续测试脚本和验证记录在主线补充；不会移动稳定标签。Windows、两架构 Mac、Ubuntu 22.04/24.04 实际 DEB 和 AppImage 验证记录见[界面与交互更新](ui-redesign.md)。
+
+[资源摘要核验](validation/stable1-artifact-verification.json)覆盖 19 项资源及六份包/源码摘要；[仓库整理核验](validation/stable1-repository-organization.json)覆盖 Latest、历史标签、历史下载资源和分支状态。发布页和实际 DEB 链接经匿名访问返回 HTTP 200。

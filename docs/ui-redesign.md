@@ -13,6 +13,16 @@
 
 [138 项原生 GNOME/X11 完整桌面检查](validation/alpha13-source-desktop.json)、[48 次视图位置切换](validation/alpha13-source-position.json)、[透明圆角](validation/alpha13-source-corners.json)通过。原生画布按钮实际移除嵌套文件、移除收集文件夹，再撤销并打包，核对清单持久化、源文件内容和实际 ZIP 内容；既有全局快捷键、隐藏唤回条上的原生拖放、文件选择器、开机启动和移动交互继续通过。
 
+### alpha.13 安装包检查
+
+应用产物源码提交：`d278ae53efd311c949147198c8c902e1be495ed8`。
+
+- Ubuntu 22.04 的实际 DEB 安装后通过 [18 项贴边与语言检查](validation/alpha13-ubuntu22-features.json)、[138 项桌面交互](validation/alpha13-ubuntu22-desktop.json)、[48 次视图位置切换](validation/alpha13-ubuntu22-position.json)、[确认重连](validation/alpha13-ubuntu22-connection.json)、[快捷键恢复](validation/alpha13-ubuntu22-shortcuts.json)及核心 IPC 31 项、重启恢复 5 项。画布实际移除嵌套文件、目录并撤销，源文件不变。随后卸载并确认系统桥接及程序已移除。DEB SHA256：`d154d68526eb5cc7f4b67194b1e3cdec2d50c90e5ff2419e81c566c9655b9195`。
+- 快捷键冲突测试中的第二个实例原本放在 x=20，扩大触发范围后会正常自动隐藏；测试脚本改为先悬停唤回，再移到 x=100 后点击展开。仅重跑受影响的快捷键检查，应用产物未改变。
+- [Windows 安装器](validation/alpha13-windows-installer.json)通过安装、授权资源、核心与重启检查及卸载。[Apple Silicon](validation/alpha13-macos-install-aarch64-apple-darwin.json) 与 [Intel](validation/alpha13-macos-install-x86_64-apple-darwin.json) 实际 DMG 均通过来源和 SHA256 核对、只读挂载、运行与分离镜像。
+
+[四平台构建与双 Ubuntu 兼容性检查](https://github.com/dogchenya/GatherPack/actions/runs/40052750295)、[两种 Mac 实际 DMG 检查](https://github.com/dogchenya/GatherPack/actions/runs/40053533779)均已通过。
+
 ## alpha.12 滑动隐藏与实际文件管理器重连
 
 - 置顶状态下，收起图标和展开清单均支持左右贴边滑出；悬停滑回，并恢复原视图、宽度、高度和纵向位置。保留 10×112 的屏内唤回条。动画为 360ms，原生窗口在动画结束后才缩为唤回条，避免内容被提前裁掉；尊重减少动态效果偏好。
